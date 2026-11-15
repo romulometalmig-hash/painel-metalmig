@@ -1,0 +1,55 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex"><title>Dashboard Metalmig</title>
+<style>*{box-sizing:border-box;margin:0}body{background:#f4f6fa;padding:12px 12px 40px;font-family:system-ui,Roboto,Arial,sans-serif;color:#14233f}.msg{max-width:560px;margin:40px auto;background:#fff;border:1px solid #d5dbe6;border-radius:14px;padding:18px;font-size:16px;text-align:center}.ft{max-width:560px;margin:16px auto 0;font-size:12px;color:#4a566b;text-align:center}.dsh{font-family:system-ui,Roboto,Arial,sans-serif;color:#14233f;max-width:560px;margin:0 auto}.dsh *{box-sizing:border-box}
+.dsh .hd{background:#1F4E78;color:#fff;padding:14px 16px;border-radius:14px}.dsh .hd small{opacity:.85;font-size:12.5px}.dsh .hd b{display:block;font-size:21px;margin-top:2px}
+.dsh h3{font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:#4a566b;margin:16px 0 6px}
+.dsh .k{display:grid;grid-template-columns:1fr 1fr;gap:8px}.dsh .c{background:#fff;border:1px solid #d5dbe6;border-radius:14px;padding:11px}.dsh .c small{font-size:11px;color:#4a566b;font-weight:700;text-transform:uppercase}.dsh .c b{display:block;font-size:21px;margin:3px 0}.dsh .c i{font-style:normal;font-size:12.5px;font-weight:700}
+.dsh .dn{color:#b42318}.dsh .up{color:#17803f}
+.dsh .al{background:#fff4e5;border:1px solid #f0b99a;border-radius:14px;padding:11px 13px;font-size:14px;margin:10px 0 0}.dsh .al b{font-size:15.5px}
+.dsh .row{background:#fff;border:1px solid #d5dbe6;border-radius:12px;padding:12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;font-size:14.5px;cursor:pointer}.dsh .row b{font-size:16px}.dsh .row.z{opacity:.55;cursor:default}
+.dsh .tp{display:flex;justify-content:space-between;gap:10px;font-size:13.5px;padding:6px 0;border-bottom:1px dashed #d5dbe6}.dsh .tp:last-child{border:0}.dsh .c .tp b{font-size:13.5px;display:inline;margin:0}.dsh .tp b{text-align:right}
+.dsh .cl{background:#fff;border:1px solid #d5dbe6;border-radius:12px;padding:10px 12px;margin-bottom:8px;font-size:14px}.dsh .cl b{display:block;font-size:15px}.dsh .cl small{color:#4a566b;font-size:12.5px;display:block;margin-top:2px}
+.dsh .a{display:flex;gap:8px;margin-top:9px}.dsh .a a,.dsh .a span{flex:1;text-align:center;border-radius:10px;padding:11px 4px;font-weight:800;font-size:13.5px;background:#17803f;color:#fff;text-decoration:none;cursor:pointer}.dsh .a .o{background:#d9480f}
+.dsh .bk{display:inline-block;font-weight:800;color:#14233f;background:#fff;border:2px solid #aab4c6;border-radius:12px;padding:10px 14px;margin:10px 0;cursor:pointer}.dsh p.n{font-size:13px;color:#4a566b;margin:6px 0 10px}</style></head><body><div id="app"><div class="msg">Carregando…</div></div><div class="ft">Metalmig · dados de uma fotografia do dia em que o link foi gerado.</div>
+<script>
+// ===== Dashboard do representante/gestor: renderizador compartilhado (painel + d.html) =====
+const DASH=(function(){
+ const E=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+ const money=v=>v>=1e6?'R$ '+(v/1e6).toFixed(2).replace('.',',')+' mi':v>=1e4?'R$ '+Math.round(v/1e3)+' mil':'R$ '+Math.round(v).toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+ const pct=(a,b)=>b>0?Math.round((a/b-1)*100):null;
+ const dl=(p,suf,a,b)=>p==null?`<i style="color:#4a566b">${a||b?'sem base de comparação':'sem pedidos no período'}</i>`:`<i class="${p<0?'dn':'up'}">${p<0?'▼':'▲'} ${Math.abs(p)}% ${suf}</i>`;
+ const CSS=`.dsh{font-family:system-ui,Roboto,Arial,sans-serif;color:#14233f;max-width:560px;margin:0 auto}.dsh *{box-sizing:border-box}
+.dsh .hd{background:#1F4E78;color:#fff;padding:14px 16px;border-radius:14px}.dsh .hd small{opacity:.85;font-size:12.5px}.dsh .hd b{display:block;font-size:21px;margin-top:2px}
+.dsh h3{font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:#4a566b;margin:16px 0 6px}
+.dsh .k{display:grid;grid-template-columns:1fr 1fr;gap:8px}.dsh .c{background:#fff;border:1px solid #d5dbe6;border-radius:14px;padding:11px}.dsh .c small{font-size:11px;color:#4a566b;font-weight:700;text-transform:uppercase}.dsh .c b{display:block;font-size:21px;margin:3px 0}.dsh .c i{font-style:normal;font-size:12.5px;font-weight:700}
+.dsh .dn{color:#b42318}.dsh .up{color:#17803f}
+.dsh .al{background:#fff4e5;border:1px solid #f0b99a;border-radius:14px;padding:11px 13px;font-size:14px;margin:10px 0 0}.dsh .al b{font-size:15.5px}
+.dsh .row{background:#fff;border:1px solid #d5dbe6;border-radius:12px;padding:12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;font-size:14.5px;cursor:pointer}.dsh .row b{font-size:16px}.dsh .row.z{opacity:.55;cursor:default}
+.dsh .tp{display:flex;justify-content:space-between;gap:10px;font-size:13.5px;padding:6px 0;border-bottom:1px dashed #d5dbe6}.dsh .tp:last-child{border:0}.dsh .c .tp b{font-size:13.5px;display:inline;margin:0}.dsh .tp b{text-align:right}
+.dsh .cl{background:#fff;border:1px solid #d5dbe6;border-radius:12px;padding:10px 12px;margin-bottom:8px;font-size:14px}.dsh .cl b{display:block;font-size:15px}.dsh .cl small{color:#4a566b;font-size:12.5px;display:block;margin-top:2px}
+.dsh .a{display:flex;gap:8px;margin-top:9px}.dsh .a a,.dsh .a span{flex:1;text-align:center;border-radius:10px;padding:11px 4px;font-weight:800;font-size:13.5px;background:#17803f;color:#fff;text-decoration:none;cursor:pointer}.dsh .a .o{background:#d9480f}
+.dsh .bk{display:inline-block;font-weight:800;color:#14233f;background:#fff;border:2px solid #aab4c6;border-radius:12px;padding:10px 14px;margin:10px 0;cursor:pointer}.dsh p.n{font-size:13px;color:#4a566b;margin:6px 0 10px}`;
+ const LBL={queda:['📉','Pedidos menores que o normal','Compraram, mas o valor dos pedidos caiu.'],rec:['🛒','Hora de recomprar','Clientes no ritmo de compra deles, ou já passaram dele.'],reat:['🔄','Clientes para reativar','Pararam de comprar. Do que mais chance até o que menos.'],orc:['🧾','Orçamentos em aberto','Orçamentos que você registrou e ainda não fecharam.']};
+ function mini(d,k){const L=(d.L||{})[k]||[];return L.length}
+ function view(d,st){const g=!!d.g;st=st||{};
+  if(st.l){const k=st.l,L=(d.L||{})[k]||[],m=LBL[k];return `<div class="dsh"><div class="hd"><small>‹ Voltar ao dashboard</small><b>${m[1]} · ${d.N&&d.N[k]!=null?d.N[k]:L.length}</b></div><div class="bk" data-back>‹ Voltar</div><p class="n">${m[2]}</p>${L.map((x,i)=>`<div class="cl"><b>${E(x.n)}</b><small>${E(x.c)}${x.x?' · '+E(x.x):''}${g&&x.r?' · Rep.: '+E(x.r):''}</small>${x.d?`<small>Último pedido: ${E(x.d)}${x.v?' · '+E(money(x.v))+' em 12 meses':''}</small>`:''}<div class="a">${x.t?`<a href="tel:${E(String(x.t).replace(/\D/g,''))}">📞 Ligar</a>`:''}${g&&x.ci!=null?`<span class="o" data-ficha="${x.ci}">👤 Ver ficha</span>`:(d.cb?`<a class="o" href="${E(d.cb(x))}">📖 Enviar catálogo</a>`:'')}</div></div>`).join('')||'<p class="n">Nenhum cliente nesta lista.</p>'}${d.N&&d.N[k]>L.length?`<p class="n">Mostrando os ${L.length} primeiros de ${d.N[k]}.</p>`:''}</div>`}
+  const K=d.k||{},nv=d.nv||{},U=d.ult,D=d.dest||{};
+  const rows=['queda','rec','reat'].concat(g?['orc']:[]).map(k=>{const n=d.N&&d.N[k]!=null?d.N[k]:mini(d,k);return `<div class="row${n?'':' z'}" ${n?`data-l="${k}"`:''}><span>${LBL[k][0]} ${LBL[k][1]}</span><span><b>${n}</b>${n?' <span style="color:#9aa6bb">›</span>':''}</span></div>`}).join('');
+  const al=(d.N&&(d.N.queda||d.N.rec))?`<div class="al"><b>${d.N.rec||0} clientes na hora de recomprar</b><br>${d.N.queda||0} com pedidos menores que o normal</div>`:'';
+  return `<div class="dsh"><div class="hd"><small>${E(d.mes)} · dados até ${E(d.ate)}</small><b>${E(d.titulo)}</b></div>${al}
+<h3>Vendas do mês · vs. mês anterior</h3><div class="k"><div class="c"><small>Vendido</small><b>${money(K.vend||0)}</b>${dl(pct(K.vend,K.vendP),'vs. '+d.mp,K.vend,K.vendP)}</div><div class="c"><small>Pedidos</small><b>${K.ped||0}</b>${dl(pct(K.ped,K.pedP),'vs. '+d.mp,K.ped,K.pedP)}</div><div class="c"><small>Ticket médio</small><b>${money(K.ped?K.vend/K.ped:0)}</b>${dl(pct(K.ped?K.vend/K.ped:0,K.pedP?K.vendP/K.pedP:0),'vs. '+d.mp,K.ped,K.pedP)}</div><div class="c"><small>Clientes que compraram</small><b>${K.cc||0}</b><i class="up">${K.cart?Math.round(100*K.cc/K.cart)+'% da carteira ativa':''}</i></div></div>
+<p class="n" style="margin:4px 2px 0">Comparação: ${E(d.cmp)}</p>
+${U?`<div class="c" style="margin-top:8px"><small>Último pedido realizado</small><b style="font-size:17px">${E(U.d)}</b><i style="color:#4a566b">${E(U.n)} · ${E(U.c)}</i></div>`:''}
+<h3>Clientes novos</h3><div class="k"><div class="c"><small>Novos no mês</small><b>${nv.q||0}</b>${nv.qP!=null?`<i style="color:#4a566b">${nv.qP} no mesmo período de ${E(d.mp)}</i>`:''}</div><div class="c"><small>Último cliente novo</small>${nv.d?`<b style="font-size:17px">${E(nv.d)}</b><i style="color:#4a566b">${E(nv.n)}<br>${nv.b?E(nv.b)+' · ':''}${E(nv.c)}</i>`:'<b>—</b>'}</div></div>
+<h3>Clientes para agir · toque para ver</h3>${rows}
+<h3>Destaques do mês</h3><div class="c">${D.prod?`<div class="tp"><span>🥇 Produto mais vendido</span><b>${E(D.prod)}</b></div>`:''}${D.cid?`<div class="tp"><span>🏙️ Cidade que mais comprou</span><b>${E(D.cid)}</b></div>`:''}${g&&D.rep?`<div class="tp"><span>👤 Representante que mais vendeu</span><b>${E(D.rep)}</b></div>`:''}${g&&D.sem!=null?`<div class="tp"><span>🏷️ Representantes sem pedido no mês</span><b>${D.sem}</b></div>`:''}${!g&&D.ofe?`<div class="tp"><span>💡 Produto para oferecer</span><b>${E(D.ofe)}</b></div>`:''}</div></div>`}
+ function bind(root,d,draw,onFicha){root.querySelectorAll('[data-l]').forEach(e=>e.onclick=()=>draw({l:e.dataset.l}));const b=root.querySelector('[data-back]');if(b)b.onclick=()=>draw({});root.querySelectorAll('[data-ficha]').forEach(e=>e.onclick=()=>onFicha&&onFicha(+e.dataset.ficha))}
+ return{CSS,view,bind,money,pct}})();
+
+function ub(s){s=s.replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';const b=atob(s);return Uint8Array.from(b,c=>c.charCodeAt(0))}
+async function load(){const h=location.hash.slice(1);if(!h)throw 0;const k=h[0],u=ub(h.slice(1));
+ if(k==='z'){const ds=new DecompressionStream('deflate-raw');const w=ds.writable.getWriter();w.write(u);w.close();return JSON.parse(await new Response(ds.readable).text())}
+ return JSON.parse(new TextDecoder().decode(u))}
+(async()=>{const app=document.getElementById('app');try{const d=await load();document.title=d.titulo||'Dashboard Metalmig';
+ d.cb=x=>'c.html#'+btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify({v:1,n:x.n,cd:x.c,t:x.t,r:d.rn||'',p:1})))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+ const draw=s=>{app.innerHTML=DASH.view(d,s);DASH.bind(app,d,draw);window.scrollTo(0,0)};draw({})}catch(e){app.innerHTML='<div class="msg">Este link está incompleto. Peça um novo link ao seu gestor.</div>'}})();
+</script></body></html>
