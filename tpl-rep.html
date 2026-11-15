@@ -119,7 +119,7 @@ let hc=H.cod!=null?parseInt(H.cod):null;let ix=hc==null?0:D.reps.findIndex(x=>x[
 $('#ini').value=diso(xl2d(H.ini)||Math.round(Date.UTC(Y,0,1)/864e5));$('#fim').value=diso(xl2d(H.fim)||REF);
 $('#rea').value=diso(xl2d(H.rea)||Math.round(Date.UTC(Y,4,1)/864e5));
 let CUSTOM=null;if(H.cini&&H.cfim){CUSTOM=[xl2d(H.cini),xl2d(H.cfim)];const o=document.createElement('option');o.value='x';o.textContent='Período de comparação do Excel';$('#cmp').appendChild(o);$('#cmp').value='x'}
-(function(){try{var l=AP&&AP.base&&AP.base.logo;if(l){var i=document.getElementById('hlogo');i.src=l;i.className='on'}}catch(e){}})();if(D.rm){var nb=document.getElementById('navresumo');if(nb)nb.textContent='Meu resumo';var no=document.getElementById('navorf');if(no)no.remove();var nc=document.getElementById('navcob');if(nc)nc.remove();var ni=document.getElementById('navimp');if(ni)ni.remove();var nv2=document.getElementById('navvis');if(nv2)nv2.remove()}$('#ver').textContent='versão v143';
+(function(){try{var l=AP&&AP.base&&AP.base.logo;if(l){var i=document.getElementById('hlogo');i.src=l;i.className='on'}}catch(e){}})();if(D.rm){var nb=document.getElementById('navresumo');if(nb)nb.textContent='Meu resumo';var no=document.getElementById('navorf');if(no)no.remove();var nc=document.getElementById('navcob');if(nc)nc.remove();var ni=document.getElementById('navimp');if(ni)ni.remove();var nv2=document.getElementById('navvis');if(nv2)nv2.remove()}$('#ver').textContent='versão v145';
 // ---------- links por cliente (WhatsApp, Maps, Fachada)
 const CEPG=(()=>{try{return JSON.parse(localStorage.getItem('metalmig_cep_v1')||'{}')}catch(e){return {}}})();
 const saveCep=()=>{try{localStorage.setItem('metalmig_cep_v1',JSON.stringify(CEPG))}catch(e){}};
@@ -1498,8 +1498,8 @@ async function run(force){if(S.busy)return;S.busy=true;try{const sn=await snapsh
   if(S.nuvem){try{await fetch(S.nuvem,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({token:S.tok,quem:q0,gerado:sn.gerado,n:Object.keys(sn.ls).length,fotos:sn.fotos.length,snap:txt.length<4.5e6?sn:{...sn,fotos:[]}})});okAlgum=true}catch(e){if(!okAlgum)S.erro='Sem internet para a nuvem (tentará de novo).'}}
   if(okAlgum){S.ult=Date.now();S.ultH=hs;S.erro='';LS('metalmig_bkp_ult',String(S.ult));LS('metalmig_bkp_hash',hs);S.sujo=false}
  }catch(e){S.erro=e.message}finally{S.busy=false;ui()}}
-window.lcBk={S,run};
-function baixar(){snapshot().then(sn=>{const b=new Blob([JSON.stringify(sn)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='metalmig_backup_'+sn.quem+'_'+vHoje()+'.json';a.click();msg('Cópia baixada.')})}
+window.lcBk={S,run,baixar,ui};
+function baixar(){snapshot().then(sn=>{const b=new Blob([JSON.stringify(sn)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='metalmig_backup_'+sn.quem+'_'+vHoje()+'.json';a.click();S.ult=Date.now();LS('metalmig_bkp_ult',String(S.ult));S.erro='';msg('Cópia baixada.');ui()})}
 async function aplicar(sn){if(!sn||!sn.metalmig_backup){msg('Arquivo inválido.');return}
  if(!confirm('Restaurar o backup de '+fmtH(sn.gerado)+'? Os registros atuais serão substituídos pelos do backup.'))return;
  Object.entries(sn.ls||{}).forEach(([k,v])=>LS(k,v));
@@ -1536,7 +1536,7 @@ function check(){const n=new Date(),h=n.getHours()+n.getMinutes()/60,dw=n.getDay
  const novos=ctLoad().filter(r=>r.rep===cod&&r.ts>ult).length;
  const ok=fim&&novos>0&&!(ult&&dia(ult)===todayL()&&novos===0)&&Date.now()>L(SOON);
  bn.style.display=ok?'block':'none';manha()}
-const mb=document.createElement('div');mb.style.cssText='display:none;position:fixed;right:14px;bottom:14px;z-index:99996;max-width:340px;background:#fff;border:2px solid #1F4E78;border-radius:14px;padding:10px 12px;box-shadow:0 4px 16px #0004;font:14px system-ui,Arial;color:#222;align-items:center;gap:10px';
+const mb=document.createElement('div');mb.style.cssText='display:none;position:fixed;right:14px;bottom:calc(80px + env(safe-area-inset-bottom,0px));z-index:99996;max-width:340px;background:#fff;border:2px solid #1F4E78;border-radius:14px;padding:10px 12px;box-shadow:0 4px 16px #0004;font:14px system-ui,Arial;color:#222;align-items:center;gap:10px';
 mb.innerHTML='<div>'+sasiM(1,78)+'</div><div id="lm_t"></div>';document.body.appendChild(mb);
 const nm=(D.reps[ri][1]||'').split(' ')[0];nm&&0;
 function manha(){const n=new Date(),dw=n.getDay(),h=n.getHours()+n.getMinutes()/60;const ult=L(pkKey);
@@ -1962,7 +1962,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER='v143';
+const NX_VER='v145';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3263,14 +3263,14 @@ if(H.sec==='agenda'){setView('agenda')}else if(H.sec==='cal'){setView('cal')}els
 (function(){try{
  if(window.__lc)return;window.__lc=1;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
- const LG=[['hoje','☀️','Hoje',['hoje','venda','agenda']],['cli','👥','Clientes',['ficha','cart','relsem','mapa','perto','abc','queda','novos','rev','orc']],['vm','📈','Vendas',['painel','resumo','meta','proj','vendas','cal','hist']],['ter','🗺️','Territórios',['cidn','camp','cobreg','orfaos','confl']],['via','🧳','Viagens',['desp','vis']],['mat','📚','Materiais',['rel','conq','bib','precos']],['sasi','🤖','Sasi',['sasi']],['sis','⚙️','Sistema',['pedidos','imp','dup','saude','pcp','nov']],['ger','🧭','Gestão',['repn','recr','most','prosp']]];
+ const LG=[['hoje','☀️','Hoje',['hoje','venda','agenda']],['cli','👥','Clientes',['ficha','cart','rec','reat','relsem','mapa','perto','abc','queda','novos','rev','orc']],['vm','📈','Vendas',['painel','resumo','meta','proj','vendas','cal','hist']],['ter','🗺️','Territórios',['cidn','camp','cobreg','orfaos','confl']],['via','🧳','Viagens',['desp','vis']],['mat','📚','Materiais',['rel','conq','bib','precos']],['sasi','🤖','Sasi',['sasi']],['sis','⚙️','Sistema',['pedidos','imp','dup','saude','pcp','nov']],['ger','🧭','Gestão',['repn','recr','most','prosp']]];
  const HID=new Set(['seg','oco','conc','cartao']);window.LCHID=HID;
  const GI={};LG.forEach(g=>GI[g[0]]=[g[1],g[2]]);
  const GC={hoje:'#F9A825',cli:'#1F78B4',vm:'#2E7D32',ter:'#E08A1E',via:'#00838F',mat:'#8E24AA',sasi:'#7c3aed',sis:'#546E7A',ger:'#6A1B9A'};
  const TI={hoje:'☀️',venda:'💰',agenda:'📅',ficha:'🪪',cart:'📂',mapa:'🗺️',perto:'📍',abc:'🔠',queda:'📉',novos:'🌱',rev:'🔄',cadi:'📝',precos:'💲',orc:'🧾',painel:'📊',resumo:'🧮',meta:'🎯',proj:'🔮',vendas:'📈',cal:'🗓️',hist:'🕘',cidn:'🏙️',camp:'📣',cobreg:'🧭',orfaos:'🙋',confl:'⚔️',desp:'💼',vis:'✅',rel:'🤝',conq:'🏆',bib:'📚',sasi:'🤖',pedidos:'🛒',imp:'📥',dup:'👯',saude:'🩺',pcp:'🏭',repn:'🗒️',recr:'🧑‍💼',most:'🖼️',prosp:'🧑‍💼',nov:'✨',relsem:'📋'};window.LCTI=TI;
  const st=document.createElement('style');st.id='lcst';st.textContent=`
 body.lc header,body.lc #gbar,body.lc #nav,body.lc #fbar,body.lc #nx3f,body.lc #mbar{display:none!important}
-html:has(body.lc),body.lc{overflow-x:hidden;max-width:100vw}body.lc main{overflow-x:auto;max-width:100vw;-webkit-overflow-scrolling:touch}body.lc{padding-bottom:78px}
+html:has(body.lc),body.lc{overflow-x:hidden;max-width:100vw}body.lc main{overflow-x:auto;max-width:100vw;-webkit-overflow-scrolling:touch}body.lc{padding-bottom:96px}
 #lctop{position:sticky;top:0;z-index:9400;background:#1F4E78;color:#fff;display:flex;align-items:center;gap:8px;padding:8px 12px}
 #lctop img{height:26px;background:#fff;border-radius:5px;padding:2px 4px}
 #lctop .t{flex:1;min-width:0}#lctop .t b{display:block;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#lctop .t small{opacity:.85;font-size:11.5px}
@@ -3639,6 +3639,17 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v145',d:'15/11/2026',t:'Inteligência comercial: recompra, reativação, meta, 2ª compra e concentração',l:[
+   ['a','Nova aba Clientes › Recomprar (Hora de recomprar): cada cliente no seu próprio ritmo de compra (na hora, passou do ritmo, chega em breve), com WhatsApp pronto. Também aparece um cartão em Hoje.'],
+   ['a','Nova aba Clientes › Reativar: quem parou de comprar, do que mais vale ao que menos vale, com chance de voltar, o que costumava levar e mensagem pronta. “Já chamei” esconde por 14 dias.'],
+   ['a','Projeção do mês: nova tabela “O que falta para bater a meta” com pedidos que faltam, por dia útil e quanto as recompras previstas cobrem.'],
+   ['a','Clientes novos: taxa de 2ª compra em até 60 dias e lista dos que estão com o prazo aberto.'],
+   ['a','Curva ABC: nova caixa de concentração, por cliente ou por produto (conforme a opção escolhida), com a dependência dos maiores. Por representante, só para o gestor.']]},
+  {v:'v144',d:'14/11/2026',t:'Situação da carteira nova, rodapé limpo e backup só quando precisa',l:[
+   ['a','Situação da carteira: gráfico grande no centro com o total, barra de proporção e uma linha por situação com número grande, porcentagem, ▲▼ e ícone de Excel pequeno; embaixo, vendido em 12 meses e classes ABC.'],
+   ['a','Rodapé limpo: saíram as bolinhas e botões flutuantes que cobriam as informações. “Aa ☀” (letra e brilho) e modo reunião ficaram no menu de baixo (Ferramentas).'],
+   ['a','Backup: aparece na barra de cima só um botão vermelho “💾 Backup”, quando falta o backup da manhã (antes do meio-dia) ou da tarde. Some sozinho depois de feito. Domingo não cobra.'],
+   ['a','Novo botão ⏻ Fechar o painel, no menu de baixo (Ferramentas).']]},
   {v:'v142',d:'13/11/2026',t:'Meta do dia, cobertura em pizza e relatório mais completo',l:[
    ['a','Hoje: barra com o que foi vendido no dia, pedidos e quanto falta para a meta da semana.'],
    ['a','Cobertura por região (gestor): pizza com cidades e regiões atendidas, só de inativos e sem cliente.'],
@@ -3728,7 +3739,13 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
   const pct=x=>tot?Math.round(x.v/tot*100):0;
   const row=(x,k)=>`<div class="pier"${x.go?` data-go="${x.go}"`:''}><span class="pd" style="background:${x.c}"></span><span class="pn">${x.ic?x.ic+' ':''}${E(x.t)}</span><span class="pv">${x.n!=null&&!(P.val&&!P.cnt)?'<b>'+x.n+'</b> ':''}${P.val?'<small>'+fmtV(x.v)+'</small> ':''}${x.dl?`<small style="color:${x.dlc};font-weight:700">${x.dl>0?'▲':'▼'}${Math.abs(x.dl)}</small> `:''}<b>${pct(x)}%</b>${x.ids&&x.ids.length?`<button class="pxl" data-px="${id}:${k}" title="Excel dos ${x.ids.length} clientes">📊</button>`:''}</span></div>`;
   let body;
-  if(!tot)body='<div class="mute" style="padding:8px 0">Sem dados para mostrar ainda.</div>';
+  if(P.rich&&tot){const ring=()=>{const R=52,L=2*Math.PI*R;let off=0,s='';it.filter(x=>x.v>0).forEach(x=>{const l=x.v/tot*L;s+=`<circle cx="70" cy="70" r="${R}" fill="none" stroke="${x.c}" stroke-width="20" stroke-dasharray="${Math.max(0,l-(it.length>1?1.5:0)).toFixed(2)} ${(L).toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}"/>`;off+=l});return `<svg viewBox="0 0 140 140"><g transform="rotate(-90 70 70)">${s}</g></svg>`};
+   const bar=`<div class="pbar">${it.filter(x=>x.v>0).map(x=>`<i style="width:${(x.v/tot*100).toFixed(2)}%;background:${x.c}"></i>`).join('')}</div>`;
+   const rr=(x,k)=>`<div class="pier rr"${x.go?` data-go="${x.go}"`:''}><span class="pd" style="background:${x.c}"></span><span class="pn">${x.ic?x.ic+' ':''}${E(x.nm||x.t)}${x.s?`<small class="ps">${E(x.s)}</small>`:''}</span><b class="rn">${x.n}</b><span class="rp">${pct(x)}%</span><span class="rd"${x.dl?` style="color:${x.dlc}"`:''}>${x.dl?(x.dl>0?'▲':'▼')+Math.abs(x.dl):''}</span>${x.ids&&x.ids.length?`<button class="pxl" data-px="${id}:${k}" title="Excel dos ${x.ids.length} clientes" aria-label="Excel dos ${x.ids.length} clientes">📊</button>`:'<span class="pxs"></span>'}</div>`;
+   const foot=P.foot&&P.foot.length?`<div class="pfoot">${P.foot.map(f=>`<div><b>${E(f.b)}</b>${E(f.t)}</div>`).join('')}</div>`:'';
+   const don=m==='g'?`<div class="piec rich">${ring()}<div class="pit rich"><b${String(cnt).length>4?' style="font-size:34px!important"':''}>${cnt}</b><small>${P.unit||''}</small>${P.cen?`<span class="pp" style="color:${P.cen.c}">${E(P.cen.t)}</span>`:''}</div></div>`:'';
+   body=`<div class="piew rich">${don}${bar}<div class="pil">${it.map(rr).join('')}</div>${foot}</div>`}
+  else if(!tot)body='<div class="mute" style="padding:8px 0">Sem dados para mostrar ainda.</div>';
   else if(m==='g')body=`<div class="piew"><div class="piec">${pieSvg(it,tot)}<div class="pit"><b>${P.val?lcAb(tot):cnt}</b><small>${P.val?'total':P.unit||''}</small></div></div><div class="pil">${it.map(row).join('')}</div></div>`;
   else body=`<div class="pil full">${it.map(row).join('')}<div class="pier tot"><span class="pn"><b>Total</b></span><span class="pv">${cnt&&!(P.val&&!P.cnt)?'<b>'+cnt+'</b> '+(P.unit?'<small>'+P.unit+'</small> ':''):''}${P.val?'<b>'+fmtV(tot)+'</b>':''}</span></div></div>`;
   return `<div class="piecard" id="pie_${id}" style="border-left:5px solid ${P.col||'#1F4E78'}"><div class="pieh"><b>${P.ic||''} ${E(P.title)}</b>${tg}</div>${P.sub?`<div class="mute" style="font-size:12.5px;margin:2px 0 4px">${E(P.sub)}</div>`:''}${body}</div>`}
@@ -3745,6 +3762,11 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
 .pietg{display:inline-flex;border:1px solid #b9c7e2;border-radius:18px;overflow:hidden}.pietg button{background:#fff;border:0;padding:6px 11px;font-size:12.5px;color:#1F4E78;min-height:34px;cursor:pointer}.pietg button.on{background:#1F4E78;color:#fff;font-weight:700}
 .piew{display:flex;gap:8px;align-items:center;flex-direction:column;margin-top:6px}.piew .pil{width:100%;flex:none}.piec svg{width:100%;height:100%}.pit b{font-size:22px}.piec{position:relative;width:190px;height:190px;flex:none;margin:0 auto}.pit{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none}.pit b{font-size:15px}.pit small{font-size:11px;color:#778}
 .pil{flex:1;min-width:150px}.pil.full{margin-top:6px}.pier{display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid #eef1f6;font-size:14px}.pier[data-go]{cursor:pointer}.pier .pd{width:14px;height:14px;border-radius:4px;flex:none}.pier .pn{flex:1;min-width:0}.pier .pv{text-align:right;white-space:nowrap}.pier .pv small{color:#667}.pier.tot{border-top:2px solid #cfd8e6}.pxl{margin-left:8px;background:#e8f5e9;border:1px solid #2E7D32;color:#1b5e20;border-radius:10px;min-width:40px;min-height:34px;font-size:15px;cursor:pointer}
+.piew.rich{gap:0;align-items:stretch}.piec.rich{width:220px;height:220px;margin:4px auto 0}.pit.rich b{font-size:46px!important;line-height:1;color:#10233f}.pit.rich small{font-size:14px;color:#667;margin-top:2px}.pit .pp{font-size:13.5px;font-weight:700;margin-top:4px}
+.pbar{display:flex;height:10px;border-radius:6px;overflow:hidden;margin:12px 0 4px;width:100%}.pbar i{display:block;height:100%}
+.pier.rr{padding:10px 0;gap:10px}.pier.rr .pn{font-size:15px;color:#10233f}.pier.rr .ps{display:block;font-size:11.5px;color:#778;margin-top:1px}.pier.rr .rn{font-size:24px;line-height:1;color:#10233f;min-width:38px;text-align:right}.pier.rr .rp{font-size:12.5px;color:#667;min-width:36px;text-align:right}.pier.rr .rd{font-size:12.5px;font-weight:700;min-width:36px}
+.pier.rr .pxl,.pier.rr .pxs{margin:0;width:32px;min-width:32px;height:32px;min-height:0;padding:0;font-size:14px;flex:none;border-radius:8px}.pier.rr .pxs{display:block}
+.pfoot{display:flex;gap:8px;margin-top:8px}.pfoot div{flex:1;min-width:0;background:#f3f6fb;border-radius:10px;padding:8px;text-align:center;font-size:11.5px;color:#667}.pfoot b{display:block;font-size:15px;color:#1f4e78;margin-bottom:1px}
 .ltl{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 10px}.ltile{background:#fff;border:1px solid #d9dfe9;border-left:6px solid var(--c,#1F4E78);border-radius:12px;padding:10px 12px;text-align:left;cursor:pointer;min-height:84px}.ltile .ic{font-size:26px;line-height:28px}.ltile b{display:block;font-size:24px;line-height:28px;color:var(--c,#1F4E78)}.ltile span{font-size:12.5px;color:#556}.ltile svg{display:block;margin-top:2px}
 `;document.head.appendChild(st);
  const C={ok:'#2E7D32',am:'#E0A800',rd:'#C62828',gy:'#9aa5b5',bl:'#1F78B4',pu:'#7c3aed',or:'#E08A1E'};
@@ -3753,8 +3775,9 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const carteira=ids=>{let a=0,r=0,i=0,n=0;ids.forEach(k=>{const u=lastD(k);if(!(u>0)){n++;return}const d=D.ref-u;if(d<=90)a++;else if(d<=180)r++;else i++});return[a,r,i,n]};
  const carteiraAt=(ids,sh)=>{let a=0,r=0,i=0,n=0;ids.forEach(k=>{let u=lastD(k);if(sh){u=0;try{nxOrd(k).forEach(x=>{if(x.d<=D.ref-sh)u=x.d})}catch(e){}}if(!(u>0)){n++;return}const d=D.ref-sh-u;if(d<=90)a++;else if(d<=180)r++;else i++});return[a,r,i,n]};
  const grpIds=ids=>{const g=[[],[],[],[]];ids.forEach(k=>{const u=lastD(k);if(!(u>0)){g[3].push(k);return}const d=D.ref-u;g[d<=90?0:d<=180?1:2].push(k)});return g};
- const cartItems=(ids,go)=>{const [a,r,i,n]=carteira(ids),p=carteiraAt(ids,30),g=grpIds(ids);const dl=(x,y,bad)=>{const d=x-y;return d?{dl:d,dlc:(d>0)===!bad?C.ok:C.rd}:{}};return[Object.assign({t:'Em dia (até 90 dias)',n:a,v:a,c:C.ok,ic:'🟢',go,ids:g[0]},dl(a,p[0],false)),Object.assign({t:'Em risco (91 a 180)',n:r,v:r,c:C.am,ic:'🟡',go,ids:g[1]},dl(r,p[1],true)),Object.assign({t:'Inativos (+180 dias)',n:i,v:i,c:C.rd,ic:'🔴',go,ids:g[2]},dl(i,p[2],true)),{t:'Nunca compraram',n:n,v:n,c:C.gy,ic:'⚪',go,ids:g[3]}].filter(x=>x.v>0)};
- const cartCard=(id,ids,go)=>pieCard(id,{title:'Situação da carteira',ic:'👥',items:cartItems(ids,go),cnt:true,unit:'clientes',col:C.bl,sub:'Por tempo sem comprar · ▲▼ comparado a 30 dias atrás'});
+ const cartItems=(ids,go)=>{const [a,r,i,n]=carteira(ids),p=carteiraAt(ids,30),g=grpIds(ids);const dl=(x,y,bad)=>{const d=x-y;return d?{dl:d,dlc:(d>0)===!bad?C.ok:C.rd}:{}};return[Object.assign({t:'Em dia (até 90 dias)',nm:'Em dia',s:'até 90 dias',n:a,v:a,c:C.ok,ic:'🟢',go,ids:g[0]},dl(a,p[0],false)),Object.assign({t:'Em risco (91 a 180)',nm:'Em risco',s:'91 a 180 dias',n:r,v:r,c:C.am,ic:'🟡',go,ids:g[1]},dl(r,p[1],true)),Object.assign({t:'Inativos (+180 dias)',nm:'Inativos',s:'mais de 180 dias',n:i,v:i,c:C.rd,ic:'🔴',go,ids:g[2]},dl(i,p[2],true)),{t:'Nunca compraram',nm:'Nunca compraram',s:'sem pedido registrado',n:n,v:n,c:C.gy,ic:'⚪',go,ids:g[3]}].filter(x=>x.v>0)};
+ const cartFoot=ids=>{let v12=0,A=0,B=0,Cc=0;ids.forEach(k=>{try{nxOrd(k).forEach(x=>{if(x.d>D.ref-365)v12+=x.v})}catch(e){}try{const a=window.lcAbc?lcAbc(k):'';if(a==='A')A++;else if(a==='B')B++;else if(a==='C')Cc++}catch(e){}});const f=[{b:lcAb(v12),t:'vendido em 12 meses'}];if(A+B+Cc)f.push({b:'A '+A+' · B '+B+' · C '+Cc,t:'classes ABC'});return f};
+ const cartCard=(id,ids,go)=>{const it=cartItems(ids,go),tt=it.reduce((s,x)=>s+x.v,0),e=it[0]&&it[0].nm==='Em dia'?it[0]:null;return pieCard(id,{title:'Situação da carteira',ic:'👥',items:it,cnt:true,unit:'clientes',col:C.bl,rich:true,cen:e&&tt?{t:Math.round(e.v/tt*100)+'% em dia',c:C.ok}:null,foot:cartFoot(ids),sub:'Por tempo sem comprar · ▲▼ comparado a 30 dias atrás'})};
  // ---- Hoje: cartões, objetivo, pizzas
  const mesVendas=()=>{const rep=nxRep(),cod=rep&&D.reps[rep]?D.reps[rep][0]:0;const dd=new Date(D.ref*864e5),ym=dd.getUTCFullYear()*12+dd.getUTCMonth(),tot=new Array(6).fill(0),byR=new Map();
   for(let i=0;i<N;i++){if(rep&&L.R[i]!==rep)continue;const t=new Date(L.D[i]*864e5),k=ym-(t.getUTCFullYear()*12+t.getUTCMonth());if(k>=0&&k<6)tot[5-k]+=L.V[i];if(k===0)byR.set(L.R[i],(byR.get(L.R[i])||0)+L.V[i])}
@@ -3856,10 +3879,10 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
   for(let i=0;i<D.cli.length;i++){const c=D.cli[i],h=fNorm(c[1]+' '+c[0]+' '+c[2]+' '+(c[9]||''));if((!FCID||c[2]===FCID)&&okR(i)&&ps.every(p=>h.includes(p)))hits.push(i)}
   if(hits.length<5&&window.lcFz&&ps.some(p=>p.length>=4)){for(let i=0;i<D.cli.length;i++){if(hits.indexOf(i)>=0)continue;const c=D.cli[i],h=fNorm(c[1]+' '+c[2]);if((!FCID||c[2]===FCID)&&okR(i)&&ps.every(p=>h.includes(p)||lcFz(h,p)))hits.push(i)}}
   if(FABC)hits=hits.filter(i=>abcMap().get(i)===FABC);
-  hits.sort((a,b)=>(D.cli[b][7]||0)-(D.cli[a][7]||0));LASTH=hits;
+  const nm=i=>ps.length&&ps.every(p=>fNorm(D.cli[i][1]).includes(p))?1:0;hits.sort((a,b)=>(nm(b)-nm(a))||((D.cli[b][7]||0)-(D.cli[a][7]||0)));LASTH=hits;
   if(!hits.length){box.innerHTML=bar+'<div class="act">Nenhum cliente encontrado para "'+FQ.replace(/</g,'&lt;')+'".</div>';bind();return}
   const sh=hits.slice(0,25);
-  box.innerHTML=bar+`<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:4px 2px"><span class="mute">${hits.length} cliente(s) encontrado(s)${hits.length>25?' — mostrando os 25 maiores; digite mais para refinar':''}</span><button class="lcq_x" id="lcq_xl">📊 Excel destes ${hits.length}</button></div><div style="background:#fff;border:1px solid #d9dfe9;border-radius:8px;max-height:62vh;overflow:auto">${sh.map(i=>`<div class="fch" data-ci="${i}" style="padding:10px 12px;border-bottom:1px solid #e6ebf3;cursor:pointer${i===FCI?';background:#e8f0fb':''}">${cardHtml(i)}</div>`).join('')}</div>`;
+  box.innerHTML=bar+`<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:4px 2px"><span class="mute">${hits.length} cliente(s) encontrado(s)${hits.length>25?' — mostrando os 25 maiores; digite mais para refinar':''}</span><button class="lcq_x" id="lcq_xl">📊 Excel destes ${hits.length}</button></div><div style="background:#fff;border:1px solid #d9dfe9;border-radius:8px;max-height:62vh;overflow:auto">${sh.map(i=>`<div class="fch" data-ci="${i}" style="padding:10px 12px;border-bottom:1px solid #e6ebf3;cursor:pointer${i===FCI?';background:#e8f0fb':''}">${ps.length&&!nm(i)?`<div style="font-size:11.5px;color:#7a4a00;margin-bottom:2px">📍 achado pela cidade ou endereço, não pelo nome</div>`:''}${cardHtml(i)}</div>`).join('')}</div>`;
   bind();const xb=document.getElementById('lcq_xl');if(xb)xb.onclick=()=>lcXls('Busca'+(FQ?' '+FQ:'')+(FABC?' classe '+FABC:''),LASTH);
   box.querySelectorAll('.fch').forEach(e=>e.onclick=()=>{FCI=+e.dataset.ci;fichaBusca();fichaShow(FCI);const d=$('#f_det');d&&d.scrollIntoView({behavior:'smooth',block:'start'})});
   if(hits.length===1&&FCI!==hits[0]){FCI=hits[0];fichaShow(FCI)}};
@@ -4107,7 +4130,7 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
   let vd=0,vs=0;const ped=new Set();for(let i=0;i<N;i++){if(rep&&L.R[i]!==rep)continue;if(L.D[i]===D.ref){vd+=L.V[i];ped.add(L.O[i])}if(L.D[i]>=ini&&L.D[i]<=D.ref)vs+=L.V[i]}
   const mt=(D.meta&&D.meta.r)?(rep?(D.meta.r[cod]||0):D.reps.reduce((t,r,i)=>t+(i&&r[2]?(D.meta.r[r[0]]||0):0),0)):0,dim=new Date(Date.UTC(dd.getUTCFullYear(),dd.getUTCMonth()+1,0)).getUTCDate(),ms=mt*7/dim,fal=Math.max(0,ms-vs),pc=ms?Math.min(100,Math.round(vs/ms*100)):0;
   const bk=document.getElementById('bkpchip');
-  const h=`<div id="lcdia"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><b>🎯 Dia ${String(dd.getUTCDate()).padStart(2,'0')}/${String(dd.getUTCMonth()+1).padStart(2,'0')}</b><span><b>${money(vd)}</b> vendidos · <b>${ped.size}</b> pedido${ped.size===1?'':'s'}</span></div>${ms?`<div class="bar"><i style="width:${pc}%"></i></div><div style="font-size:13px">Semana: <b>${money(vs)}</b> de ${money(ms)} · ${fal?'faltam <b>'+money(fal)+'</b>':'<b style="color:#2E7D32">meta da semana batida ✔</b>'}</div>`:'<div class="mute" style="font-size:12.5px;margin-top:4px">Sem meta cadastrada para calcular a semana.</div>'}${bk?`<div style="margin-top:8px"><button class="btn" id="lcbk">💾 Backup agora</button> <span class="mute" style="font-size:12px">${E(bk.textContent.replace('💾 ',''))}</span></div>`:''}</div>`;
+  const h=`<div id="lcdia"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><b>🎯 Dia ${String(dd.getUTCDate()).padStart(2,'0')}/${String(dd.getUTCMonth()+1).padStart(2,'0')}</b><span><b>${money(vd)}</b> vendidos · <b>${ped.size}</b> pedido${ped.size===1?'':'s'}</span></div>${ms?`<div class="bar"><i style="width:${pc}%"></i></div><div style="font-size:13px">Semana: <b>${money(vs)}</b> de ${money(ms)} · ${fal?'faltam <b>'+money(fal)+'</b>':'<b style="color:#2E7D32">meta da semana batida ✔</b>'}</div>`:'<div class="mute" style="font-size:12.5px;margin-top:4px">Sem meta cadastrada para calcular a semana.</div>'}</div>`;
   out.insertAdjacentHTML('afterbegin',h);const b=document.getElementById('lcbk');if(b)b.onclick=()=>{const c=document.getElementById('bkpchip');if(c)c.click()}}catch(e){console.error('lcG dia',e)}};
  // ---------- (6) aviso sem sinal
  const off=document.createElement('div');off.id='lcoff';off.innerHTML='📴 Sem sinal — o painel segue funcionando e tudo que você registrar fica salvo neste aparelho. <button id="lcoffb">💾 Backup</button>';document.body.appendChild(off);
@@ -4122,7 +4145,7 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
   const out=document.getElementById('v2out');if(!out)return;const o=document.getElementById('lcextra');if(o)o.remove();
   const rep=nxRep(),ids=nxCli(rep);let h='';
   // 18 aviso de backup
-  const ag=bkAge();if(window.lcBk&&(ag==null||ag>=7))h+=`<div class="lccard" style="border-left:5px solid #C62828"><b>⚠️ ${ag==null?'Nenhum backup feito ainda':'Faz '+ag+' dias sem backup'}</b><div class="mute" style="font-size:13px">Seus registros ficam só neste aparelho. Toque em “Backup agora” acima.</div></div>`;
+  const ag=bkAge();if(false)h+=`<div class="lccard" style="border-left:5px solid #C62828"><b>⚠️ ${ag==null?'Nenhum backup feito ainda':'Faz '+ag+' dias sem backup'}</b><div class="mute" style="font-size:13px">Seus registros ficam só neste aparelho. Toque em “Backup agora” acima.</div></div>`;
   // 9 clientes esquecidos
   let map=null;if(G){try{map=lcVisMap()}catch(e){}}
   const esq=[];ids.forEach(i=>{const c=D.cli[i],tot=c[11]||0;if(tot<10000)return;const o2=nxOrd(i);if(!o2.length)return;const dias=D.ref-o2[o2.length-1].d;if(dias<120||dias>720)return;
@@ -4150,7 +4173,7 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
    m.querySelector('#lcct').innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:13.5px">${rows.map(r=>`<tr style="border-top:1px solid #eef1f6"><td style="padding:6px 2px;color:#556">${r[0]}</td><td style="text-align:right;${r[3]>r[4]?'font-weight:700;color:#2E7D32':''}">${r[1]}</td><td style="text-align:right;${r[4]>r[3]?'font-weight:700;color:#2E7D32':''}">${r[2]}</td></tr>`).join('')}</table>`};
   m.querySelector('#lca').onchange=m.querySelector('#lcb').onchange=draw;m.querySelector('#lccx').onclick=()=>m.remove();m.onclick=e=>{if(e.target===m)m.remove()};draw()}
  // 18 backup automático semanal (só roda sozinho se a pasta já estiver liberada)
- setTimeout(()=>{try{const b=window.lcBk;if(b&&b.S.dir&&b.S.perm){const ag=bkAge();if(ag==null||ag>=7)b.run(true)}}catch(e){}},5000);
+ setTimeout(()=>{try{const b=window.lcBk;if(b&&b.S.dir&&b.S.perm){if(window.lcBkDue&&lcBkDue())b.run(true)}}catch(e){}},5000);
 
  // ---------- (10) meta do ano do cliente na Ficha
  if(typeof fichaShow==='function'){const fs0=fichaShow;fichaShow=function(ci){fs0.apply(this,arguments);try{
@@ -4569,6 +4592,206 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  bp.onclick=()=>go(P,'Esta tela não tem PDF.');bx.onclick=()=>go(X,'Esta tela não tem Excel.');
  setInterval(upd,700);upd();
 }catch(e){console.error('lcO',e)}})();
+
+// ===== v144 · backup só quando precisa, ferramentas no menu, fechar o painel =====
+(function(){try{ if(window.__lcP)return;window.__lcP=1;
+ const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+ const st=document.createElement('style');st.textContent=`
+#bkpchip,#uiBtn,#lcmeetb{display:none!important}
+#lctop #lcbkb{display:none;background:#C62828;color:#fff;border:0;border-radius:14px;padding:0 10px;min-width:0!important;height:28px;min-height:28px!important;line-height:1;font-family:system-ui,Arial;font-weight:700;font-size:12.5px!important;cursor:pointer;flex:none;white-space:nowrap;align-items:center;gap:4px}
+#lctop #lcbkb.on{display:inline-flex}
+#lctools{margin-top:10px;border-top:1px solid #e3e8f0;padding-top:6px}
+#lctools .lcb.x{color:#C62828;border-color:#f0c4c4;background:#fdf1f1}
+#lcbt{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:99991;background:#263238;color:#fff;padding:9px 16px;border-radius:18px;font-weight:700;font-size:14px;max-width:90vw;text-align:center;display:none}
+#lcbye{position:fixed;inset:0;z-index:2147483600;background:#0d1c2e;color:#fff;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;font-family:system-ui,Arial}
+#lcbye .bx{max-width:340px;width:100%}#lcbye h2{margin:6px 0 10px;font-size:24px;background:none!important;color:#fff!important;padding:0!important;border:0!important}#lcbye p{line-height:1.5;font-size:15px;color:#cfdbec;margin:0 0 16px}
+#lcbye button{display:block;width:100%;min-height:50px;margin-top:10px;border-radius:12px;border:0;font-size:16px;font-weight:700;cursor:pointer;background:#fff;color:#1F4E78}
+#lcbye button.red{background:#C62828;color:#fff}#lcbye button.gh{background:transparent;color:#cfdbec;border:1px solid #4d6584}
+`;document.head.appendChild(st);
+ // ---- quando o backup é devido: manhã (até 12h) e tarde (12h em diante); domingo não cobra
+ const due=()=>{const b=window.lcBk;if(!b)return false;const n=new Date();if(n.getDay()===0)return false;const ini=new Date(n.getFullYear(),n.getMonth(),n.getDate(),n.getHours()<12?0:12).getTime();return !(b.S.ult>=ini)};
+ window.lcBkDue=due;
+ // ---- aviso rápido
+ const toast=t=>{let d=document.getElementById('lcbt');if(!d){d=document.createElement('div');d.id='lcbt';document.body.appendChild(d)}d.textContent=t;d.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>d.style.display='none',2800)};
+ // ---- botão vermelho na barra de cima (só aparece quando falta backup)
+ const r2=document.querySelector('#lctop .r2'),mas=document.getElementById('lcmas');
+ const bk=document.createElement('button');bk.id='lcbkb';bk.type='button';bk.innerHTML='💾 Backup';bk.title='Fazer o backup agora';bk.setAttribute('aria-label','Fazer o backup agora');
+ if(r2)r2.insertBefore(bk,mas||null);
+ const upd=()=>{try{bk.classList.toggle('on',due())}catch(e){}};
+ async function fazer(){const b=window.lcBk;if(!b)return false;const t0=Date.now();
+  if(b.S.dir&&!b.S.perm){const c=document.getElementById('bkpchip');if(c)c.click();return false}
+  if(b.S.dir&&b.S.perm){await b.run(true)}else{b.baixar();for(let i=0;i<20&&!(b.S.ult>=t0);i++)await new Promise(r=>setTimeout(r,200))}
+  upd();return b.S.ult>=t0}
+ bk.onclick=async()=>{bk.disabled=true;let ok=false;try{ok=await fazer()}catch(e){}bk.disabled=false;toast(ok?'✔ Backup feito':'⚠️ Backup não concluído. Toque de novo.')};
+ setInterval(upd,30000);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')upd()});setTimeout(upd,1500);setTimeout(upd,6000);
+ // ---- fechar o painel
+ function tela(h){let o=document.getElementById('lcbye');if(o)o.remove();o=document.createElement('div');o.id='lcbye';o.innerHTML='<div class="bx">'+h+'</div>';document.body.appendChild(o);return o}
+ function fechado(){try{window.close()}catch(e){}
+  setTimeout(()=>{const o=tela('<div style="font-size:54px">🔒</div><h2>Painel fechado</h2><p>Os dados ficam protegidos e continuam salvos neste aparelho.<br>Para sair de vez, toque no botão <b>Início</b> do celular ou feche esta aba.</p><button id="lcbye_o">Abrir de novo</button>');o.querySelector('#lcbye_o').onclick=()=>o.remove()},350)}
+ function fechar(){const c=document.getElementById('lcov');if(c)c.click();
+  if(due()){const o=tela('<div style="font-size:48px">💾</div><h2>Falta o backup</h2><p>Ainda não foi feito o backup desta '+(new Date().getHours()<12?'manhã':'tarde')+'. Faça agora antes de fechar.</p><button class="red" id="lcbye_b">Fazer o backup e fechar</button><button id="lcbye_f">Fechar assim mesmo</button><button class="gh" id="lcbye_v">Voltar ao painel</button>');
+   o.querySelector('#lcbye_b').onclick=async()=>{const b=o.querySelector('#lcbye_b');b.textContent='Salvando…';b.disabled=true;let ok=false;try{ok=await fazer()}catch(e){}if(ok){o.remove();fechado()}else{b.disabled=false;b.textContent='Não deu. Tentar de novo'}};
+   o.querySelector('#lcbye_f').onclick=()=>{o.remove();fechado()};o.querySelector('#lcbye_v').onclick=()=>o.remove();return}
+  fechado()}
+ window.lcFechar=fechar;
+ // ---- Ferramentas no fim do menu de baixo
+ const sh=document.getElementById('lcsheet');
+ function tools(){if(!sh||sh.querySelector('#lctools'))return;const b=window.lcBk,u=b&&b.S.ult;
+  const d=document.createElement('div');d.id='lctools';
+  d.innerHTML='<h4>Ferramentas</h4><div class="lcg"><button class="lcb" id="lct_aa" type="button"><span class="ti">Aa ☀</span> Letra e brilho<small>Tamanho da letra e brilho da tela</small></button>'+
+   (document.getElementById('lcmeetb')?'<button class="lcb" id="lct_mt" type="button"><span class="ti">👁️</span> Modo reunião<small>Esconde valores e nomes</small></button>':'')+
+   (b?'<button class="lcb" id="lct_bk" type="button"><span class="ti">💾</span> Backup agora<small>'+(u?'Último: '+E(new Date(u).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})):'Nenhum ainda')+'</small></button>':'')+
+   '<button class="lcb x" id="lct_x" type="button"><span class="ti">⏻</span> Fechar o painel</button></div>';
+  const br=sh.querySelector('.lcbrand');if(br)sh.insertBefore(d,br);else sh.appendChild(d);
+  const cl=()=>{const c=document.getElementById('lcov');if(c)c.click()};
+  d.querySelector('#lct_aa').onclick=()=>{cl();const x=document.getElementById('uiBtn');if(x)x.click()};
+  const mt=d.querySelector('#lct_mt');if(mt)mt.onclick=()=>{cl();const x=document.getElementById('lcmeetb');if(x)x.click()};
+  const kb=d.querySelector('#lct_bk');if(kb)kb.onclick=()=>{cl();bk.click()};
+  d.querySelector('#lct_x').onclick=fechar}
+ if(sh){new MutationObserver(()=>tools()).observe(sh,{childList:true});tools()}
+}catch(e){console.error('lcP',e)}})();
+
+// ===== v145 · inteligência comercial: recompra no ritmo, reativação, projeção, 2ª compra, concentração =====
+(function(){try{ if(window.__lcQ)return;window.__lcQ=1;
+ const G=!D.rm,E=sqE;
+ const MES=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+ const mAno=d=>{const t=new Date(d*864e5);return MES[t.getUTCMonth()]+'/'+t.getUTCFullYear()};
+ const st=document.createElement('style');st.textContent=`.lcqk{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}.lcqk>div{flex:1 1 90px;min-width:0;background:#fff;border:1px solid #d9dfe9;border-radius:10px;padding:8px 10px;text-align:center}.lcqk b{display:block;font-size:22px;color:#10233f}.lcqk small{color:#667;font-size:11.5px}
+.lcqf{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.lcqf button{border:1px solid #1F4E78;background:#fff;color:#1F4E78;border-radius:16px;padding:6px 12px;font-size:13px;font-weight:700;cursor:pointer}.lcqf button.on{background:#1F4E78;color:#fff}
+.lcqb{height:8px;border-radius:4px;background:#e6ebf3;overflow:hidden;margin-top:3px}.lcqb i{display:block;height:100%;background:#1F4E78}`;document.head.appendChild(st);
+ // ---------- ritmo de compra de cada cliente (cache por data-base)
+ let RCc=null;
+ const median=a=>{const s=a.slice().sort((x,y)=>x-y),m=s.length>>1;return s.length%2?s[m]:(s[m-1]+s[m])/2};
+ function ritmo(){if(RCc&&RCc.ref===D.ref)return RCc.m;const m=new Map();
+  for(let i=0;i<D.cli.length;i++){const o=nxOrd(i);if(!o.length)continue;const n=o.length,last=o[n-1];
+   const gaps=[];for(let k=Math.max(1,n-6);k<n;k++)gaps.push(o[k].d-o[k-1].d);
+   let cyc=n>=3?Math.max(15,median(gaps)):0;if(cyc>365)cyc=0;
+   m.set(i,{n,first:o[0].d,last:last.d,tot:o.reduce((s,x)=>s+x.v,0),cyc,typ:median(o.slice(-5).map(x=>x.v))})}
+  RCc={ref:D.ref,m};return m}
+ // situação de recompra: hora / atr (passou do ritmo) / breve (até 21 dias); nulo = fora (esfriou ou sem ritmo)
+ function stat(x){if(!x.cyc)return null;const since=D.ref-x.last;if(since>540)return null;const ratio=since/x.cyc,due=x.cyc-since;
+  if(ratio>=3)return null;if(ratio>=1.3)return{k:'atr',since,ratio,due};if(ratio>=0.85)return{k:'hora',since,ratio,due};if(due<=21)return{k:'breve',since,ratio,due};return null}
+ const recList=ids=>{const M=ritmo(),l=[];ids.forEach(ci=>{const x=M.get(ci);if(!x)return;const s=stat(x);if(s)l.push({ci,x,s})});return l};
+ const first=n=>n3First(n);
+ const abcOf=ci=>{try{return window.lcAbc?(lcAbc(ci)||''):''}catch(e){return''}};
+ // ---------- abas novas
+ try{const nav=document.getElementById('nav');[['rec','Recomprar'],['reat','Reativar']].forEach(([v,t])=>{const b=document.createElement('button');b.dataset.v=v;b.textContent=t;if(nav)nav.appendChild(b)})}catch(e){}
+ const rdQ=render;render=function(){if(VIEW==='rec'||VIEW==='reat')return;return rdQ.apply(this,arguments)};
+ const svQ=setView;setView=function(v){if(v==='rec'||v==='reat'){svQ(v);try{v==='rec'?renderRec():renderReat()}catch(e){console.error(e)}return}return svQ(v)};
+ // ===== (1) Hora de recomprar =====
+ const RQ={k:'all'};
+ function renderRec(){const r=nxRep();ctl(nxRepSel('rec_rep',r));nxRepBind('rec_rep',renderRec);
+  const all=recList(nx2Ids()),sm=k=>{const l=all.filter(o=>o.s.k===k);return{n:l.length,v:l.reduce((a,o)=>a+o.x.typ,0)}};
+  const H=sm('hora'),A=sm('atr'),B=sm('breve'),rk={hora:0,atr:1,breve:2};
+  let l=all.filter(o=>RQ.k==='all'||o.s.k===RQ.k).sort((a,b)=>rk[a.s.k]-rk[b.s.k]||b.x.typ-a.x.typ);const tot=l.length;l=l.slice(0,80);
+  const rowH=o=>{const c=D.cli[o.ci],x=o.x,s=o.s,ab=abcOf(o.ci);
+   const chip=s.k==='hora'?nxChip('🟢 Na hora',NXC.g):s.k==='atr'?nxChip('🟠 Passou do ritmo',NXC.o):nxChip('🔵 Em '+Math.max(1,Math.round(s.due))+' dias',NXC.b);
+   const msg=`Olá, ${first(c[1])}! Aqui é ${first(sqRn(c[8]))} da Metalmig. Pelo seu ritmo de compras, deve estar chegando a hora de repor o estoque. Posso montar o pedido com os itens que você costuma levar?`;
+   return `<div class="lccard"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><a href="#" class="rcf" data-ci="${o.ci}"><b>${E(c[1])}</b></a><span style="white-space:nowrap">${chip}${ab?nxChip(ab,'#667'):''}</span></div><div class="mute" style="font-size:12.5px">${E(c[2]||'')}</div>
+   <div style="font-size:13.5px;margin:4px 0">Compra a cada <b>~${Math.round(x.cyc)} dias</b> · última há <b>${s.since} dias</b> (${dstr(x.last)}) · pedido típico <b>${R0(x.typ)}</b></div><div>${n3Btn(n3Wa(c[3],msg),'💬 WhatsApp')}</div></div>`};
+  $('#v2out').innerHTML=`<div class="vmh"><h2>🔁 Hora de recomprar</h2><p>Cada cliente tem o seu ritmo: calculei o intervalo normal entre os pedidos dele (mediana dos últimos pedidos). Aqui estão os que <b>estão na hora</b>, <b>passaram um pouco do ritmo</b> ou <b>chegam nas próximas 3 semanas</b>. Quem esfriou de vez está em <b>Reativar clientes</b>. Só entram clientes com 3 pedidos ou mais. Dados até ${dstr(D.ref)}.</p></div>
+  <button id="k_xl" style="display:none"></button>
+  <div class="lcqk"><div><b>${H.n}</b><small>na hora · ${R0(H.v)}</small></div><div><b>${A.n}</b><small>passaram do ritmo · ${R0(A.v)}</small></div><div><b>${B.n}</b><small>nas próximas 3 semanas · ${R0(B.v)}</small></div></div>
+  <div class="lcqf">${[['all','Todos ('+all.length+')'],['hora','Na hora ('+H.n+')'],['atr','Passou do ritmo ('+A.n+')'],['breve','Em breve ('+B.n+')']].map(([k,t])=>`<button class="rqk${RQ.k===k?' on':''}" data-k="${k}">${t}</button>`).join('')}</div>
+  ${l.length?l.map(rowH).join('')+(tot>80?`<div class="mute">Mostrando os 80 de maior valor de ${tot}. Use o Excel para a lista completa.</div>`:''):'<div class="act">Nenhum cliente nesta situação agora.</div>'}`;
+  document.querySelectorAll('.rqk').forEach(b=>b.onclick=()=>{RQ.k=b.dataset.k;renderRec()});
+  document.querySelectorAll('.rcf').forEach(a=>a.onclick=e=>{e.preventDefault();nxFicha(+a.dataset.ci)});
+  const xb=document.getElementById('k_xl');if(xb)xb.onclick=()=>{if(window.lcXls)lcXls('Hora de recomprar',all.filter(o=>RQ.k==='all'||o.s.k===RQ.k).map(o=>o.ci))}}
+ // cartão em Hoje
+ const rhQ=renderHoje;renderHoje=function(){rhQ.apply(this,arguments);try{const out=document.getElementById('v2out');if(!out)return;const o0=document.getElementById('lcrec');if(o0)o0.remove();
+  const all=recList(nx2Ids()).filter(o=>o.s.k!=='breve').sort((a,b)=>(a.s.k==='hora'?0:1)-(b.s.k==='hora'?0:1)||b.x.typ-a.x.typ);if(!all.length)return;
+  const nh=all.filter(o=>o.s.k==='hora').length,na=all.length-nh,v=all.reduce((s,o)=>s+o.x.typ,0);
+  const h=`<div id="lcrec" class="lccard" style="border-left:5px solid #2E7D32"><b>🔁 Hora de recomprar</b><div style="font-size:13.5px;margin:3px 0"><b>${nh}</b> na hora${na?` · <b>${na}</b> passaram do ritmo`:''} · cerca de <b>${R0(v)}</b> em pedidos típicos</div>${all.slice(0,3).map(o=>`<div class="mute" style="font-size:12.5px">• ${E(D.cli[o.ci][1])} · há ${o.s.since} dias · típico ${R0(o.x.typ)}</div>`).join('')}<div style="margin-top:6px"><button class="btn pri" id="lcrec_b">Ver todos</button></div></div>`;
+  const an=document.getElementById('lcextra')||document.getElementById('lcdia');if(an)an.insertAdjacentHTML('afterend',h);else out.insertAdjacentHTML('afterbegin',h);
+  const b=document.getElementById('lcrec_b');if(b)b.onclick=()=>setView('rec')}catch(e){console.error('lcQ hoje',e)}};
+ // ===== (2) Reativar clientes =====
+ const RE={k:'all',h:false};let BYC=null;
+ const byC=()=>{if(BYC)return BYC;BYC=new Map();for(let i=0;i<N;i++){let a=BYC.get(L.C[i]);if(!a)BYC.set(L.C[i],a=[]);a.push(i)}return BYC};
+ const hidK=()=>'mm_reat_v1_'+(D.rm?'r':'g');
+ const hidGet=()=>{try{return JSON.parse(localStorage.getItem(hidK())||'{}')||{}}catch(e){return{}}};
+ const hidSet=o=>{try{localStorage.setItem(hidK(),JSON.stringify(o))}catch(e){}};
+ const cap=s=>{s=String(s||'').toLowerCase();return s.charAt(0).toUpperCase()+s.slice(1)};
+ function costumava(ci,x){const o=nxOrd(ci),from=o[Math.max(0,o.length-3)].d,m=new Map();(byC().get(ci)||[]).forEach(i=>{if(L.D[i]>=from)m.set(L.P[i],(m.get(L.P[i])||0)+L.V[i])});
+  return [...m.entries()].sort((a,b)=>b[1]-a[1]).slice(0,3).map(([p])=>String(D.prods[p]||'').toLowerCase().slice(0,38))}
+ function renderReat(){const r=nxRep();ctl(nxRepSel('rea_rep',r));nxRepBind('rea_rep',renderReat);
+  const M=ritmo(),hid=hidGet(),now=Date.now(),cand=[];
+  nx2Ids().forEach(ci=>{const x=M.get(ci);if(!x||x.n<2)return;const since=D.ref-x.last,ratio=x.cyc?since/x.cyc:null;const frio=x.cyc?ratio>=3:since>180;if(!frio||since>1095)return;
+   let ch=x.cyc?(ratio<=4?'A':ratio<=8?'M':'B'):(since<=270?'M':'B');if(since>730&&ch==='A')ch='M';
+   cand.push({ci,x,since,ch,h:(hid[D.cli[ci][0]]||0)>now-14*864e5})});
+  const vis=cand.filter(o=>RE.h||!o.h),nH=cand.filter(o=>o.h).length;
+  const cs=k=>{const l=vis.filter(o=>o.ch===k);return{n:l.length,v:l.reduce((a,o)=>a+o.x.typ,0)}};const cA=cs('A'),cM=cs('M'),cB=cs('B'),rk={A:0,M:1,B:2};
+  let l=vis.filter(o=>RE.k==='all'||o.ch===RE.k).sort((a,b)=>rk[a.ch]-rk[b.ch]||b.x.tot-a.x.tot);const tot=l.length;l=l.slice(0,60);
+  const rowH=o=>{const c=D.cli[o.ci],x=o.x,ab=abcOf(o.ci),pr=costumava(o.ci,x);
+   const chip=o.ch==='A'?nxChip('🟢 Boa chance',NXC.g):o.ch==='M'?nxChip('🟠 Chance média',NXC.o):nxChip('⚪ Chance baixa','#78909C');
+   const msg=`Olá, ${first(c[1])}! Aqui é ${first(sqRn(c[8]))} da Metalmig. Faz um tempo que não temos um pedido seu (o último foi em ${mAno(x.last)}). Chegaram novidades e temos boas condições${pr.length?' para repor '+pr[0]:' para o seu próximo pedido'}. Posso te mandar uma proposta?`;
+   return `<div class="lccard"${o.h?' style="opacity:.55"':''}><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><a href="#" class="rcf" data-ci="${o.ci}"><b>${E(c[1])}</b></a><span style="white-space:nowrap">${chip}${ab?nxChip(ab,'#667'):''}</span></div><div class="mute" style="font-size:12.5px">${E(c[2]||'')}</div>
+   <div style="font-size:13.5px;margin:4px 0">Último pedido em <b>${dstr(x.last)}</b> (há ${Math.round(o.since/30)} meses) · ${x.cyc?'comprava a cada ~'+Math.round(x.cyc)+' dias':'só '+x.n+' pedidos'} · pedido típico <b>${R0(x.typ)}</b> · já comprou <b>${R0(x.tot)}</b> em ${x.n} pedidos</div>
+   ${pr.length?`<div class="mute" style="font-size:12.5px;margin-bottom:4px">Costumava levar: ${E(pr.map(cap).join(' · '))}</div>`:''}
+   <div>${n3Btn(n3Wa(c[3],msg),'💬 WhatsApp')}<button class="rhid btn" data-c="${c[0]}" style="font-size:12.5px;padding:3px 8px;margin:1px 3px">${o.h?'↩ Voltar para a lista':'✔ Já chamei'}</button></div></div>`};
+  $('#v2out').innerHTML=`<div class="vmh"><h2>♻️ Reativar clientes</h2><p>Clientes que <b>pararam de comprar</b> (passaram de 3 vezes o intervalo normal deles, ou mais de 6 meses sem pedido quando há poucos pedidos), do que mais vale para o que menos vale. A <b>chance</b> considera há quanto tempo pararam em relação ao ritmo antigo. “✔ Já chamei” esconde o cliente por 14 dias. Dados até ${dstr(D.ref)}.</p></div>
+  <button id="k_xl" style="display:none"></button>
+  <div class="lcqk"><div><b>${cA.n}</b><small>boa chance · ${R0(cA.v)}</small></div><div><b>${cM.n}</b><small>chance média · ${R0(cM.v)}</small></div><div><b>${cB.n}</b><small>chance baixa · ${R0(cB.v)}</small></div></div>
+  <div class="mute" style="font-size:12px">Os valores são o pedido típico de cada cliente, somado: o que entra se eles voltarem ao padrão de antes.</div>
+  <div class="lcqf">${[['all','Todos ('+vis.length+')'],['A','Boa chance ('+cA.n+')'],['M','Média ('+cM.n+')'],['B','Baixa ('+cB.n+')']].map(([k,t])=>`<button class="rek${RE.k===k?' on':''}" data-k="${k}">${t}</button>`).join('')}${nH?`<button id="re_h" class="${RE.h?'on':''}">${RE.h?'Esconder':'Mostrar'} já chamados (${nH})</button>`:''}</div>
+  ${l.length?l.map(rowH).join('')+(tot>60?`<div class="mute">Mostrando os 60 de maior valor de ${tot}. Use o Excel para a lista completa.</div>`:''):'<div class="act">Nenhum cliente nesta situação.</div>'}`;
+  document.querySelectorAll('.rek').forEach(b=>b.onclick=()=>{RE.k=b.dataset.k;renderReat()});const hb=document.getElementById('re_h');if(hb)hb.onclick=()=>{RE.h=!RE.h;renderReat()};
+  document.querySelectorAll('.rcf').forEach(a=>a.onclick=e=>{e.preventDefault();nxFicha(+a.dataset.ci)});
+  document.querySelectorAll('.rhid').forEach(b=>b.onclick=()=>{const o=hidGet(),k=b.dataset.c;if(o[k]&&o[k]>Date.now()-14*864e5)delete o[k];else o[k]=Date.now();hidSet(o);renderReat()});
+  const xb=document.getElementById('k_xl');if(xb)xb.onclick=()=>{if(window.lcXls)lcXls('Reativar clientes',vis.filter(o=>RE.k==='all'||o.ch===RE.k).map(o=>o.ci))}}
+ // ===== (4) Projeção do mês: o que falta para a meta =====
+ function projExtra(){if(!D.obj||!D.obj.t)return;const T=D.obj.t,dut=T.dut||0,dud=T.dud||0,faltam=Math.max(0,dut-dud);
+  const dt=new Date(D.ref*864e5),ms=Math.floor(Date.UTC(dt.getUTCFullYear(),dt.getUTCMonth(),1)/864e5),me=Math.floor(Date.UTC(dt.getUTCFullYear(),dt.getUTCMonth()+1,1)/864e5)-1,diasMes=me-D.ref;
+  const per=new Map();for(let i=0;i<N;i++){const d=L.D[i];if(d<ms||d>D.ref)continue;const r=L.R[i];let x=per.get(r);if(!x)per.set(r,x={v:0,o:new Set()});x.v+=L.V[i];x.o.add(L.C[i]*100003+L.O[i])}
+  const M=ritmo(),rows=[];
+  D.reps.forEach((x,i)=>{if(!i)return;if(D.rm&&i!==1)return;if(!D.rm&&!x[2])return;const o=D.obj.r&&D.obj.r[x[0]];if(!o)return;const obj=o[1]||0,v=o[2]||0;if(!obj&&!v)return;
+   const falta=Math.max(0,obj-v),p=per.get(i),tk=p&&p.o.size?p.v/p.o.size:0;let pot=0,nc=0;
+   if(falta)recList(nxCli(i)).forEach(o2=>{if(o2.s.k!=='breve'||o2.s.due<=diasMes){pot+=o2.x.typ;nc++}});
+   const ped=tk&&falta?Math.ceil(falta/tk):0;rows.push({nm:sqRn(i),falta,tk,ped,dia:faltam&&ped?ped/faltam:0,pot,nc})});
+  if(!rows.length)return;rows.sort((a,b)=>b.falta-a.falta);
+  const th=['Representante','Falta para a meta','Ticket médio do mês','Pedidos que faltam','Por dia útil','Recompras previstas','Cobrem'];
+  const body=rows.map(x=>[E(x.nm),x.falta?R0(x.falta):'<b style="color:#2E7D32">✔ meta batida</b>',x.tk?R0(x.tk):'—',x.ped||'—',x.dia?x.dia.toFixed(1).replace('.',','):'—',x.falta?R0(x.pot)+' <span class="mute">('+x.nc+' cli.)</span>':'—',x.falta?nxChip(Math.min(999,Math.round(x.pot/x.falta*100))+'%',x.pot>=x.falta?NXC.g:x.pot>=x.falta*0.5?NXC.o:NXC.r):'—']);
+  $('#v2out').insertAdjacentHTML('beforeend',`<h3 style="margin:18px 0 4px;color:#1F4E78">🧮 O que falta para bater a meta</h3><div class="mute" style="margin-bottom:6px">Faltam <b>${faltam}</b> dias úteis. “Pedidos que faltam” = quanto falta ÷ ticket médio dos pedidos do mês. “Recompras previstas” = pedido típico dos clientes que, pelo ritmo deles, devem comprar até o fim do mês (veja em Hora de recomprar). “Cobrem” = quanto dessa previsão cobre o que falta.</div>${nxTbl(th,body,['','right','right','right','right','right','center'])}`)}
+ const rpQ=renderProj;renderProj=function(){rpQ.apply(this,arguments);try{projExtra()}catch(e){console.error('lcQ proj',e)}};
+ // ===== (6) Clientes novos: taxa de 2ª compra =====
+ function novosExtra(){const out=document.getElementById('v2out'),vm=out&&out.querySelector('.vmh');if(!vm)return;const o0=document.getElementById('lcn2');if(o0)o0.remove();
+  const ids=nx2Ids(),M=ritmo(),rep=new Map(),open=[];let av=0,ok=0,tard=0,nun=0;
+  ids.forEach(ci=>{const x=M.get(ci);if(!x)return;const o=nxOrd(ci),f=x.first;
+   if(f>=D.ref-240&&f<=D.ref-60){av++;const sg=o[1];const q=D.cli[ci][8];let a=rep.get(q);if(!a)rep.set(q,a={n:0,ok:0});a.n++;if(sg&&sg.d-f<=60){ok++;a.ok++}else if(sg)tard++;else nun++}
+   else if(f>D.ref-60&&o.length===1)open.push({ci,f,left:60-(D.ref-f),v:o[0].v})});
+  open.sort((a,b)=>a.left-b.left);
+  const pc=av?Math.round(ok/av*100):0,cor=pc>=50?NXC.g:pc>=30?NXC.o:NXC.r;
+  const seg=(c)=>`Olá, ${first(c[1])}! Aqui é ${first(sqRn(c[8]))} da Metalmig. Como foi a venda do primeiro pedido? Se precisar repor, já posso montar o próximo pra você.`;
+  const tb=G&&!rep.size?'':(G&&!nx2Ids.r&&nxRep()===0&&rep.size>1?`<details style="margin-top:6px"><summary>Taxa de 2ª compra por representante</summary>${nxTbl(['Representante','Novos avaliados','Com 2ª compra','Taxa'],[...rep.entries()].filter(([q,a])=>a.n>=3).sort((a,b)=>b[1].ok/b[1].n-a[1].ok/a[1].n).map(([q,a])=>[E(sqRn(q)),a.n,a.ok,Math.round(a.ok/a.n*100)+'%']),['','right','right','right'])}</details>`:'');
+  vm.insertAdjacentHTML('afterend',`<div id="lcn2" class="lccard" style="border-left:5px solid ${cor}"><b>🔁 Taxa de 2ª compra</b><div class="mute" style="font-size:12.5px">Clientes com 1º pedido entre ${dstr(D.ref-240)} e ${dstr(D.ref-60)} (já dá para avaliar). Vale a 2ª compra feita em até 60 dias do 1º pedido.</div>
+   ${av?`<div class="lcqk"><div><b style="color:${cor}">${pc}%</b><small>fizeram a 2ª compra em até 60 dias</small></div><div><b>${ok}/${av}</b><small>clientes</small></div><div><b>${tard}</b><small>compraram de novo, mas depois de 60 dias</small></div><div><b>${nun}</b><small>nunca voltaram</small></div></div>`:'<div class="mute">Ainda não há clientes novos suficientes para avaliar.</div>'}${tb}
+   ${open.length?`<div style="margin-top:8px"><b>⏳ Prazo da 2ª compra aberto</b> <span class="mute" style="font-size:12.5px">(${open.length} cliente${open.length>1?'s':''} com 1 pedido nos últimos 60 dias; os mais perto do prazo primeiro)</span>${open.slice(0,8).map(o=>{const c=D.cli[o.ci];return `<div style="padding:6px 0;border-top:1px solid #eef1f6"><a href="#" class="n2f" data-ci="${o.ci}"><b>${E(c[1])}</b></a> <span class="mute" style="font-size:12.5px">· ${E(c[2]||'')}</span><div style="font-size:13px">1º pedido em ${dstr(o.f)} (${R0(o.v)}) · ${o.left>0?'faltam <b>'+o.left+' dias</b> para o prazo':'<b style="color:#B71C1C">prazo vencido</b>'} ${n3Btn(n3Wa(c[3],seg(c)),'💬 2º pedido')}</div></div>`}).join('')}</div>`:''}</div>`);
+  document.querySelectorAll('.n2f').forEach(a=>a.onclick=e=>{e.preventDefault();nxFicha(+a.dataset.ci)})}
+ const rnQ=renderNovos;renderNovos=function(){rnQ.apply(this,arguments);try{novosExtra()}catch(e){console.error('lcQ novos',e)}};
+ // ===== (8) Curva ABC: concentração por cliente / por produto =====
+ function abcExtra(){const out=document.getElementById('v2out'),res=document.getElementById('abc_res');if(!out||!res)return;const o0=document.getElementById('lcconc');if(o0)o0.remove();
+  const r=nxRep(),cl=(typeof ABCT!=='undefined'?ABCT:'c')==='c';let arr=[];
+  if(cl){nx2Ids().forEach(i=>{if(D.cli[i][7]>0)arr.push([i,D.cli[i][7]])})}else{const pm=new Map();for(let i=0;i<N;i++){if(r&&L.R[i]!==r)continue;if(L.D[i]<D.ref-365)continue;pm.set(L.P[i],(pm.get(L.P[i])||0)+L.V[i])}arr=[...pm.entries()].filter(a=>a[1]>0)}
+  arr.sort((a,b)=>b[1]-a[1]);const tot=arr.reduce((s,a)=>s+a[1],0);if(!tot)return;
+  const nm=k=>cl?D.cli[k][1]:String(D.prods[k]||''),sh=n=>arr.slice(0,n).reduce((s,a)=>s+a[1],0)/tot*100;
+  const nFor=p=>{let c=0,i=0;while(i<arr.length&&c<tot*p){c+=arr[i][1];i++}return i};
+  const t1=sh(1),t5=sh(5),t10=sh(10),n50=nFor(0.5),n80=nFor(0.8);
+  const risco=t1>=20||t5>=60?['Alta dependência',NXC.r]:t1>=10||t5>=40?['Dependência moderada',NXC.o]:['Bem distribuída',NXC.g];
+  const un=cl?'cliente':'produto',unp=cl?'clientes':'produtos';
+  const top=arr.slice(0,5).map(a=>`<div style="margin-top:6px;font-size:13.5px"><div style="display:flex;justify-content:space-between;gap:8px"><span>${cl?`<a href="#" class="cnf" data-ci="${a[0]}">${E(nm(a[0]))}</a>`:E(nm(a[0]).toLowerCase().replace(/^./,c=>c.toUpperCase()))}</span><b>${(a[1]/tot*100).toFixed(1).replace('.',',')}%</b></div><div class="lcqb"><i style="width:${Math.min(100,a[1]/tot*100*2.5)}%"></i></div></div>`).join('');
+  let reps='';
+  if(G&&!r){const mp=new Map();for(let i=0;i<N;i++){if(L.D[i]<D.ref-365)continue;const q=L.R[i];if(!q)continue;const k=cl?L.C[i]:L.P[i];let a=mp.get(q);if(!a)mp.set(q,a=new Map());a.set(k,(a.get(k)||0)+L.V[i])}
+   const rw=[];mp.forEach((a,q)=>{const v=[...a.entries()].sort((x,y)=>y[1]-x[1]),T=v.reduce((s,x)=>s+x[1],0);if(T<=0||v.length<8)return;let c=0,n=0;while(n<v.length&&c<T*0.5){c+=v[n][1];n++}
+    rw.push([E(sqRn(q)),v.length,E(nm(v[0][0]).slice(0,26))+' <b>'+Math.round(v[0][1]/T*100)+'%</b>',Math.round(v.slice(0,5).reduce((s,x)=>s+x[1],0)/T*100)+'%',n,v[0][1]/T])});
+   rw.sort((a,b)=>b[5]-a[5]);
+   if(rw.length)reps=`<details style="margin-top:8px"><summary>Concentração por representante (só gestor)</summary>${nxTbl(['Representante',cl?'Clientes':'Produtos','Maior '+un,'Top 5',un==='cliente'?'Clientes p/ 50%':'Produtos p/ 50%'],rw.map(x=>x.slice(0,5)),['','right','','right','right'])}</details>`}
+  const html=`<div id="lcconc" class="lccard" style="border-left:5px solid ${risco[1]}"><b>🧲 Concentração por ${un}</b> ${nxChip(risco[0],risco[1])}
+   <div class="lcqk"><div><b>${t1.toFixed(0)}%</b><small>maior ${un}</small></div><div><b>${t5.toFixed(0)}%</b><small>5 maiores</small></div><div><b>${t10.toFixed(0)}%</b><small>10 maiores</small></div></div>
+   <div style="font-size:13.5px"><b>${n50}</b> ${n50===1?un:unp} (${(n50/arr.length*100).toFixed(1).replace('.',',')}%) respondem por <b>50%</b> das vendas e <b>${n80}</b> por <b>80%</b>, de ${arr.length} ${unp} nos últimos 12 meses.</div>
+   <div style="margin-top:8px"><b style="font-size:13px">Os 5 maiores</b>${top}</div>${reps}</div>`;
+  const rowF=res.previousElementSibling;if(rowF)rowF.insertAdjacentHTML('beforebegin',html);else res.insertAdjacentHTML('beforebegin',html);
+  document.querySelectorAll('.cnf').forEach(a=>a.onclick=e=>{e.preventDefault();nxFicha(+a.dataset.ci)})}
+ const raQ=renderAbc;renderAbc=function(){raQ.apply(this,arguments);try{abcExtra()}catch(e){console.error('lcQ abc',e)}};
+}catch(e){console.error('lcQ',e)}})();
 
 
 </script></body></html>
