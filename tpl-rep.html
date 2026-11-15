@@ -119,7 +119,7 @@ let hc=H.cod!=null?parseInt(H.cod):null;let ix=hc==null?0:D.reps.findIndex(x=>x[
 $('#ini').value=diso(xl2d(H.ini)||Math.round(Date.UTC(Y,0,1)/864e5));$('#fim').value=diso(xl2d(H.fim)||REF);
 $('#rea').value=diso(xl2d(H.rea)||Math.round(Date.UTC(Y,4,1)/864e5));
 let CUSTOM=null;if(H.cini&&H.cfim){CUSTOM=[xl2d(H.cini),xl2d(H.cfim)];const o=document.createElement('option');o.value='x';o.textContent='Período de comparação do Excel';$('#cmp').appendChild(o);$('#cmp').value='x'}
-(function(){try{var l=AP&&AP.base&&AP.base.logo;if(l){var i=document.getElementById('hlogo');i.src=l;i.className='on'}}catch(e){}})();if(D.rm){var nb=document.getElementById('navresumo');if(nb)nb.textContent='Meu resumo';var no=document.getElementById('navorf');if(no)no.remove();var nc=document.getElementById('navcob');if(nc)nc.remove();var ni=document.getElementById('navimp');if(ni)ni.remove();var nv2=document.getElementById('navvis');if(nv2)nv2.remove()}$('#ver').textContent='versão v145';
+(function(){try{var l=AP&&AP.base&&AP.base.logo;if(l){var i=document.getElementById('hlogo');i.src=l;i.className='on'}}catch(e){}})();if(D.rm){var nb=document.getElementById('navresumo');if(nb)nb.textContent='Meu resumo';var no=document.getElementById('navorf');if(no)no.remove();var nc=document.getElementById('navcob');if(nc)nc.remove();var ni=document.getElementById('navimp');if(ni)ni.remove();var nv2=document.getElementById('navvis');if(nv2)nv2.remove()}$('#ver').textContent='versão v146';
 // ---------- links por cliente (WhatsApp, Maps, Fachada)
 const CEPG=(()=>{try{return JSON.parse(localStorage.getItem('metalmig_cep_v1')||'{}')}catch(e){return {}}})();
 const saveCep=()=>{try{localStorage.setItem('metalmig_cep_v1',JSON.stringify(CEPG))}catch(e){}};
@@ -1962,7 +1962,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER='v145';
+const NX_VER='v146';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3263,7 +3263,7 @@ if(H.sec==='agenda'){setView('agenda')}else if(H.sec==='cal'){setView('cal')}els
 (function(){try{
  if(window.__lc)return;window.__lc=1;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
- const LG=[['hoje','☀️','Hoje',['hoje','venda','agenda']],['cli','👥','Clientes',['ficha','cart','rec','reat','relsem','mapa','perto','abc','queda','novos','rev','orc']],['vm','📈','Vendas',['painel','resumo','meta','proj','vendas','cal','hist']],['ter','🗺️','Territórios',['cidn','camp','cobreg','orfaos','confl']],['via','🧳','Viagens',['desp','vis']],['mat','📚','Materiais',['rel','conq','bib','precos']],['sasi','🤖','Sasi',['sasi']],['sis','⚙️','Sistema',['pedidos','imp','dup','saude','pcp','nov']],['ger','🧭','Gestão',['repn','recr','most','prosp']]];
+ const LG=[['hoje','☀️','Hoje',['hoje','venda','agenda']],['cli','👥','Clientes',['ficha','cart','catx','rec','reat','relsem','mapa','perto','abc','queda','novos','rev','orc']],['vm','📈','Vendas',['painel','resumo','meta','proj','vendas','cal','hist']],['ter','🗺️','Territórios',['cidn','camp','cobreg','orfaos','confl']],['via','🧳','Viagens',['desp','vis']],['mat','📚','Materiais',['rel','conq','bib','precos']],['sasi','🤖','Sasi',['sasi']],['sis','⚙️','Sistema',['pedidos','imp','dup','saude','pcp','nov']],['ger','🧭','Gestão',['repn','recr','most','prosp']]];
  const HID=new Set(['seg','oco','conc','cartao']);window.LCHID=HID;
  const GI={};LG.forEach(g=>GI[g[0]]=[g[1],g[2]]);
  const GC={hoje:'#F9A825',cli:'#1F78B4',vm:'#2E7D32',ter:'#E08A1E',via:'#00838F',mat:'#8E24AA',sasi:'#7c3aed',sis:'#546E7A',ger:'#6A1B9A'};
@@ -3639,6 +3639,11 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v146',d:'15/11/2026',t:'Catálogo do cliente: enviar catálogo e pedido pelo celular',l:[
+   ['a','Nova aba Clientes › Catálogo: escolha o cliente e envie o catálogo pelo WhatsApp, com ou sem preço. O cliente abre o link no próprio celular (sem cadastro) e o pedido volta para o WhatsApp da Metalmig.'],
+   ['a','Montar pedido para o cliente: você escolhe os itens e as quantidades, escreve uma observação, e o cliente só ajusta e envia. O que ele alterou aparece marcado no pedido.'],
+   ['a','Pedido mínimo de R$ 1.500 (com IPI) só é conferido na hora de fechar; abaixo disso o cliente recebe sugestões do que costuma comprar. Cliente novo e link sem preço passam direto.'],
+   ['a','Ficha do cliente: novo botão “Enviar catálogo”. Lista de enviados e clientes para oferecer na própria aba.']]},
   {v:'v145',d:'15/11/2026',t:'Inteligência comercial: recompra, reativação, meta, 2ª compra e concentração',l:[
    ['a','Nova aba Clientes › Recomprar (Hora de recomprar): cada cliente no seu próprio ritmo de compra (na hora, passou do ritmo, chega em breve), com WhatsApp pronto. Também aparece um cartão em Hoje.'],
    ['a','Nova aba Clientes › Reativar: quem parou de comprar, do que mais vale ao que menos vale, com chance de voltar, o que costumava levar e mensagem pronta. “Já chamei” esconde por 14 dias.'],
@@ -4192,7 +4197,7 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
   if(!P.length){out.innerHTML='<div class="act">A tabela de preços não está neste arquivo.</div>';return}
   const tb=(()=>{try{return AP.base.regras.tabela||''}catch(e){return''}})(),gs=[...new Set(P.map(x=>x.g).filter(Boolean))].sort();
   out.innerHTML=`<div class="vmh"><h2>💲 Tabela de preços</h2><p>${E(tb)}${(()=>{try{return AP.base.precoProvisorio?' <b style="color:#C62828">(provisória)</b>':''}catch(e){return''}})()} · ${P.length} produtos. Digite a referência ou parte da descrição.</p></div><div style="background:#fff;border:1px solid #d9dfe9;border-radius:12px;padding:10px 12px;margin-bottom:10px"><input id="pf_q" type="search" placeholder="Referência ou descrição" value="${E(PF.q)}" style="width:100%;padding:10px;font-size:16px;box-sizing:border-box"><select id="pf_g" style="width:100%;padding:10px;font-size:16px;margin-top:6px"><option value="">Todas as linhas</option>${gs.map(x=>`<option${x===PF.g?' selected':''}>${E(x)}</option>`).join('')}</select></div><div id="pf_r"></div>`;
-  const draw=()=>{const t=fNorm(PF.q).trim(),w=t.split(/\s+/).filter(Boolean);const l=P.filter(x=>(!PF.g||x.g===PF.g)&&(!w.length||w.every(k=>fNorm(x.c+' '+x.n).includes(k))));
+  const draw=()=>{const sy=z=>fNorm(z).replace(/galvanizad[ao]s?/g,'galv').replace(/\bcaixas?\b/g,'cx').replace(/\bcorreios?\b/g,'cor').replace(/\bnumeros?\b/g,'n').replace(/\bn[º°o]\b/g,'n').replace(/[.,]/g,' ').replace(/\s+/g,' ');const t=fNorm(PF.q).trim(),ts=sy(PF.q).trim(),w=ts.split(/\s+/).filter(Boolean);const l=P.filter(x=>(!PF.g||x.g===PF.g)&&(!w.length||w.every(k=>sy(x.c+' '+x.n).includes(k))));
    l.sort((a,b)=>{const ea=String(a.c)===t?0:String(a.c).startsWith(t)?1:2,eb=String(b.c)===t?0:String(b.c).startsWith(t)?1:2;return ea-eb||String(a.n).localeCompare(String(b.n))});
    const f=v=>'R$ '+(+v).toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+,)/g,'.');
    document.getElementById('pf_r').innerHTML=`<div class="mute" style="margin-bottom:6px">${l.length} produto${l.length===1?'':'s'}${l.length>60?' (mostrando 60; refine a busca)':''}</div>`+l.slice(0,60).map(x=>`<div class="lccard"><div style="display:flex;justify-content:space-between;gap:8px"><b>${E(x.n)}</b><b style="white-space:nowrap">${f(x.p)}</b></div><div class="mute" style="font-size:12.5px">Ref. <b>${E(x.c)}</b> · ${E(x.g||'')}</div><div class="mute" style="font-size:12.5px">IPI ${((x.ipi||0)*100).toFixed(1).replace('.',',')}% · com IPI <b>${f(x.p*(1+(x.ipi||0)))}</b> · NCM ${E(x.ncm||'—')}</div></div>`).join('')};
@@ -4672,6 +4677,7 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  function stat(x){if(!x.cyc)return null;const since=D.ref-x.last;if(since>540)return null;const ratio=since/x.cyc,due=x.cyc-since;
   if(ratio>=3)return null;if(ratio>=1.3)return{k:'atr',since,ratio,due};if(ratio>=0.85)return{k:'hora',since,ratio,due};if(due<=21)return{k:'breve',since,ratio,due};return null}
  const recList=ids=>{const M=ritmo(),l=[];ids.forEach(ci=>{const x=M.get(ci);if(!x)return;const s=stat(x);if(s)l.push({ci,x,s})});return l};
+ window.lcRecList=recList;
  const first=n=>n3First(n);
  const abcOf=ci=>{try{return window.lcAbc?(lcAbc(ci)||''):''}catch(e){return''}};
  // ---------- abas novas
@@ -4792,6 +4798,80 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
   document.querySelectorAll('.cnf').forEach(a=>a.onclick=e=>{e.preventDefault();nxFicha(+a.dataset.ci)})}
  const raQ=renderAbc;renderAbc=function(){raQ.apply(this,arguments);try{abcExtra()}catch(e){console.error('lcQ abc',e)}};
 }catch(e){console.error('lcQ',e)}})();
+
+// ===== v146 · aba Catálogo: enviar catálogo ao cliente (com/sem preço), montar pedido com observação, enviados =====
+(function(){try{ if(window.__lcR)return;window.__lcR=1;
+ const E=sqE,BASE='https://romulometalmig-hash.github.io/painel-metalmig/c.html',K='mm_catenv_v1_'+(D.rm?'r':'g');
+ const st=document.createElement('style');st.textContent=`.ctb{display:block;width:100%;text-align:center;border:0;border-radius:10px;padding:12px;font-weight:700;font-size:15px;background:#E4572E;color:#fff;margin:6px 0;cursor:pointer;text-decoration:none;box-sizing:border-box}.ctb.g{background:#1FA855}.ctb.l{background:#fff;color:#1F4E78;border:2px solid #cfd6e3}
+.ctq{display:flex;align-items:center;gap:6px}.ctq b{width:30px;height:30px;border-radius:8px;background:#1F4E78;color:#fff;display:flex;align-items:center;justify-content:center;font-size:17px;cursor:pointer;user-select:none}.ctq u{text-decoration:none;min-width:22px;text-align:center;font-weight:700}
+.ctr{display:flex;justify-content:space-between;align-items:center;gap:8px;background:#fff;border:1px solid #d9dfe9;border-radius:10px;padding:8px 10px;margin:5px 0;font-size:13.5px}.ctr.s{border-color:#E4572E;background:#fff8f4}.ctr small{display:block;color:#667;font-size:11.5px}
+.ctm{display:flex;gap:8px;margin:8px 0}.ctm div{flex:1;border:2px solid #cfd6e3;border-radius:10px;padding:10px 6px;text-align:center;font-weight:700;background:#fff;cursor:pointer;font-size:14px}.ctm div.on{border-color:#E4572E;background:#fff8f4;color:#B4451F}`;document.head.appendChild(st);
+ const nav=document.getElementById('nav');if(nav){const b=document.createElement('button');b.dataset.v='catx';b.textContent='📖 Catálogo';nav.appendChild(b)}
+ const rdR=render;render=function(){if(VIEW==='catx')return;return rdR.apply(this,arguments)};
+ const svR=setView;setView=function(v){if(v==='catx'){svR(v);try{renderCatx()}catch(e){console.error(e)}return}return svR(v)};
+ const T=s=>String(s||'').toLowerCase().replace(/(^|[\s\/\-])(\S)/g,(m,a,b)=>a+b.toUpperCase()).replace(/\/(\w{2})$/,(m,u)=>'/'+u.toUpperCase());
+ const nz=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+ const b64=s=>btoa(String.fromCharCode(...new TextEncoder().encode(s))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+ const PROD=()=>{try{return AP.base.produtos.filter(x=>x.p!=null)}catch(e){return[]}};
+ const br=v=>'R$ '+v.toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+ const lin=(x,q)=>Math.round(x.p*(1+(x.ipi||0))*q*100)/100;
+ function hist(ci){const ok=new Set(PROD().map(x=>+x.c)),m=new Map();
+  cliLines(ci).forEach(i=>{const code=+D.pc[L.P[i]];if(!ok.has(code))return;const d=D.ref-L.D[i];if(d>540)return;let a=m.get(code);if(!a)m.set(code,a={n:0,d:d});a.n++;if(d<a.d)a.d=d});
+  return [...m.entries()].sort((a,b)=>b[1].n-a[1].n||a[1].d-b[1].d).slice(0,10).map(([c,a])=>[c,a.d])}
+ function mkLink(ci,o){const c=D.cli[ci],j={v:1,n:c[1],cd:T(c[2]),t:c[3]||'',r:n3First(sqRn(c[8])),p:o.p?1:0};
+  if(!nxOrd(ci).length)j.nv=1;if(o.items&&o.items.length)j.it=o.items;if(o.obs)j.o=o.obs;const h=hist(ci);if(h.length)j.h=h;
+  return BASE+'#'+b64(JSON.stringify(j))}
+ const getLog=()=>{try{return JSON.parse(localStorage.getItem(K)||'[]')||[]}catch(e){return[]}};
+ const setLog=a=>{try{localStorage.setItem(K,JSON.stringify(a.slice(0,60)))}catch(e){}};
+ const logIt=(ci,k,p)=>{const a=getLog();a.unshift({ci,k,p:p?1:0,ts:Date.now(),ok:0});setLog(a)};
+ const CT={ci:null,mode:'home',p:1,items:{},obs:'',q:'',pq:''};
+ window.lcCatCli=ci=>{CT.ci=ci;CT.mode='home';CT.items={};CT.obs='';setView('catx')};
+ const dt=ts=>{const d=new Date(ts);return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')};
+ function msgCat(ci,link,ped){const rp=D.rm?n3First(sqRn(D.cli[ci][8])):'';return ped?`Olá! ${rp?'Aqui é '+rp+' da Metalmig. ':''}Preparei um pedido para você conferir. É só abrir, ajustar as quantidades e enviar:\n👉 ${link}\nSe tiver dúvida, me chame.`:`Olá! ${rp?'Aqui é '+rp+' da Metalmig. ':''}Segue o catálogo da Metalmig para você montar seu pedido direto pelo celular:\n👉 ${link}\nSe tiver dúvida, me chame.`}
+ function pickList(){const t=nz(CT.q).trim(),ids=nx2Ids(),h=[];if(t.length<2)return'<div class="mute" style="padding:6px 2px">Digite pelo menos 2 letras do nome, parte do código ou da cidade.</div>';
+  const ps=t.split(/\s+/);for(const i of ids){const c=D.cli[i],s=nz(c[1]+' '+c[0]+' '+c[2]);if(ps.every(p=>s.includes(p)))h.push(i)}
+  h.sort((a,b)=>(D.cli[b][7]||0)-(D.cli[a][7]||0));if(!h.length)return'<div class="act">Nenhum cliente encontrado.</div>';
+  return h.slice(0,12).map(i=>{const c=D.cli[i];return`<div class="ctr" data-pick="${i}" style="cursor:pointer"><div><b>${E(c[1])}</b><small>${E(T(c[2]))} · cód. ${E(c[0])}</small></div><span>›</span></div>`}).join('')}
+ function prodRows(){const q=nz(CT.pq).trim(),H=hist(CT.ci),hs=new Set(H.map(x=>x[0]));let l=PROD();
+  const row=(x,tag)=>{const k=CT.items[x.c]||0;return`<div class="ctr ${k?'s':''}"><div style="min-width:0"><b>${E(x.n)}</b><small>Cód. ${x.c} · ${br(x.p)}${x.ipi?' + IPI '+Math.round(x.ipi*1000)/10+'%':''}${tag||''}</small></div>${k?`<div class="ctq"><b data-m="${x.c}">−</b><u>${k}</u><b data-p="${x.c}">+</b></div>`:`<div class="ctq"><b data-p="${x.c}" style="width:auto;padding:0 10px">+ Adicionar</b></div>`}</div>`};
+  if(q.length<2){const hl=H.map(([c,d])=>[PROD().find(x=>+x.c===c),d]).filter(a=>a[0]);return(hl.length?'<div class="mute" style="margin:6px 0 2px">Itens que o cliente costuma comprar:</div>'+hl.map(([x,d])=>row(x,` · última compra há ${d} dias`)).join(''):'')+'<div class="mute" style="padding:6px 2px">Busque outros produtos pelo nome ou código.</div>'}
+  const ps=q.split(/\s+/);l=l.filter(x=>{const s=nz(x.n+' '+x.c);return ps.every(p=>s.includes(p))}).slice(0,25);return l.length?l.map(x=>row(x)).join(''):'<div class="act">Nenhum produto encontrado.</div>'}
+ function sumPed(){const P=PROD();const it=Object.keys(CT.items).filter(c=>CT.items[c]).map(c=>[+c,CT.items[c]]);let t=0;it.forEach(([c,q])=>{const x=P.find(y=>+y.c===c);if(x)t+=lin(x,q)});return{it,t:Math.round(t*100)/100}}
+ function renderCatx(){ctl('');const out=document.getElementById('v2out');
+  const sel=CT.ci==null?'':(()=>{const c=D.cli[CT.ci];return`<div class="lccard"><div style="display:flex;justify-content:space-between;gap:8px"><div><b>${E(c[1])}</b><div class="mute">${E(T(c[2]))} · cód. ${E(c[0])}${c[3]?' · '+E(c[3]):' · <b>sem telefone cadastrado</b>'}</div></div><a href="#" id="ct_troca" style="font-size:13px">trocar</a></div></div>`})();
+  let body='';
+  if(CT.ci==null){body=`<div class="lccard"><b>Escolha o cliente</b><input id="ct_q" type="search" autocomplete="off" placeholder="Nome, código ou cidade" style="width:100%;box-sizing:border-box;margin:8px 0;padding:10px;font-size:15px;border:2px solid #cfd6e3;border-radius:10px" value="${E(CT.q)}"><div id="ct_pl">${pickList()}</div></div>`}
+  else if(CT.mode==='home'){body=`${sel}<div style="font-weight:700;margin-top:6px">Como enviar?</div><div class="ctm"><div class="${CT.p?'on':''}" data-pp="1">💲 Com preço</div><div class="${CT.p?'':'on'}" data-pp="0">🚫 Sem preço</div></div>
+   <div class="mute" style="margin-bottom:8px">O link leva os dados do cliente e as sugestões do que ele costuma comprar. ${CT.p?'O cliente vê a tabela e o pedido mínimo é conferido ao fechar.':'O cliente só escolhe os produtos, sem ver valores e sem mínimo.'}</div>
+   <a class="ctb g" id="ct_env" href="#">📲 Enviar catálogo pelo WhatsApp</a><div class="ctb l" id="ct_cp">🔗 Copiar link</div><div class="ctb" id="ct_ped" style="background:#1F4E78">🧾 Montar pedido para o cliente</div>`}
+  else{const S=sumPed();body=`${sel}<div style="font-weight:700;margin:4px 0">🧾 Pedido para o cliente</div><input id="ct_pq" type="search" autocomplete="off" placeholder="Buscar produto (nome ou código)" style="width:100%;box-sizing:border-box;margin:4px 0;padding:10px;font-size:15px;border:2px solid #cfd6e3;border-radius:10px" value="${E(CT.pq)}"><div id="ct_pr">${prodRows()}</div>
+   <div class="lccard" style="margin-top:10px"><b>No pedido: ${S.it.length} ${S.it.length===1?'item':'itens'}${S.it.length?' · '+br(S.t)+' (tabela + IPI)':''}</b></div>
+   <div style="font-weight:700;margin-top:6px">📝 Observação para o cliente</div><textarea id="ct_ob" rows="3" style="width:100%;box-sizing:border-box;margin:4px 0;padding:10px;font-size:15px;border:2px solid #cfd6e3;border-radius:10px" placeholder="Ex.: Reposição do mês. Conferi o estoque da loja…">${E(CT.obs)}</textarea>
+   <div class="ctm"><div class="${CT.p?'on':''}" data-pp="1">💲 Com preço</div><div class="${CT.p?'':'on'}" data-pp="0">🚫 Sem preço</div></div>
+   <a class="ctb g" id="ct_env2" href="#">📲 Enviar ao cliente pelo WhatsApp</a><div class="ctb l" id="ct_cp2">🔗 Copiar link</div><div class="ctb l" id="ct_back">‹ Voltar</div>`}
+  const lg=getLog().slice(0,12),ofr=(window.lcRecList?lcRecList(nx2Ids()):[]).filter(o=>o.s.k!=='breve').sort((a,b)=>(a.s.k==='hora'?0:1)-(b.s.k==='hora'?0:1)||b.x.typ-a.x.typ).slice(0,6);
+  const extra=CT.ci==null||CT.mode==='home'?`${lg.length?`<div style="font-weight:700;margin:14px 0 4px">📤 Enviados</div>${lg.map((g,i)=>{const c=D.cli[g.ci];return`<div class="ctr"><div><b>${E(c?c[1]:'?')}</b><small>${dt(g.ts)} · ${g.k==='ped'?'pedido montado':'catálogo'} · ${g.p?'com preço':'sem preço'}</small></div><span data-ok="${i}" style="cursor:pointer;font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;${g.ok?'background:#e7f6ec;color:#17803f':'background:#fff3e8;color:#b4451f'}">${g.ok?'✔ respondeu':'aguardando'}</span></div>`}).join('')}<div class="mute">Toque em “aguardando” para marcar que o cliente respondeu.</div>`:''}
+   ${CT.ci==null&&ofr.length?`<div style="font-weight:700;margin:14px 0 4px">🎯 Clientes para oferecer</div>${ofr.map(o=>{const c=D.cli[o.ci];return`<div class="ctr" data-pick="${o.ci}" style="cursor:pointer"><div><b>${E(c[1])}</b><small>${o.s.k==='hora'?'🟢 Na hora de recomprar':'🟠 Passou do ritmo'} · última compra há ${o.s.since} dias</small></div><span>›</span></div>`}).join('')}`:''}`:'';
+  out.innerHTML=`<div class="vmh"><h2>📖 Catálogo</h2><p>Envie o catálogo para o cliente fazer o pedido pelo celular, ou monte o pedido por ele. O pedido chega no WhatsApp da Metalmig.</p></div><button id="k_xl" style="display:none"></button>${body}${extra}`;
+  bind()}
+ function bind(){const q=id=>document.getElementById(id),all=s=>document.querySelectorAll(s);
+  all('[data-pick]').forEach(e=>e.onclick=()=>{CT.ci=+e.dataset.pick;CT.mode='home';CT.items={};CT.obs='';renderCatx();window.scrollTo(0,0)});
+  const ci=q('ct_q');if(ci){ci.oninput=()=>{CT.q=ci.value;q('ct_pl').innerHTML=pickList();all('#ct_pl [data-pick]').forEach(e=>e.onclick=()=>{CT.ci=+e.dataset.pick;renderCatx()})};all('#ct_pl [data-pick]').forEach(e=>e.onclick=()=>{CT.ci=+e.dataset.pick;renderCatx()});setTimeout(()=>ci.focus(),30)}
+  const tr=q('ct_troca');if(tr)tr.onclick=e=>{e.preventDefault();CT.ci=null;CT.mode='home';renderCatx()};
+  all('[data-pp]').forEach(e=>e.onclick=()=>{CT.p=+e.dataset.pp;const o=q('ct_ob');if(o)CT.obs=o.value;renderCatx()});
+  all('[data-ok]').forEach(e=>e.onclick=()=>{const a=getLog(),g=a[+e.dataset.ok];if(g){g.ok=g.ok?0:1;setLog(a);renderCatx()}});
+  const go=(k,items,obs)=>{const c=D.cli[CT.ci],link=mkLink(CT.ci,{p:CT.p,items,obs}),m=msgCat(CT.ci,link,k==='ped'),h=n3Wa(c[3],m)||('https://wa.me/?text='+encodeURIComponent(m));return{link,m,h}};
+  const env=q('ct_env');if(env){const r=go('cat');if(r.h){env.href=r.h;env.target='_blank';env.rel='noopener';env.onclick=()=>logIt(CT.ci,'cat',CT.p)}else{env.textContent='📲 Cliente sem telefone: use “Copiar link”';env.style.background='#999';env.onclick=e=>e.preventDefault()}}
+  const copy=(el,k,items,obs)=>{el.onclick=()=>{const r=go(k,items,obs);const done=()=>{logIt(CT.ci,k,CT.p);el.textContent='✔ Link copiado';setTimeout(()=>renderCatx(),1200)};try{navigator.clipboard.writeText(r.m).then(done,()=>{prompt('Copie a mensagem:',r.m)})}catch(e){prompt('Copie a mensagem:',r.m)}}};
+  const cp=q('ct_cp');if(cp)copy(cp,'cat');
+  const pd=q('ct_ped');if(pd)pd.onclick=()=>{CT.mode='ped';renderCatx();window.scrollTo(0,0)};
+  const bk=q('ct_back');if(bk)bk.onclick=()=>{const o=q('ct_ob');if(o)CT.obs=o.value;CT.mode='home';renderCatx()};
+  const pq=q('ct_pq');if(pq){const rb=()=>{q('ct_pr').innerHTML=prodRows();pbind()};const pbind=()=>{all('#ct_pr [data-p]').forEach(e=>e.onclick=()=>{CT.items[e.dataset.p]=(CT.items[e.dataset.p]||0)+1;const o=q('ct_ob');if(o)CT.obs=o.value;renderCatx()});all('#ct_pr [data-m]').forEach(e=>e.onclick=()=>{const c=e.dataset.m;CT.items[c]=(CT.items[c]||0)-1;if(CT.items[c]<=0)delete CT.items[c];const o=q('ct_ob');if(o)CT.obs=o.value;renderCatx()})};pq.oninput=()=>{CT.pq=pq.value;rb()};pbind()}
+  const e2=q('ct_env2');if(e2){const mk=()=>{const o=q('ct_ob');if(o)CT.obs=o.value;const S=sumPed();return go('ped',S.it,CT.obs.trim())};const r=mk();if(r.h){e2.href=r.h;e2.target='_blank';e2.rel='noopener';e2.onclick=()=>{const o=q('ct_ob');if(o)CT.obs=o.value;const r2=mk();e2.href=r2.h;logIt(CT.ci,'ped',CT.p)}}else{e2.textContent='📲 Cliente sem telefone: use “Copiar link”';e2.style.background='#999';e2.onclick=e=>e.preventDefault()}}
+  const c2=q('ct_cp2');if(c2){c2.onclick=()=>{const o=q('ct_ob');if(o)CT.obs=o.value;const S=sumPed(),r=go('ped',S.it,CT.obs.trim());const done=()=>{logIt(CT.ci,'ped',CT.p);c2.textContent='✔ Link copiado'};try{navigator.clipboard.writeText(r.m).then(done,()=>{prompt('Copie a mensagem:',r.m)})}catch(e){prompt('Copie a mensagem:',r.m)}}}}
+ // botão na Ficha do cliente
+ const fsR=fichaShow;fichaShow=function(ci){fsR.apply(this,arguments);try{const det=document.getElementById('f_det');if(!det||det.querySelector('#ct_fb'))return;det.insertAdjacentHTML('afterbegin',`<div id="ct_fb" style="margin:8px 0"><button class="ctb" style="background:#1F4E78;display:inline-block;width:auto;padding:9px 16px;font-size:14px" id="ct_fbb">📖 Enviar catálogo</button></div>`);document.getElementById('ct_fbb').onclick=()=>lcCatCli(ci)}catch(e){console.error(e)}};
+}catch(e){console.error('lcR',e)}})();
 
 
 </script></body></html>
