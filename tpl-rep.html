@@ -1962,7 +1962,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER='v175';
+const NX_VER='v176';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3639,6 +3639,9 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v176',d:'16/11/2026',t:'Logo da Metalmig e botão de fechar',l:[
+   ['a','A logo da Metalmig agora aparece inteira e maior no topo, em placa branca.'],
+   ['a','O botão de fechar (✕) da busca de abas ficou vermelho e bem visível.']]},
   {v:'v175',d:'16/11/2026',t:'Balões também nas tabelas',l:[
    ['a','Toque em Inativo, Em risco, Atrasado, Em dia ou na classe A/B/C dentro das tabelas (Carteira, listas) para ver o que significa.']]},
   {v:'v174',d:'16/11/2026',t:'Histórico dos clientes transferidos',l:[
@@ -6166,6 +6169,22 @@ window.lcRelPos=function(w,S){
   h=h.replace(/<b>(Dar atenção na próxima visita\.?)<\/b>/g,'<b style="color:#c62828">$1</b>');
   if(h!==e.innerHTML)e.innerHTML=h});
 };
+
+// ===== v176 · logo inteira em placa branca + X de fechar bem visível =====
+(function(){try{
+ if(window.__lcAI)return;window.__lcAI=1;
+ const st=document.createElement('style');st.id='lcAIcss';
+ st.textContent=`
+#lctop #lclw{background:#fff!important;border-radius:10px!important;width:auto!important;height:54px!important;padding:4px 12px!important;box-sizing:border-box;display:flex;align-items:center;justify-content:center;overflow:hidden;flex:none;margin-right:2px}
+#lctop #lclw img{height:46px!important;width:auto!important;max-width:none!important}
+#lctop .r1{padding:7px 12px!important;gap:12px!important}
+#lctop .t{border-left:1px solid #3a4c6e;padding-left:12px;min-width:0}
+@media(max-width:420px){#lctop .t{display:none!important}#lctop .r1{gap:8px!important}#lctop #lcfv{margin-left:auto}#lctop #lclw{padding:4px 8px!important;height:48px!important}#lctop #lclw img{height:40px!important}}
+#lcsheet .lch #lcx,#lcsheet #lcx,#lcsrch #lcsx,#lcsrch .lcsh button#lcsx{background:#c62828!important;color:#fff!important;border:0!important;border-radius:10px!important;min-width:52px!important;min-height:46px!important;font-size:24px!important;font-weight:700!important;line-height:1;box-shadow:0 1px 4px rgba(0,0,0,.35);cursor:pointer}
+@media(min-width:1000px){#lcnav,#lcsheet{top:72px!important}#lcov,#lcov.full{top:72px!important}}
+`;
+ document.head.appendChild(st);
+}catch(e){}})();
 
 
 </script></body></html>
