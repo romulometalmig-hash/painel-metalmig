@@ -119,7 +119,7 @@ let hc=H.cod!=null?parseInt(H.cod):null;let ix=hc==null?0:D.reps.findIndex(x=>x[
 $('#ini').value=diso(xl2d(H.ini)||Math.round(Date.UTC(Y,0,1)/864e5));$('#fim').value=diso(xl2d(H.fim)||REF);
 $('#rea').value=diso(xl2d(H.rea)||Math.round(Date.UTC(Y,4,1)/864e5));
 let CUSTOM=null;if(H.cini&&H.cfim){CUSTOM=[xl2d(H.cini),xl2d(H.cfim)];const o=document.createElement('option');o.value='x';o.textContent='Período de comparação do Excel';$('#cmp').appendChild(o);$('#cmp').value='x'}
-(function(){try{var l=AP&&AP.base&&AP.base.logo;if(l){var i=document.getElementById('hlogo');i.src=l;i.className='on'}}catch(e){}})();if(D.rm){var nb=document.getElementById('navresumo');if(nb)nb.textContent='Meu resumo';var no=document.getElementById('navorf');if(no)no.remove();var nc=document.getElementById('navcob');if(nc)nc.remove();var ni=document.getElementById('navimp');if(ni)ni.remove();var nv2=document.getElementById('navvis');if(nv2)nv2.remove()}$('#ver').textContent='versão v173';
+(function(){try{var l=AP&&AP.base&&AP.base.logo;if(l){var i=document.getElementById('hlogo');i.src=l;i.className='on'}}catch(e){}})();if(D.rm){var nb=document.getElementById('navresumo');if(nb)nb.textContent='Meu resumo';var no=document.getElementById('navorf');if(no)no.remove();var nc=document.getElementById('navcob');if(nc)nc.remove();var ni=document.getElementById('navimp');if(ni)ni.remove();var nv2=document.getElementById('navvis');if(nv2)nv2.remove()}$('#ver').textContent='versão v174';
 // ---------- links por cliente (WhatsApp, Maps, Fachada)
 const CEPG=(()=>{try{return JSON.parse(localStorage.getItem('metalmig_cep_v1')||'{}')}catch(e){return {}}})();
 const saveCep=()=>{try{localStorage.setItem('metalmig_cep_v1',JSON.stringify(CEPG))}catch(e){}};
@@ -685,7 +685,7 @@ function renderMapa(){
  const h=apMapa(cur);if(!h){out.innerHTML='<div class="act">Este representante não tem clientes para mostrar no mapa.</div>';return}
  out.innerHTML='<iframe id="mapaGer" title="Mapa de clientes" allow="geolocation; clipboard-write" style="width:100%;height:calc(100vh - 190px);min-height:520px;border:1px solid #d9dfe9;border-radius:8px;background:#fff"></iframe>';$('#mapaGer').srcdoc=h}
 function apEnv(ri,mes){
- const rp=D.reps[ri],cod=rp[0],keep=[];for(let i=0;i<N;i++)if(L.R[i]===ri)keep.push(i);
+ const rp=D.reps[ri],cod=rp[0],keep=[];const mvT=new Set();try{const m_=rtAll();D.cli.forEach((c,o)=>{const x=m_[c[0]];if(x&&c[8]===ri&&rtIdx(x.t,x.tn)===ri)mvT.add(o)})}catch(e){}for(let i=0;i<N;i++)if(L.R[i]===ri||mvT.has(L.C[i]))keep.push(i);
  const cm=new Map(),cl=[],om=new Map(),ord=[];
  const addC=o=>{if(!cm.has(o)){cm.set(o,cl.length);const c=D.cli[o].slice();c[8]=(c[8]===ri?1:0);cl.push(c)}return cm.get(o)};
  D.cli.forEach((c,o)=>{if(c[8]===ri)addC(o)});
@@ -1962,7 +1962,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER='v173';
+const NX_VER='v174';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3639,6 +3639,8 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v174',d:'16/11/2026',t:'Histórico dos clientes transferidos',l:[
+   ['g','Páginas dos representantes: o histórico de compras dos clientes transferidos para o representante agora vai junto (Ficha, Curva ABC de produtos).']]},
   {v:'v173',d:'16/11/2026',t:'Ajuste na janela de novidades',l:[
    ['g','Janela de novidades não aparece mais vazia para o representante.']]},
   {v:'v172',d:'16/11/2026',t:'Relatório de viagem com seções separadas',l:[
