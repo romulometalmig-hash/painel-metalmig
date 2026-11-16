@@ -1962,7 +1962,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER='v176';
+const NX_VER='v177';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3263,11 +3263,11 @@ if(H.sec==='agenda'){setView('agenda')}else if(H.sec==='cal'){setView('cal')}els
 (function(){try{
  if(window.__lc)return;window.__lc=1;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
- const LG=[['hoje','☀️','Hoje',['dash','hoje','venda','agenda','dashrep']],['cli','👥','Clientes',['ficha','cart','catx','rec','reat','relsem','mapa','perto','abc','queda','novos','rev','orc','pspc','mpr']],['vm','📈','Vendas',['painel','resumo','meta','proj','vendas','cal','hist']],['ter','🗺️','Territórios',['cidn','camp','cobreg','orfaos','confl']],['via','🧳','Viagens',['desp','vis']],['mat','📚','Materiais',['rel','conq','bib','precos']],['sasi','🤖','Sasi',['sasi']],['sis','⚙️','Sistema',['pedidos','imp','dup','saude','pcp','nov']],['ger','🧭','Gestão',['repterm','repn','recr','most','prosp']]];
+ const LG=[['hoje','☀️','Hoje',['dash','hoje','venda','agenda','dashrep']],['cli','👥','Clientes',['ficha','cart','catx','rec','reat','relsem','mapa','perto','abc','queda','novos','rev','orc','pspc','mpr']],['vm','📈','Vendas',['painel','resumo','meta','proj','vendas','cal','hist']],['ter','🗺️','Territórios',['cidn','camp','cobreg','orfaos','confl']],['via','🧳','Viagens',['desp','vis']],['mat','📚','Materiais',['rel','conq','bib','precos']],['sasi','🤖','Sasi',['sasi']],['sis','⚙️','Sistema',['pedidos','prec','imp','dup','saude','pcp','nov']],['ger','🧭','Gestão',['repterm','repn','recr','most','prosp','and']]];
  const HID=new Set(['seg','oco','conc','cartao']);window.LCHID=HID;
  const GI={};LG.forEach(g=>GI[g[0]]=[g[1],g[2]]);
  const GC={hoje:'#F9A825',cli:'#1F78B4',vm:'#2E7D32',ter:'#E08A1E',via:'#00838F',mat:'#8E24AA',sasi:'#7c3aed',sis:'#546E7A',ger:'#6A1B9A'};
- const TI={pspc:'📞',mpr:'📞',hoje:'☀️',venda:'💰',agenda:'📅',ficha:'🪪',cart:'📂',mapa:'🗺️',perto:'📍',abc:'🔠',queda:'📉',novos:'🌱',rev:'🔄',cadi:'📝',precos:'💲',orc:'🧾',painel:'📊',resumo:'🧮',meta:'🎯',proj:'🔮',vendas:'📈',cal:'🗓️',hist:'🕘',cidn:'🏙️',camp:'📣',cobreg:'🧭',orfaos:'🙋',confl:'⚔️',desp:'💼',vis:'✅',rel:'🤝',conq:'🏆',bib:'📚',sasi:'🤖',pedidos:'🛒',imp:'📥',dup:'👯',saude:'🩺',pcp:'🏭',repn:'🗒️',recr:'🧑‍💼',most:'🖼️',prosp:'🧑‍💼',nov:'✨',relsem:'📋',repterm:'🌡️'};window.LCTI=TI;
+ const TI={and:'🧭',prec:'📥',pspc:'📞',mpr:'📞',hoje:'☀️',venda:'💰',agenda:'📅',ficha:'🪪',cart:'📂',mapa:'🗺️',perto:'📍',abc:'🔠',queda:'📉',novos:'🌱',rev:'🔄',cadi:'📝',precos:'💲',orc:'🧾',painel:'📊',resumo:'🧮',meta:'🎯',proj:'🔮',vendas:'📈',cal:'🗓️',hist:'🕘',cidn:'🏙️',camp:'📣',cobreg:'🧭',orfaos:'🙋',confl:'⚔️',desp:'💼',vis:'✅',rel:'🤝',conq:'🏆',bib:'📚',sasi:'🤖',pedidos:'🛒',imp:'📥',dup:'👯',saude:'🩺',pcp:'🏭',repn:'🗒️',recr:'🧑‍💼',most:'🖼️',prosp:'🧑‍💼',nov:'✨',relsem:'📋',repterm:'🌡️'};window.LCTI=TI;
  const st=document.createElement('style');st.id='lcst';st.textContent=`
 body.lc header,body.lc #gbar,body.lc #nav,body.lc #fbar,body.lc #nx3f,body.lc #mbar{display:none!important}
 html:has(body.lc),body.lc{overflow-x:hidden;max-width:100vw}body.lc main{overflow-x:auto;max-width:100vw;-webkit-overflow-scrolling:touch}body.lc{padding-bottom:96px}
@@ -3639,6 +3639,10 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v177',d:'16/11/2026',t:'Pedidos chegam sozinhos no seu Google Drive',l:[
+   ['g','Nova aba “Pedidos recebidos” (Sistema): lista os pedidos que os representantes digitaram, com filtros, itens, PDF para imprimir e marcação de “já digitei na fábrica”.'],
+   ['g','Nova aba “Andamento das internas” (Gestão): visitas, contatos de prospectos e registros da Naiara e da Bruna chegam sozinhos para você.'],
+   ['a','Quando o representante salva o pedido, ele é enviado automaticamente à Metalmig (se estiver sem internet, segue sozinho quando voltar). Nada muda na tela de pedido.']]},
   {v:'v176',d:'16/11/2026',t:'Logo da Metalmig e botão de fechar',l:[
    ['a','A logo da Metalmig agora aparece inteira e maior no topo, em placa branca.'],
    ['a','O botão de fechar (✕) da busca de abas ficou vermelho e bem visível.']]},
@@ -5878,7 +5882,7 @@ window.LC_RK={"20001": "7bf33d9a4d61fc268efcf90c32605dd0", "20002": "66ec6407a6e
  setInterval(()=>{if(!document.hidden)push()},45*1000);
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(ciclo,800)});
  window.lcProspSync=ciclo;
- window.lcBkFor=cod=>{const u=url(),k=(window.LC_RK||{})[String(cod)];return u&&k?{u,k,c:String(cod)}:null};
+ window.lcBkFor=cod=>{const u=url(),k=(window.LC_RK||{})[String(cod)];return k?{u:u||'',k,c:String(cod)}:null};
 }catch(e){console.error('lcAD',e)}})();
 
 // ===== v160 · Meus prospectos (representante / interna): lojas indicadas pela Metalmig, agenda e retorno ao gestor =====
@@ -6185,6 +6189,159 @@ window.lcRelPos=function(w,S){
 `;
  document.head.appendChild(st);
 }catch(e){}})();
+
+// ===== v177 · Pedidos recebidos (gestor): pedidos dos representantes que chegam no seu Google Drive =====
+(function(){try{ if(window.__lcAJ||D.rm)return;window.__lcAJ=1;
+ const GK='b4fCekslpS8DmJ1q4TKBLZS5lva5DwLN';
+ const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+ const L0=localStorage,gs=k=>{try{return L0.getItem(k)}catch(e){return null}},ss=(k,v)=>{try{L0.setItem(k,v)}catch(e){}};
+ const URLK='metalmig_bkp_pedurl',CK='metalmig_bkp_pedcache';
+ const brl=v=>'R$ '+(+v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+ const dBR=iso=>{if(!iso)return'';const d=new Date(iso);if(isNaN(d))return'';return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})};
+ let URL_=(gs(URLK)||'').trim(),LISTA=[],LOAD=null,ERR='',ST={rep:'',st:'novos',per:'7',q:''},BUSY=false,TM=null;
+ try{LISTA=(JSON.parse(gs(CK)||'null')||{}).lista||[]}catch(e){}
+ async function cfg(){ // endereço vem do drive.json do site (ou do campo manual)
+  try{const r=await fetch(new URL('drive.json?t='+Date.now(),location.href).href,{cache:'no-store'});const j=await r.json();if(j&&j.u){URL_=j.u;return j}}catch(e){}
+  return URL_?{u:URL_}:null}
+ async function carregar(){
+  if(BUSY)return;BUSY=true;ERR='';
+  try{const c=await cfg();if(!c||!c.u){ERR='sem-url';return}
+   const r=await fetch(c.u+(c.u.indexOf('?')>0?'&':'?')+'k='+GK+'&a=lista&t='+Date.now());const j=await r.json();
+   if(!j||!j.ok)throw new Error(j&&j.erro||'falha');
+   LISTA=j.lista||[];LOAD=Date.now();ss(CK,JSON.stringify({t:LOAD,lista:LISTA}))
+  }catch(e){ERR=String(e&&e.message||e)}finally{BUSY=false;badge();if(VIEW==='prec')draw()}}
+ const naoImp=()=>LISTA.filter(p=>!p.impresso).length;
+ function badge(){const b=document.querySelector('#nav button[data-v="prec"]');if(b){const n=naoImp();b.textContent='Pedidos recebidos'+(n?' ('+n+')':'')}
+  const o=document.querySelector('#lcnav button[data-g="sis"] .bd');}
+ try{const nav=document.getElementById('nav');if(nav){const b=document.createElement('button');b.dataset.v='prec';b.className='gest';b.title='Aba exclusiva do gestor';b.textContent='Pedidos recebidos';nav.appendChild(b)}}catch(e){}
+ const rd=render;render=function(){if(VIEW==='prec')return;return rd.apply(this,arguments)};
+ const sv0=setView;setView=function(v){if(v==='prec'){sv0(v);try{draw();carregar();clearInterval(TM);TM=setInterval(()=>{if(VIEW==='prec'&&!document.hidden)carregar();else if(VIEW!=='prec')clearInterval(TM)},60000)}catch(e){console.error(e)}return}return sv0(v)};
+ const css=document.createElement('style');css.textContent=`.pr-b{background:#fff;border:1px solid #d9dfe9;border-radius:12px;padding:12px 14px;margin:0 0 12px}.pr-b h3{margin:0 0 8px;font-size:15px;color:#14233f}
+.pr-f{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.pr-f select,.pr-f input{padding:9px 10px;border:1px solid #b9c7e2;border-radius:9px;font-size:14px;background:#fff}
+.pr-c{background:#fff;border:1px solid #d9dfe9;border-radius:12px;padding:12px 14px;margin:0 0 10px}.pr-c.n{border-left:4px solid #F9A825}.pr-c.ok{opacity:.78}
+.pr-t{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}.pr-t b{font-size:15.5px;color:#14233f}.pr-m{font-size:12.5px;color:#5b6b82;margin-top:2px}
+.pr-v{font-size:18px;font-weight:800;color:#14233f;text-align:right}.pr-l{border-top:1px solid #eef1f6;margin-top:9px;padding-top:9px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.pr-l button{border:0;border-radius:9px;padding:10px 14px;font-weight:700;font-size:13.5px;cursor:pointer;background:#eef2f9;color:#1F4E78}.pr-l button.p{background:#1F4E78;color:#fff}.pr-l button.g{background:#2E7D32;color:#fff}
+.pr-g{display:inline-block;font-size:11.5px;font-weight:700;border-radius:999px;padding:2px 9px;margin-left:6px}
+.pr-it{font-size:13px;margin:8px 0 0}.pr-it table{width:100%;border-collapse:collapse}.pr-it td{padding:4px 6px;border-bottom:1px solid #f0f2f6}.pr-it td:nth-child(2),.pr-it td:nth-child(3){text-align:right;white-space:nowrap}`;
+ document.head.appendChild(css);
+ const tag=(t,c)=>`<span class="pr-g" style="background:${c}22;color:${c}">${t}</span>`;
+ function filtrada(){const hoje=new Date();hoje.setHours(0,0,0,0);const lim=ST.per==='todos'?0:hoje.getTime()-(+ST.per-1)*864e5,q=(ST.q||'').toLowerCase().trim();
+  return LISTA.filter(p=>{if(ST.rep&&String(p.rep)!==ST.rep)return false;
+   if(ST.st==='novos'&&p.impresso)return false;if(ST.st==='imp'&&(!p.impresso||p.digitado))return false;if(ST.st==='dig'&&!p.digitado)return false;if(ST.st==='pend'&&p.digitado)return false;
+   if(ST.st!=='novos'&&ST.st!=='pend'&&lim&&new Date(p.recebido).getTime()<lim)return false;
+   if(q&&!((p.cliNome||'')+' '+(p.repNome||'')+' '+(p.num||'')+' '+(p.cid||'')).toLowerCase().includes(q))return false;return true}).sort((a,b)=>String(b.recebido).localeCompare(String(a.recebido)))}
+ function card(p){const n=!p.impresso;
+  return `<div class="pr-c ${n?'n':(p.digitado?'ok':'')}" data-k="${E(p.key)}"><div class="pr-t"><div><b>${E(p.cliNome||'Cliente '+p.cli)}</b>${p.revisado?tag('REVISADO','#C62828'):''}${n?tag('NOVO','#E65100'):''}${p.impresso?tag('🖨 impresso','#1F4E78'):''}${p.digitado?tag('✔ digitado','#2E7D32'):''}
+   <div class="pr-m">Pedido ${E(p.num)} · ${E(p.cid||'')}</div><div class="pr-m">${E(String(p.repNome||'').replace(/\s*-?\s*INATIVO/i,''))} · recebido ${dBR(p.recebido)}</div></div>
+   <div><div class="pr-v">${brl(p.geral)}</div><div class="pr-m" style="text-align:right">${p.pecas||0} peça(s) · ${(p.itens||[]).length} item(ns)</div></div></div>
+   ${p.obs?`<div class="pr-m" style="margin-top:6px">📝 ${E(p.obs)}</div>`:''}
+   <details class="pr-it"><summary style="cursor:pointer;color:#1F4E78;font-weight:600">Ver itens</summary><table>${(p.itens||[]).map(i=>`<tr><td>${E(i.n)}</td><td>${i.q} un</td><td>${brl(i.p)}</td></tr>`).join('')}</table><div class="pr-m" style="margin-top:6px">Faturamento ${E(p.fat||'—')} · Cobrança ${E(p.cob||'—')}${p.frete?' · Frete '+E(p.frete):''}</div></details>
+   <div class="pr-l"><button class="${n?'p':''}" data-a="imp">🖨 Abrir e imprimir</button><button class="${p.digitado?'':'g'}" data-a="dig">${p.digitado?'↩ Desfazer digitado':'✔ Já digitei na fábrica'}</button></div></div>`}
+ function draw(){const o=document.getElementById('v2out');if(!o)return;
+  const reps=[...new Map(LISTA.map(p=>[String(p.rep),p.repNome])).entries()].sort((a,b)=>String(a[1]).localeCompare(String(b[1])));
+  const L=filtrada(),tot=L.reduce((s,p)=>s+(+p.geral||0),0);
+  o.innerHTML=`<div class="vmh"><h2>📥 Pedidos recebidos</h2><p>Pedidos que os representantes digitaram e chegaram na sua pasta <b>“Pedidos recebidos”</b> do Google Drive. Use para imprimir e passar para quem digita no sistema da fábrica. <b>Só conferência:</b> as vendas continuam sendo atualizadas pelo relatório do sistema.</p></div>
+  ${ERR==='sem-url'?`<div class="pr-b"><h3>Ligação com o Google</h3><div class="pr-m" style="margin-bottom:8px">Cole o endereço do Apps Script (termina em /exec). Se o arquivo <b>drive.json</b> já estiver no site, isso é automático.</div><div class="pr-f"><input id="pr_u" style="flex:1;min-width:240px" placeholder="https://script.google.com/macros/s/…/exec" value="${E(URL_)}"><button class="pr-l" style="all:unset"></button><button id="pr_ug" style="background:#1F4E78;color:#fff;border:0;border-radius:9px;padding:10px 14px;font-weight:700;cursor:pointer">Ligar</button></div></div>`:''}
+  <div class="pr-b"><h3>Filtros</h3><div class="pr-f"><select id="pr_s"><option value="novos">Não impressos</option><option value="pend">Ainda não digitados</option><option value="imp">Impressos, a digitar</option><option value="dig">Já digitados</option><option value="todos">Todos</option></select>
+   <select id="pr_r"><option value="">Todos os representantes</option>${reps.map(r=>`<option value="${E(r[0])}">${E(String(r[1]).replace(/\s*-?\s*INATIVO/i,''))}</option>`).join('')}</select>
+   <select id="pr_p"><option value="1">Hoje</option><option value="7">Últimos 7 dias</option><option value="30">Últimos 30 dias</option><option value="todos">Todo o período</option></select>
+   <input id="pr_q" placeholder="🔎 cliente, cidade, nº" value="${E(ST.q)}" style="flex:1;min-width:150px"><button id="pr_a" style="border:0;border-radius:9px;padding:10px 14px;font-weight:700;cursor:pointer;background:#eef2f9;color:#1F4E78">🔄 Atualizar</button></div></div>
+  <div class="pr-b" style="background:#f7f9fc"><div class="pr-f" style="justify-content:space-between"><span><b>${L.length}</b> pedido(s) · <b>${brl(tot)}</b></span><span class="pr-m">${BUSY?'Atualizando…':(ERR&&ERR!=='sem-url'?'⚠ Sem conexão com o Google — mostrando o último que recebi':(LOAD?'Atualizado às '+new Date(LOAD).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}):''))}</span></div></div>
+  ${L.length?L.map(card).join(''):`<div class="pr-b"><div class="pr-m">Nenhum pedido neste filtro.${LISTA.length?'':' Quando um representante digitar um pedido, ele aparece aqui sozinho.'}</div></div>`}`;
+  const $=s=>o.querySelector(s);$('#pr_s').value=ST.st;$('#pr_r').value=ST.rep;$('#pr_p').value=ST.per;
+  $('#pr_s').onchange=e=>{ST.st=e.target.value;draw()};$('#pr_r').onchange=e=>{ST.rep=e.target.value;draw()};$('#pr_p').onchange=e=>{ST.per=e.target.value;draw()};
+  $('#pr_q').oninput=e=>{ST.q=e.target.value;clearTimeout(draw.t);draw.t=setTimeout(()=>{draw();const i=document.getElementById('pr_q');if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}},350)};
+  $('#pr_a').onclick=()=>carregar();
+  const ug=$('#pr_ug');if(ug)ug.onclick=()=>{const v=$('#pr_u').value.trim();if(!/^https:\/\/script\.google\.com\/macros\/s\/[^\s]+\/exec$/.test(v)){alert('O endereço precisa começar com https://script.google.com/macros/s/ e terminar em /exec');return}URL_=v;ss(URLK,v);carregar()};
+  o.querySelectorAll('.pr-c').forEach(c=>{const k=c.dataset.k;c.querySelector('[data-a="imp"]').onclick=()=>abrir(k);c.querySelector('[data-a="dig"]').onclick=()=>marcar(k,'digitado')})}
+ async function chamar(q){const r=await fetch(URL_+(URL_.indexOf('?')>0?'&':'?')+'k='+GK+'&'+q+'&t='+Date.now());return r.json()}
+ async function abrir(k){const p=LISTA.find(x=>x.key===k);if(!p)return;
+  const w=window.open('','_blank');if(w)w.document.write('<p style="font-family:sans-serif">Abrindo o pedido…</p>');
+  try{const j=await chamar('a=pdf&id='+encodeURIComponent(p.pdfId));if(!j.ok)throw new Error(j.erro);
+   const bin=atob(j.b64),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);
+   const url=URL.createObjectURL(new Blob([u],{type:'application/pdf'}));
+   if(w)w.location.href=url;else location.href=url;
+   if(!p.impresso)marcar(k,'impresso',true)}catch(e){if(w)w.close();alert('Não consegui abrir o PDF agora. Confira a internet e tente de novo.')}}
+ async function marcar(k,campo,so1){const p=LISTA.find(x=>x.key===k);if(!p)return;const novo=so1?true:!p[campo];
+  p[campo]=novo?new Date().toISOString():null;ss(CK,JSON.stringify({t:LOAD,lista:LISTA}));badge();draw();
+  try{await fetch(URL_,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({k:GK,t:'marcar',key:k,campo,valor:novo})})}catch(e){}}
+ window.lcPedRecCarregar=carregar;
+ setTimeout(()=>{carregar()},6000);setInterval(()=>{if(!document.hidden)carregar()},180000);
+}catch(e){console.error('lcAJ',e)}})();
+
+// ===== v177 · Representante: liga o endereço do Google (drive.json) e, só para as internas, envia o andamento ao gestor =====
+(function(){try{ if(window.__lcAK||!D.rm)return;window.__lcAK=1;
+ const L0=localStorage,gs=k=>{try{return L0.getItem(k)}catch(e){return null}};
+ const DENY=/^metalmig_(menu|ui_v\d*|hrv|exp_ok|cep_v\d*|geo_v\d*|geocli_v\d*|pre_.*|bkp.*|backup.*|sync.*|prosp_pushed|splash.*)$/;
+ let CFG=null,busy=false,ult='';
+ async function cfg(){
+  try{const r=await fetch(new URL('drive.json?t='+Date.now(),location.href).href,{cache:'no-store'});CFG=await r.json();try{L0.setItem('metalmig_bkp_drvcfg',JSON.stringify(CFG))}catch(e){}}
+  catch(e){try{CFG=JSON.parse(gs('metalmig_bkp_drvcfg')||'null')}catch(x){}}
+  if(CFG&&CFG.u&&D.bk&&!D.bk.u)D.bk.u=CFG.u;return CFG}
+ const cod=()=>String((D.bk&&D.bk.c)||'');
+ const interna=()=>CFG&&Array.isArray(CFG.internas)&&CFG.internas.map(String).indexOf(cod())>=0&&D.bk&&D.bk.k&&D.bk.u;
+ function snap(){const ls={};for(let i=0;i<L0.length;i++){const k=L0.key(i);if(k&&k.indexOf('metalmig_')===0&&!DENY.test(k)){const v=L0.getItem(k);if(v&&v.length<3e6)ls[k]=v}}return ls}
+ async function enviar(force){
+  if(busy)return;if(!CFG)await cfg();if(!interna())return;if(navigator.onLine===false)return;
+  const ls=snap(),h=Object.keys(ls).sort().map(k=>k+':'+ls[k].length+':'+ls[k].slice(-40)).join('|');
+  if(!force&&h===ult)return;busy=true;
+  try{const nome=(D.reps&&D.reps[1]&&D.reps[1][1])||'';
+   const r=await fetch(D.bk.u,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({k:D.bk.k,rep:D.bk.c,t:'backup',nome,dados:{ls,gerado:new Date().toISOString()}})});
+   const j=await r.json();if(j&&j.ok)ult=h}catch(e){}finally{busy=false}}
+ setTimeout(()=>cfg().then(()=>enviar(true)),5000);
+ setInterval(()=>{if(!document.hidden)enviar(false)},2*60*1000);
+ document.addEventListener('visibilitychange',()=>{if(document.hidden)enviar(false)});
+ addEventListener('online',()=>setTimeout(()=>enviar(true),1500));
+ window.lcAndEnviar=enviar;
+}catch(e){console.error('lcAK',e)}})();
+
+// ===== v177 · Andamento das internas (gestor): visitas, prospectos e registros que a Naiara e a Bruna fazem, vindos do Google =====
+(function(){try{ if(window.__lcAL||D.rm)return;window.__lcAL=1;
+ const GK='b4fCekslpS8DmJ1q4TKBLZS5lva5DwLN';
+ const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+ const L0=localStorage,gs=k=>{try{return L0.getItem(k)}catch(e){return null}},ss=(k,v)=>{try{L0.setItem(k,v)}catch(e){}};
+ const CK='metalmig_bkp_andcache';
+ let DATA={},LOAD=null,ERR='',BUSY=false,CFG=null,SEL='';
+ try{const c=JSON.parse(gs(CK)||'null');if(c){DATA=c.d||{};LOAD=c.t}}catch(e){}
+ const br=s=>s?String(s).split('-').reverse().join('/'):'';
+ const dt=t=>{if(!t)return'';const d=new Date(t);return isNaN(d)?'':d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})};
+ const RES={pedido:'Pedido feito',pensar:'Vai pensar',semint:'Sem interesse',novo:'Cliente novo',ausente:'Não estava',rel:'Visita de relacionamento',lig:'Ligação'};
+ const PRS={nao:'Não atendeu',conv:'Conversou',int:'Interessado',ret:'Pediu retorno',cat:'Catálogo enviado',ped:'Fez pedido',sem:'Sem interesse'};
+ const NOMES={orc:'Orçamentos',oco:'Ocorrências',con:'Conferências',rev:'Revisão de carteira',novos:'Clientes novos cadastrados'};
+ async function cfg(){try{const r=await fetch(new URL('drive.json?t='+Date.now(),location.href).href,{cache:'no-store'});CFG=await r.json()}catch(e){}return CFG}
+ async function carregar(){
+  if(BUSY)return;BUSY=true;ERR='';
+  try{const c=await cfg();if(!c||!c.u||!Array.isArray(c.internas)||!c.internas.length){ERR='sem-url';return}
+   for(const cod of c.internas){try{const r=await fetch(c.u+'?t=backup&rep='+cod+'&k='+GK+'&x='+Date.now());const j=await r.json();if(j&&j.ok)DATA[cod]=j.backup||null}catch(e){ERR='conexao'}}
+   LOAD=Date.now();ss(CK,JSON.stringify({t:LOAD,d:DATA}))
+  }catch(e){ERR='conexao'}finally{BUSY=false;if(VIEW==='and')draw()}}
+ try{const nav=document.getElementById('nav');if(nav){const b=document.createElement('button');b.dataset.v='and';b.className='gest';b.title='Aba exclusiva do gestor';b.textContent='Andamento das internas';nav.appendChild(b)}}catch(e){}
+ const rd=render;render=function(){if(VIEW==='and')return;return rd.apply(this,arguments)};
+ const sv0=setView;setView=function(v){if(v==='and'){sv0(v);try{draw();carregar()}catch(e){console.error(e)}return}return sv0(v)};
+ const J=(ls,pref)=>{const k=Object.keys(ls||{}).find(x=>x.indexOf(pref)===0);if(!k)return null;try{return JSON.parse(ls[k])}catch(e){return null}};
+ const nomePros=id=>{try{const p=(lcProsp.load()||[]).find(x=>x.id===id);return p?p.nome:id}catch(e){return id}};
+ function bloco(cod){const b=DATA[cod];const nome=((D.reps||[]).find(r=>String(r[0])===String(cod))||[0,'Representante '+cod])[1];
+  if(!b)return `<div class="an-b"><h3>${E(nome)}</h3><div class="an-m">Ainda não chegou nada desta pessoa. Ela precisa abrir o sistema com internet.</div></div>`;
+  const ls=(b.dados&&b.dados.ls)||{};
+  const VIS=(()=>{try{return JSON.parse(ls['metalmig_visitas_v1']||'[]')}catch(e){return[]}})().sort((a,c)=>String(c.data+c.hora).localeCompare(String(a.data+a.hora)));
+  const lim=new Date(Date.now()-6*864e5).toISOString().slice(0,10),sem=VIS.filter(v=>v.data>=lim);
+  const MPR=J(ls,'metalmig_mpr_v1')||{};const pk=Object.keys(MPR),cont=pk.reduce((n,k)=>n+((MPR[k].hist||[]).length),0);
+  const ult=[];pk.forEach(k=>(MPR[k].hist||[]).forEach(h=>ult.push([k,h])));ult.sort((a,c)=>String(c[1].d).localeCompare(String(a[1].d)));
+  const outros=Object.keys(NOMES).map(n=>{const v=J(ls,'metalmig_'+n+'_v1');const q=Array.isArray(v)?v.length:(v&&typeof v==='object'?Object.keys(v).length:0);return q?`<span class="an-t">${NOMES[n]}: <b>${q}</b></span>`:''}).join('');
+  return `<div class="an-b"><h3>${E(nome)} <span class="an-m" style="font-weight:400">· último envio ${dt(b.ts)}</span></h3>
+  <div class="an-s"><div class="an-h">🧳 Visitas · ${sem.length} nos últimos 7 dias · ${VIS.length} no total</div>${VIS.slice(0,12).map(v=>`<div class="an-r"><b>${E(v.cliNome||'')}</b> <span class="an-m">· ${br(v.data)} ${E(v.hora||'')} · ${E(v.cid||'')} · ${E(RES[v.res]||v.res||'')}${v.valor?' · R$ '+(+v.valor).toLocaleString('pt-BR',{minimumFractionDigits:2}):''}</span>${v.obs?`<div class="an-m">📝 ${E(v.obs)}</div>`:''}</div>`).join('')||'<div class="an-m">Nenhuma visita registrada.</div>'}</div>
+  <div class="an-s"><div class="an-h">📞 Prospectos · ${pk.length} com andamento · ${cont} contato(s)</div>${ult.slice(0,10).map(([id,h])=>`<div class="an-r"><b>${E(nomePros(id))}</b> <span class="an-m">· ${br(h.d)} · ${E(PRS[h.res]||h.res||'')}${h.ret?' · retorno '+br(h.ret):''}</span>${h.obs?`<div class="an-m">📝 ${E(h.obs)}</div>`:''}</div>`).join('')||'<div class="an-m">Nenhum contato de prospecto ainda.</div>'}</div>
+  <div class="an-s"><div class="an-h">📋 Outros registros</div><div>${outros||'<span class="an-m">Nada além do acima.</span>'}</div><div class="an-m" style="margin-top:6px">Pedidos digitados por ela aparecem na aba <b>Pedidos recebidos</b>. Fotos das visitas ficam só no aparelho dela.</div></div></div>`}
+ const css=document.createElement('style');css.textContent=`.an-b{background:#fff;border:1px solid #d9dfe9;border-radius:12px;padding:12px 14px;margin:0 0 14px}.an-b h3{margin:0 0 8px;font-size:17px;color:#14233f}.an-m{font-size:12.5px;color:#5b6b82}.an-s{border-top:1px solid #eef1f6;margin-top:10px;padding-top:10px}.an-h{font-weight:700;color:#1F4E78;margin-bottom:6px;font-size:14px}.an-r{padding:5px 0;border-bottom:1px dashed #eef1f6;font-size:14px}.an-t{display:inline-block;background:#eef2f9;border-radius:999px;padding:3px 10px;margin:0 6px 6px 0;font-size:13px}`;
+ document.head.appendChild(css);
+ function draw(){const o=document.getElementById('v2out');if(!o)return;const ids=(CFG&&CFG.internas)||Object.keys(DATA);
+  o.innerHTML=`<div class="vmh"><h2>🧭 Andamento das internas</h2><p>Tudo que a Naiara e a Bruna registram no sistema chega aqui sozinho (a cada poucos minutos, quando elas estão com internet). <b>Só você vê esta aba.</b></p></div>
+  <div class="an-b" style="background:#f7f9fc"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center"><span class="an-m">${BUSY?'Atualizando…':(ERR==='sem-url'?'⚠ Ligação com o Google ainda não configurada (arquivo drive.json).':ERR?'⚠ Sem conexão — mostrando o último que recebi':(LOAD?'Atualizado às '+new Date(LOAD).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}):''))}</span><button id="an_a" style="border:0;border-radius:9px;padding:10px 14px;font-weight:700;cursor:pointer;background:#eef2f9;color:#1F4E78">🔄 Atualizar</button></div></div>
+  ${ids.map(bloco).join('')}`;
+  const a=o.querySelector('#an_a');if(a)a.onclick=()=>carregar()}
+ setTimeout(carregar,8000);setInterval(()=>{if(!document.hidden&&VIEW==='and')carregar()},120000);
+}catch(e){console.error('lcAL',e)}})();
 
 
 </script></body></html>
