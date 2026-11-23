@@ -120,6 +120,10 @@ def main():
     itens.sort(key=lambda x: x[2], reverse=True)
     json.dump({'gerado': HOJE.isoformat(), 'mes_base': mes, 'janela_dias': JANELA, 'total': len(itens), 'itens': itens},
               open(os.path.join(SAIDA, 'lojas_novas.json'), 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
+    # lista só da Bahia, liberada para a página do representante M4 (2001)
+    _ba=[x for x in itens if x[4]=='BA']
+    json.dump({'gerado': HOJE.isoformat(), 'mes_base': mes, 'janela_dias': JANELA, 'total': len(_ba), 'itens': _ba},
+              open(os.path.join(SAIDA, 'lojas_novas_ba.json'), 'w', encoding='utf-8'), ensure_ascii=False, separators=(',',':'))
     json.dump({'gerado': HOJE.isoformat(), 'mes_base': mes, 'total': len(fechados), 'itens': sorted(fechados.values())},
               open(os.path.join(SAIDA, 'cnpjs_fechados.json'), 'w', encoding='utf-8'), separators=(',', ':'))
     STATUS['ok'] = True; STATUS['total'] = len(itens); STATUS['fechados'] = len(fechados)

@@ -3642,8 +3642,9 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const NOVS=[
   {v:'v209',d:'23/11/2026',t:'Recomprar com representante, telefone e agenda',l:[
    ['g','Hora de recomprar e Reativar clientes: em cada cliente aparece o representante, o telefone com botão copiar e o botão Agendar conversa (cai no Hoje no dia marcado).'],
+   ['g','CNPJs novos liberado para o representante M4 Representações (código 2001), só da Bahia: lista com filtros, telefone para copiar, WhatsApp e Descartar. Os outros representantes não veem.'],
    ['g','WhatsApp (gestor): os botões abrem o WhatsApp Web sempre na mesma aba, já com a mensagem; não reinicia mais o aplicativo.'],
-   ['g','Reativar clientes: botão Passar para… em cada cliente (abre a janela do Repasse). Ficha aberta por Recomprar e Reativar não vem mais em branco. Botões dos cartões menores.'],
+   ['g','Reativar clientes: botão Passar para… em cada cliente (abre a janela do Repasse). Ficha aberta por Recomprar e Reativar não vem mais em branco. Hoje, Retornos: cada retorno em cartão próprio, com o bloco Ações (Feito, Novo retorno, Ficha, Catálogo, WhatsApp, Ligar, Copiar, Passar). Cartões de Reativar e Recomprar separados. Reativar e Recomprar mostram quem está com a carteira e quem fez a última venda. Bloco Ações com todos os botões do mesmo tamanho (Ficha, Catálogo, WhatsApp, Ligar, Copiar tel., Agendar, Passar, Já chamei), também no Recomprar.'],
    ['g','Vendas, Representantes ativos com pedido no mês: quem também é cliente (ex.: Alexandre Fabris Lima, Reinaldo Tadeu) deixa de aparecer como INATIVO.']]},
   {v:'v208',d:'23/11/2026',t:'Conversas com representantes e Descartar lojas novas',l:[
    ['a','Conversas com representantes (só gestor): no termômetro de cada representante, botão Registrar conversa (assunto, como foi, o que foi falado) e histórico. Dá para agendar a próxima conversa: no dia ela aparece no Hoje, com WhatsApp, Conversei e Adiar. Fica guardado na nuvem.'],
@@ -9203,25 +9204,70 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
  window.lcConv.pend=()=>pendentes().length;
 }catch(e){console.error('lcBW',e)}})();
 
-// v209 · Hora de recomprar e Reativar clientes: representante, telefone p/ copiar e "Agendar conversa" (gestor)
+// v209 · Recomprar/Reativar: bloco "Ações" (todos os botões do mesmo tamanho) + representante e telefone (gestor)
 (function(){try{
  if(typeof D==='undefined'||!D.cli||!D.reps||D.rm)return;
  const E=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
- const st=document.createElement('style');st.textContent='.lcbx{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;font-size:12.5px;margin:3px 0;padding-top:3px;border-top:1px solid #eef1f6}.lcbx .tel{user-select:all;font-weight:600}.lcbx button{color:#1F4E78!important;background:#fff!important;border:1px solid #cfd8e6!important;border-radius:5px;padding:1px 7px!important;font-size:11px!important;font-weight:600;cursor:pointer;min-height:22px!important;height:22px!important;line-height:1;width:auto!important;flex:none}.lcbx button:hover{background:#eef2f8!important}';
+ const st=document.createElement('style');st.textContent='.lcbx-i{font-size:13px;margin:4px 0;padding-top:4px;border-top:1px solid #eef1f6}.lcbx-i .tel{user-select:all;font-weight:600}.lcbx-h{display:none!important}'
+ +'.lcbx-b{margin-top:8px;border:1px solid #b7cbe8;border-radius:10px;padding:8px;background:#dfeaf8}.lcbx-b .tt{font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:#2c5282;font-weight:700;margin-bottom:6px}'
+ +'.lcbx-g{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}@media(max-width:620px){.lcbx-g{grid-template-columns:repeat(2,1fr)}}'
+ +'.lcbx-g button{height:36px!important;min-height:36px!important;width:100%!important;margin:0!important;border-radius:8px!important;border:1px solid #a9bfdf!important;background:#fff!important;color:#1F4E78!important;box-shadow:0 1px 0 #c4d4ec;font:700 12.5px Arial,sans-serif!important;display:flex;align-items:center;justify-content:center;gap:5px;white-space:nowrap;cursor:pointer;padding:0 6px!important}'
+ +'.lcbx-g button.wa{background:#1b8a3c!important;color:#fff!important;border-color:#1b8a3c!important;box-shadow:none}.lcbx-g button:disabled{opacity:.6;background:#cdd9ea!important;color:#6b7a90!important;border-color:#b7cbe8!important;box-shadow:none;cursor:default}.lcbx-g button.wa:disabled{background:#cdd9ea!important;color:#6b7a90!important}';
+ st.textContent+='#v2out .lccard.lcbx-k{margin:0 0 14px!important;border:1px solid #d5dbe6!important;border-left:4px solid var(--kc,#1F4E78)!important;box-shadow:0 1px 3px rgba(20,40,70,.10)}'
+ +'.lcvh .lcbx-c{background:#fff;border:1px solid #e3b5b5!important;border-left:4px solid #c62828!important;border-radius:10px;padding:9px 11px!important;margin-top:12px;box-shadow:0 1px 3px rgba(120,40,40,.12)}.lcvh .lcbx-c .lcbx-g button.ok{background:#e8f5e9!important;border-color:#9ccc9f!important;color:#1b5e20!important}';
  document.head.appendChild(st);
  const dig=t=>{let d=String(t||'').replace(/\D/g,'').replace(/^0+/,'');if(d.length>11&&d.startsWith('55'))d=d.slice(2);return d};
  const fmt=d=>d.length===11?'('+d.slice(0,2)+') '+d.slice(2,7)+'-'+d.slice(7):d.length===10?'('+d.slice(0,2)+') '+d.slice(2,6)+'-'+d.slice(6):d;
+ function repI(i){const r=D.reps[i];if(!r)return '';const ap=window.lcApel&&window.lcApel.get?window.lcApel.get(r[0]):'';return ap||String(r[1]).replace(/\s*-?\s*INATIVO/i,'')}
+ let LV=null;function ultV(ci){try{if(!LV){LV=new Map();for(let i=0;i<L.D.length;i++){if(!(L.V[i]>0))continue;const c=L.C[i],x=LV.get(c);if(!x||L.D[i]>=x.d)LV.set(c,{d:L.D[i],r:L.R[i]})}}const x=LV.get(ci);return x?(repI(x.r)||''):''}catch(e){return ''}}
  function rep(c){const r=D.reps[c[8]];if(!r)return '—';const ap=window.lcApel&&window.lcApel.get?window.lcApel.get(r[0]):'';return ap||String(r[1]).replace(/\s*-?\s*INATIVO/i,'')}
- function deco(){if(typeof VIEW==='undefined'||VIEW!=='rec'&&VIEW!=='reat')return;
-  document.querySelectorAll('#v2out .lccard').forEach(card=>{if(card.querySelector('.lcbx'))return;const a=card.querySelector('a.rcf');if(!a)return;const ci=+a.dataset.ci,c=D.cli[ci];if(!c)return;
+ const q=(card,s)=>card.querySelector(s);
+ function sync(card,ci){ // esconde os botões antigos e liga/desliga os do bloco conforme o que existe
+  card.querySelectorAll('.rowb,.rhid,button.lctb').forEach(el=>{if(el.closest('.lcbx-b'))return;const t=el.classList.contains('rhid')?(el.parentElement!==card?el.parentElement:el):el;t.classList.add('lcbx-h')});
+  const wa=q(card,'.rowb a.w'),lg=q(card,'.rowb a.lig'),ct=q(card,'button.lctb'),b=card.querySelector('.lcbx-b');if(!b)return;
+  const set=(k,on)=>{const x=b.querySelector('[data-k="'+k+'"]');if(x)x.disabled=!on};
+  set('wa',!!wa);set('lig',!!lg);set('ct',!!ct);}
+ function deco(){if(typeof VIEW==='undefined'||(VIEW!=='rec'&&VIEW!=='reat'))return;const reat=VIEW==='reat';
+  document.querySelectorAll('#v2out .lccard').forEach(card=>{const a=q(card,'a.rcf');if(!a)return;const ci=+a.dataset.ci,c=D.cli[ci];if(!c)return;
+   card.classList.add('lcbx-k');card.style.setProperty('--kc',reat?'#E08A1E':'#2E7D32');
+   if(card.querySelector('.lcbx-b')){sync(card,ci);return}
    const d=dig(c[3]),ok=d.length>=10;
-   const w=document.createElement('div');w.className='lcbx';
-   w.innerHTML='<span>👤 <b>'+E(rep(c))+'</b></span>'+(ok?'<span class="tel">📞 '+E(fmt(d))+'</span><button class="cp" data-t="'+d+'" title="Copiar telefone">📋</button>':'<span class="mute">sem telefone</span>')+(VIEW==='reat'&&window.lcRep&&window.lcRep.passar?'<button class="ps" title="Passar este cliente para outro representante">↪ Passar para…</button>':'')+'<button class="ag" title="Agendar nova conversa (cai no Hoje)">📅 Agendar</button>';
-   const cp=w.querySelector('.cp');if(cp)cp.onclick=ev=>{ev.stopPropagation();const t=cp.dataset.t,done=()=>{cp.textContent='✔';setTimeout(()=>{cp.textContent='📋'},1500)};try{navigator.clipboard.writeText(t).then(done,()=>{const r=document.createRange();r.selectNodeContents(w.querySelector('.tel'));const g=getSelection();g.removeAllRanges();g.addRange(r)})}catch(e){}};
-   const ps=w.querySelector('.ps');if(ps)ps.onclick=ev=>{ev.stopPropagation();window.lcRep.passar(ci)};
-   w.querySelector('.ag').onclick=ev=>{ev.stopPropagation();if(window.lcLembrar)window.lcLembrar(ci)};
-   const city=card.querySelector('.mute');if(city)city.insertAdjacentElement('afterend',w);else card.appendChild(w)})}
- setInterval(()=>{try{deco()}catch(e){console.error('lcBX',e)}},900);
+   const inf=document.createElement('div');inf.className='lcbx-i';const uv=ultV(ci);inf.innerHTML='👤 Carteira: <b>'+E(rep(c))+'</b>'+(uv?' · 🧾 Última venda: <b>'+E(uv)+'</b>':'')+' · 📞 '+(ok?'<span class="tel">'+E(fmt(d))+'</span>':'<span class="mute">sem telefone</span>');
+   const bl=document.createElement('div');bl.className='lcbx-b';
+   bl.innerHTML='<div class="tt">Ações</div><div class="lcbx-g"><button data-k="fi">👤 Ficha</button><button data-k="ct">📖 Catálogo</button><button data-k="wa" class="wa">💬 WhatsApp</button><button data-k="lig">📞 Ligar</button><button data-k="cp"'+(ok?'':' disabled')+'>📋 Copiar tel.</button><button data-k="ag">📅 Agendar</button>'+(reat?'<button data-k="ps">↪ Passar para…</button><button data-k="jc">✔ Já chamei</button>':'')+'</div>';
+   const on=(k,f)=>{const x=bl.querySelector('[data-k="'+k+'"]');if(x)x.onclick=ev=>{ev.preventDefault();ev.stopPropagation();f(x)}};
+   on('fi',()=>{const f=q(card,'.rowb a.fi')||a;f.click()});
+   on('ct',()=>{const x=q(card,'button.lctb');if(x)x.click()});
+   on('wa',()=>{const x=q(card,'.rowb a.w');if(x)x.click()});
+   on('lig',()=>{const x=q(card,'.rowb a.lig');if(x)x.click()});
+   on('cp',x=>{const done=()=>{x.textContent='✔ Copiado';setTimeout(()=>{x.textContent='📋 Copiar tel.'},1500)};try{navigator.clipboard.writeText(d).then(done,()=>{const r=document.createRange();r.selectNodeContents(inf.querySelector('.tel'));const g=getSelection();g.removeAllRanges();g.addRange(r)})}catch(e){}});
+   on('ag',()=>{if(window.lcLembrar)window.lcLembrar(ci)});
+   on('ps',()=>{if(window.lcRep&&window.lcRep.passar)window.lcRep.passar(ci)});
+   on('jc',()=>{const x=q(card,'.rhid');if(x)x.click()});
+   const city=card.querySelector('.mute');(city||card).insertAdjacentElement(city?'afterend':'beforeend',inf);
+   const last=[...card.children].filter(x=>!x.classList.contains('lcbx-h')&&x!==inf).pop();(last&&last!==inf?last:inf).insertAdjacentElement('afterend',bl);
+   sync(card,ci)})}
+
+ function decoRet(){if(typeof VIEW==='undefined'||VIEW!=='hoje')return;
+  document.querySelectorAll('.lcvh > div').forEach(it=>{const ff=it.querySelector('.lc_ff');if(!ff)return;const row=ff.parentElement;
+   if(it.querySelector('.lcbx-b'))return;
+   const cod=ff.dataset.c,ci=D.cli.findIndex(c=>String(c[0])===String(cod));if(ci<0)return;const c=D.cli[ci];
+   const d=dig(c[3]),ok=d.length>=10,uv=ultV(ci);
+   it.classList.add('lcbx-c');row.classList.add('lcbx-h');
+   const inf=document.createElement('div');inf.className='lcbx-i';inf.style.borderTop='0';
+   inf.innerHTML='👤 Carteira: <b>'+E(rep(c))+'</b>'+(uv?' · 🧾 Última venda: <b>'+E(uv)+'</b>':'')+' · 📞 '+(ok?'<span class="tel">'+E(fmt(d))+'</span>':'<span class="mute">sem telefone</span>');
+   const bl=document.createElement('div');bl.className='lcbx-b';
+   bl.innerHTML='<div class="tt">Ações</div><div class="lcbx-g"><button data-k="fe" class="ok">✔ Feito</button><button data-k="nr">🔁 Novo retorno</button><button data-k="fi">👤 Ficha</button><button data-k="ct">📖 Catálogo</button><button data-k="wa" class="wa"'+(d.length>=10?'':' disabled')+'>💬 WhatsApp</button><button data-k="lig"'+(ok?'':' disabled')+'>📞 Ligar</button><button data-k="cp"'+(ok?'':' disabled')+'>📋 Copiar tel.</button><button data-k="ps">↪ Passar para…</button></div>';
+   const on=(k,f)=>{const x=bl.querySelector('[data-k="'+k+'"]');if(x)x.onclick=ev=>{ev.preventDefault();ev.stopPropagation();f(x)}};
+   const clk=sel=>{const x=it.querySelector(sel);if(x)x.click()};
+   on('fe',()=>clk('.lc_rf'));on('nr',()=>clk('.lc_rn'));on('fi',()=>clk('.lc_ff'));
+   on('ct',()=>{if(window.lcCatAsk)window.lcCatAsk(ci)});
+   on('wa',()=>{let t=d;if(t.length===10&&/[6-9]/.test(t[2]))t=t.slice(0,2)+'9'+t.slice(2);if(t.length!==11)return;const a=document.createElement('a');a.href='https://wa.me/55'+t+'?text='+encodeURIComponent('Olá! Aqui é da Metalmig. ');a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove()});
+   on('lig',()=>{const a=document.createElement('a');a.href='tel:+55'+d;document.body.appendChild(a);a.click();a.remove()});
+   on('cp',x=>{const done=()=>{x.textContent='✔ Copiado';setTimeout(()=>{x.textContent='📋 Copiar tel.'},1500)};try{navigator.clipboard.writeText(d).then(done,()=>{})}catch(e){}});
+   on('ps',()=>{if(window.lcRep&&window.lcRep.passar)window.lcRep.passar(ci)});
+   row.insertAdjacentElement('beforebegin',inf);row.insertAdjacentElement('afterend',bl)})}
+ setInterval(()=>{try{deco();decoRet()}catch(e){console.error('lcBX',e)}},900);
 }catch(e){console.error('lcBX',e)}})();
 
 // v209 · WhatsApp (gestor): abre sempre o WhatsApp Web na MESMA aba, já com a mensagem
@@ -9236,6 +9282,64 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
   const w=window.open(u,'metalmig_whatsapp');if(!w)location.href=u;else{try{w.focus()}catch(_){}}
  },true);
 }catch(e){console.error('lcBY',e)}})();
+
+// ===== v209 · "CNPJs novos" liberado para representantes específicos, só dos estados liberados (hoje: M4 Representações, 2001, só Bahia) =====
+(function(){try{
+ if(typeof D==='undefined'||!D.rm||!D.bk||window.__lcBZ)return;
+ const LIB={2001:['BA']};const COD=+D.bk.c,UFS=LIB[COD];if(!UFS)return;window.__lcBZ=1;
+ const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+ const nz=s=>String(s||'').toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^A-Z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
+ const nome1=n=>String(n||'').toLowerCase().replace(/(^|\s)(\S)/g,(m,a,b)=>a+b.toUpperCase());
+ const HOJE=Math.floor(Date.now()/864e5);
+ const DK='metalmig_cnpjn_desc_r'+COD;let DSC={};try{DSC=JSON.parse(localStorage.getItem(DK)||'{}')||{}}catch(_){DSC={}}
+ const salva=()=>{try{localStorage.setItem(DK,JSON.stringify(DSC))}catch(_){}};
+ const MOT={sem:'Sem interesse',tipo:'Não trabalha com o nosso tipo de produto',out:'Outro motivo'};
+ let DADOS=null,ERR='',CARR=false;const F={cid:'',mes:'',q:'',ds:'',max:60};
+ const mes=(cid,uf)=>{try{const o=window.lcMeso&&lcMeso.ofCid(cid+'/'+uf);return o?o.m:''}catch(_){return ''}};
+ const dbr=iso=>iso.slice(8,10)+'/'+iso.slice(5,7)+'/'+iso.slice(0,4);
+ const fone=t=>{t=String(t||'').replace(/\D/g,'');if(t.length<10)return '';return '('+t.slice(0,2)+') '+t.slice(2,t.length-4)+'-'+t.slice(-4)};
+ const wa=t=>{t=String(t||'').replace(/\D/g,'');if(t.length===10&&/[6-9]/.test(t[2]))t=t.slice(0,2)+'9'+t.slice(2);return t.length===11&&t[2]==='9'&&!/^(\d{2})9(\d)\2{7}$/.test(t)?'https://wa.me/55'+t:''};
+ let LST=null;
+ function lista(){if(LST)return LST;LST=((DADOS&&DADOS.itens)||[]).filter(x=>UFS.includes(x[4])).map(x=>{const dd=Date.UTC(+x[2].slice(0,4),+x[2].slice(5,7)-1,+x[2].slice(8,10))/864e5;return {cnpj:x[0],nome:x[1],ab:x[2],dias:HOJE-Math.floor(dd),cid:nome1(x[3]),uf:x[4],bai:x[5],end:x[6],tel:x[7],cnae:x[8],mes:mes(nome1(x[3]),x[4])}});return LST}
+ async function carregar(){if(CARR)return;CARR=true;try{const r=await fetch(new URL('lojas_novas_'+UFS[0].toLowerCase()+'.json?t='+Date.now(),location.href).href,{cache:'no-store'});if(r.ok)DADOS=await r.json();else throw 0}catch(e){DADOS=null;ERR='sem-lista'}CARR=false;LST=null;if(VIEW==='lnb')draw()}
+ function descarta(x){const m=document.createElement('div');m.style.cssText='position:fixed;inset:0;background:rgba(10,20,40,.55);z-index:100000;display:flex;align-items:center;justify-content:center;padding:14px';let mot='tipo';
+  const pinta=()=>{m.innerHTML='<div style="background:#fff;width:min(460px,100%);border-radius:14px;padding:16px;max-height:92vh;overflow:auto"><b style="font-size:17px">Descartar esta loja</b><div style="font-size:13px;color:#667;margin-bottom:8px">'+E(x.nome)+' · '+E(x.cid)+'/'+x.uf+'</div>'+Object.keys(MOT).map(k=>'<div class="dsc_op" data-k="'+k+'" style="border:1px solid '+(mot===k?'#1F4E78':'#c9d3e3')+';background:'+(mot===k?'#eaf1fb':'#fff')+';border-radius:10px;padding:9px 12px;margin:6px 0;font-size:14px;cursor:pointer">'+(mot===k?'● ':'○ ')+E(MOT[k])+'</div>').join('')+'<input id="dsc_o" placeholder="Observação (opcional)" style="width:100%;box-sizing:border-box;padding:8px;border:1px solid #c5d0e3;border-radius:9px;margin-top:6px"><div style="display:flex;gap:8px;margin-top:12px"><button type="button" class="btn" id="dsc_x" style="flex:1">Cancelar</button><button type="button" class="btn pri" id="dsc_ok" style="flex:2">Descartar</button></div></div>';
+   m.querySelectorAll('.dsc_op').forEach(b=>b.onclick=()=>{const ob=(m.querySelector('#dsc_o')||{}).value||'';mot=b.dataset.k;pinta();m.querySelector('#dsc_o').value=ob});
+   m.querySelector('#dsc_x').onclick=()=>m.remove();m.onclick=e=>{if(e.target===m)m.remove()};
+   m.querySelector('#dsc_ok').onclick=()=>{const t=new Date();DSC[x.cnpj]={m:mot,o:((m.querySelector('#dsc_o')||{}).value||'').trim().slice(0,200),d:t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0')};salva();m.remove();draw()}};
+  pinta();document.body.appendChild(m)}
+ const SEL='padding:7px 9px;border:1px solid #c5d0e3;border-radius:9px;font-size:13px;background:#fff;flex:1 1 150px;min-width:0';
+ function draw(){const o=document.getElementById('v2out');if(!o)return;
+  let h='<div class="vmh"><h2>🆕 CNPJs novos na '+(UFS.length===1&&UFS[0]==='BA'?'Bahia':UFS.join(', '))+'</h2><p>Empresas de material de construção que abriram CNPJ há pouco, segundo a Receita Federal. Ainda não são clientes da Metalmig: são possíveis clientes para você visitar ou chamar no WhatsApp.</p></div>';
+  if(!DADOS){h+='<div class="act">'+(ERR?'A lista ainda não chegou. Ela é atualizada sozinha duas vezes por mês.':'Carregando…')+'</div>';o.innerHTML=h;if(!ERR)carregar();return}
+  const L=lista(),nDs=L.filter(x=>DSC[x.cnpj]).length,q=nz(F.q);
+  const base=L.filter(x=>F.ds==='d'?!!DSC[x.cnpj]:!DSC[x.cnpj]);
+  const cids=[...new Set(base.filter(x=>!F.mes||x.mes===F.mes).map(x=>x.cid))].sort((a,b)=>a.localeCompare(b,'pt'));
+  const ms=[...new Set(base.map(x=>x.mes).filter(Boolean))].sort();
+  const V=base.filter(x=>(!F.mes||x.mes===F.mes)&&(!F.cid||x.cid===F.cid)&&(!q||nz(x.nome+' '+x.cid+' '+x.bai).includes(q)));
+  const sel=(c,ph,arr,v)=>'<select class="'+c+'" style="'+SEL+'"><option value="">'+ph+'</option>'+arr.map(a=>'<option'+(a===v?' selected':'')+'>'+E(a)+'</option>').join('')+'</select>';
+  h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0">'+(ms.length?sel('bn_mes','Mesorregião: todas',ms,F.mes):'')+sel('bn_cid','Cidade: todas',cids,F.cid)
+   +'<select class="bn_ds" style="'+SEL+'"><option value="">Mostrar: ativos ('+(L.length-nDs)+')</option><option value="d"'+(F.ds==='d'?' selected':'')+'>Descartados ('+nDs+')</option></select>'
+   +'<input class="bn_q" placeholder="🔎 Nome, cidade ou bairro" value="'+E(F.q)+'" style="'+SEL+'"></div>';
+  h+='<div style="font-size:12px;color:#64748b;margin:4px 0 8px">'+V.length+' de '+L.length+' CNPJs novos · abertos nos últimos '+DADOS.janela_dias+' dias · lista de '+dbr(DADOS.gerado)+'</div>';
+  h+=V.slice(0,F.max).map(x=>{const f=fone(x.tel),w=wa(x.tel),dc=DSC[x.cnpj];return '<div style="background:#fff;border:1px solid #d9dfe9;border-radius:12px;padding:10px 12px;margin:0 0 9px"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><b>'+E(x.nome)+'</b><span style="font-size:11.5px;color:#1F4E78;background:#eef4fb;border-radius:8px;padding:2px 7px;white-space:nowrap" title="Data de abertura do CNPJ na Receita Federal">CNPJ aberto há '+x.dias+' dias</span></div>'
+   +'<div style="font-size:13px;color:#475569;margin-top:3px">📍 '+E(x.cid)+'/'+x.uf+(x.mes?' · '+E(x.mes):'')+(x.bai?' · '+E(x.bai):'')+'</div>'+(x.end?'<div style="font-size:12.5px;color:#64748b">'+E(x.end)+'</div>':'')
+   +'<div style="display:flex;gap:8px;margin-top:7px;flex-wrap:wrap;align-items:center">'+(f?'<span style="font-size:13px;user-select:all">📞 '+f+'</span><button type="button" class="bn_cp btn" data-t="'+String(x.tel).replace(/\D/g,'')+'" style="font-size:12px;padding:3px 8px">📋 copiar</button>':'<span style="font-size:12.5px;color:#94a3b8">sem telefone</span>')+(w?'<a href="'+w+'" target="_blank" rel="noopener" style="font-size:13px;padding:5px 10px;border-radius:9px;background:#16a34a;color:#fff;text-decoration:none">💬 WhatsApp</a>':'')
+   +(dc?'':'<button type="button" class="bn_dc btn" data-c="'+x.cnpj+'" style="font-size:12px;padding:3px 8px;margin-left:auto" title="Sem interesse ou não trabalha com o nosso tipo de produto: sai da lista">🚫 Descartar</button>')+'</div>'
+   +(dc?'<div style="margin-top:6px;font-size:12.5px;color:#92400e;background:#fef3c7;border-radius:8px;padding:5px 8px">🚫 Descartada em '+dbr(dc.d)+' · '+E(MOT[dc.m]||'')+(dc.o?' · '+E(dc.o):'')+' <button type="button" class="bn_rs btn" data-c="'+x.cnpj+'" style="font-size:12px;padding:2px 8px;margin-left:6px">Restaurar</button></div>':'')+'</div>'}).join('');
+  if(V.length>F.max)h+='<div style="text-align:center;margin:6px 0"><button type="button" class="btn" id="bn_mais">Ver mais ('+(V.length-F.max)+')</button></div>';
+  o.innerHTML=h;
+  const by={};L.forEach(x=>by[x.cnpj]=x);
+  o.querySelectorAll('.bn_dc').forEach(e=>e.onclick=()=>{const x=by[e.dataset.c];if(x)descarta(x)});
+  o.querySelectorAll('.bn_rs').forEach(e=>e.onclick=()=>{delete DSC[e.dataset.c];salva();draw()});
+  o.querySelectorAll('.bn_cp').forEach(b=>b.onclick=()=>{const t=b.dataset.t,ok=()=>{b.textContent='✔ copiado';setTimeout(()=>{b.textContent='📋 copiar'},1500)};try{navigator.clipboard.writeText(t).then(ok,()=>{})}catch(e){}});
+  const on=(c,k,reset)=>{const e=o.querySelector(c);if(e)e.onchange=()=>{F[k]=e.value;F.max=60;(reset||[]).forEach(r=>F[r]='');draw()}};if(ms.length)on('.bn_mes','mes',['cid']);on('.bn_cid','cid');on('.bn_ds','ds');
+  const qi=o.querySelector('.bn_q');qi.oninput=()=>{F.q=qi.value;F.max=60;const p=qi.selectionStart;draw();const n=document.querySelector('.bn_q');n.focus();try{n.setSelectionRange(p,p)}catch(_){}};
+  const mb=o.querySelector('#bn_mais');if(mb)mb.onclick=()=>{F.max+=60;draw()}}
+ try{const nav=document.getElementById('nav');if(nav){const b=document.createElement('button');b.dataset.v='lnb';b.title='Lojas novas na Receita Federal (só Bahia)';b.textContent='🆕 CNPJs novos';nav.appendChild(b)}}catch(e){}
+ const rd=render;render=function(){if(VIEW==='lnb')return;return rd.apply(this,arguments)};
+ const sv0=setView;setView=function(v){if(v==='lnb'){sv0(v);try{draw();if(!DADOS&&!ERR)carregar()}catch(e){console.error(e)}return}return sv0(v)};
+}catch(e){console.error('lcBZ',e)}})();
 
 
 </script></body></html>
