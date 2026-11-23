@@ -1962,7 +1962,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v201';
+const NX_VER = 'v202';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -2583,7 +2583,7 @@ function n3CidKey(s){const mm=String(s||'').trim().match(/^(.*?)[\s\-\/,]+([A-Za
 let RCT='fun';
 function renderRecr(){
  if(nxGestOnly())return;ctl('');
- const all=prAll(),W=Object.assign({},N3_PW0,nxLS(nxK('prw'),{})),CK=nxLS(nxK('prck'),{}),AG=nxLS(nxK('pragd'),{});
+ const all=prAll().filter(c=>!window.lcFiltro||lcFiltro.ok(c)),W=Object.assign({},N3_PW0,nxLS(nxK('prw'),{})),CK=nxLS(nxK('prck'),{}),AG=nxLS(nxK('pragd'),{});
  const sc=c=>{const ye=Math.min(1,(n3Num(c.tempo)||0)/10),cl=Math.min(1,(n3Num(c.cli)||0)/30),rg=prRegiao(c),des=/descoberta/.test(rg.txt)?1:0.3,mr=Math.min(1,(c.marcas||[]).length/5);const sw=W.t+W.c+W.r+W.m||1;return Math.round((ye*W.t+cl*W.c+des*W.r+mr*W.m)/sw*100)};
  let body='';
  if(RCT==='fun'){
@@ -2607,7 +2607,7 @@ function renderRecr(){
   setTimeout(()=>{const b=$('#ag_ics');if(b)b.onclick=()=>save(new Blob([n3Ics(ev)],{type:'text/calendar'}),'Conversas_candidatos.ics')},0);
  }else{
   const geo=n3Geo(),cl=new Map();D.cli.forEach(c=>{const k=n3CidKey(c[2]);const key=k.n+'|'+k.u;cl.set(key,(cl.get(key)||0)+1)});
-  const pts=[],cand=[],miss=[];cl.forEach((n,k)=>{const g=geo.get(k);if(g)pts.push({la:g[0],lo:g[1],n})});
+  const pts=[],cand=[],miss=[];cl.forEach((n,k)=>{if(window.lcFiltro&&!lcFiltro.cityOk(k))return;const g=geo.get(k);if(g)pts.push({la:g[0],lo:g[1],n})});
   all.forEach(c=>{const k=n3CidKey(c.cid),key=k.n+'|'+k.u;const g=geo.get(key);const des=!cl.has(key);if(g)cand.push({la:g[0],lo:g[1],nm:c.nome,des,st:prSt(c)});else miss.push(c)});
   const A=pts.concat(cand);
   if(A.length<2)body='<div class="act">Poucas cidades com coordenadas guardadas. Clique em “Buscar coordenadas dos candidatos” (precisa de internet) ou abra a aba “Perto de mim” para o painel guardar as coordenadas das cidades dos clientes.</div>';
@@ -2616,7 +2616,8 @@ function renderRecr(){
   if(miss.length)body+=`<div style="margin-top:8px" class="mute">${miss.length} candidato(s) sem coordenadas: ${miss.map(c=>n3Esc(c.nome.split(' ')[0])).join(', ')}. <button class="btn" id="mp_geo">🌐 Buscar coordenadas dos candidatos</button></div>`;
   setTimeout(()=>{const b=$('#mp_geo');if(b)b.onclick=async()=>{b.disabled=true;b.textContent='Buscando…';for(const c of miss){const k=n3CidKey(c.cid);const nm=(String(c.cid).replace(/[\s\-\/,]+[A-Za-z]{2}$/,'').trim());const key=nm.toUpperCase()+'/'+k.u;try{const g=await ptCidade(key);if(g){PT_GC[key]=g}}catch(e){}}try{ptSave()}catch(e){}renderRecr()}},0);
  }
- $('#v2out').innerHTML=`<div class="vmh"><h2>🧲 Recrutamento de representantes</h2><p>Exclusivo do gestor. Funil, pontuação, checklist de contratação, agenda de conversas e mapa das regiões. Complementa o quadro de candidatos, na aba “Candidatos (quadro)” acima.</p></div><div style="margin:6px 0">${[['fun','Funil'],['pon','Pontuação'],['chk','Checklist de contratação'],['age','Agenda de conversas'],['map','Mapa']].map(([k,t])=>`<button class="rct btn${RCT===k?' pri':''}" data-k="${k}">${t}</button>`).join(' ')}</div>${body}`;
+ $('#v2out').innerHTML=`<div class="vmh"><h2>🧲 Recrutamento de representantes</h2><p>Exclusivo do gestor. Funil, pontuação, checklist de contratação, agenda de conversas e mapa das regiões. Complementa o quadro de candidatos, na aba “Candidatos (quadro)” acima.</p></div><div style="margin:6px 0">${[['fun','Funil'],['pon','Pontuação'],['chk','Checklist de contratação'],['age','Agenda de conversas'],['map','Mapa']].map(([k,t])=>`<button class="rct btn${RCT===k?' pri':''}" data-k="${k}">${t}</button>`).join(' ')}</div>${window.lcFiltro?lcFiltro.html():''}${body}`;
+ if(window.lcFiltro)lcFiltro.wire(renderRecr);
  document.querySelectorAll('.rct').forEach(b=>b.onclick=()=>{RCT=b.dataset.k;renderRecr()});
  document.querySelectorAll('.pw').forEach(e=>e.onchange=()=>{W[e.dataset.k]=Math.max(0,+e.value||0);nxSV(nxK('prw'),W);renderRecr()});
  document.querySelectorAll('.ck').forEach(e=>e.onchange=()=>{const o=CK[e.dataset.id]||{};o[e.dataset.k]=e.checked;CK[e.dataset.id]=o;nxSV(nxK('prck'),CK);renderRecr()});
@@ -3263,7 +3264,7 @@ if(H.sec==='agenda'){setView('agenda')}else if(H.sec==='cal'){setView('cal')}els
 (function(){try{
  if(window.__lc)return;window.__lc=1;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
- const LG=[['hoje','☀️','Hoje',['dash','hoje','venda','agenda','dashrep']],['cli','👥','Clientes',['ficha','cart','catx','rec','reat','repas','relsem','mapa','perto','abc','queda','novos','rev','orc','pspc','mpr']],['vm','📈','Vendas',['painel','resumo','meta','proj','vendas','cal','hist']],['ter','🗺️','Territórios',['cobert','cidn','lnv','camp','cobreg','orfaos','confl']],['via','🧳','Viagens',['desp','vis']],['mat','📚','Materiais',['rel','conq','bib','precos']],['sasi','🤖','Sasi',['sasi']],['sis','⚙️','Sistema',['pedidos','prec','lnk','imp','dup','saude','pcp','nov']],['ger','🧭','Gestão',['repterm','repn','recr','most','prosp','and']]];
+ const LG=[['hoje','☀️','Hoje',['dash','hoje','venda','agenda','dashrep']],['cli','👥','Clientes',['ficha','cart','catx','rec','reat','repas','relsem','mapa','perto','abc','queda','novos','rev','orc','pspc','mpr']],['vm','📈','Vendas',['painel','resumo','meta','proj','vendas','cal','hist']],['ter','🗺️','Territórios',['cobert','cidn','lnv','cfe','camp','cobreg','orfaos','confl']],['via','🧳','Viagens',['desp','vis']],['mat','📚','Materiais',['rel','conq','bib','precos']],['sasi','🤖','Sasi',['sasi']],['sis','⚙️','Sistema',['pedidos','prec','lnk','imp','dup','saude','pcp','nov']],['ger','🧭','Gestão',['repterm','repn','recr','most','prosp','and']]];
  const HID=new Set(['seg','oco','conc','cartao']);window.LCHID=HID;
  const GI={};LG.forEach(g=>GI[g[0]]=[g[1],g[2]]);
  const GC={hoje:'#F9A825',cli:'#1F78B4',vm:'#2E7D32',ter:'#E08A1E',via:'#00838F',mat:'#8E24AA',sasi:'#7c3aed',sis:'#546E7A',ger:'#6A1B9A'};
@@ -3639,6 +3640,10 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v202',d:'22/11/2026',t:'CNPJs fechados e filtro no Recrutamento',l:[
+   ['g','Nova aba “🚫 CNPJs fechados” (Territórios): clientes nossos com CNPJ baixado, inapto ou suspenso na Receita Federal, com aviso de quem comprou depois da baixa. Só consulta: nada é inativado sozinho.'],
+   ['g','Recrutamento (Funil, Pontuação, Checklist, Agenda e Mapa): filtro por região do Brasil, estado, mesorregião e DDD também nessas abas e no mapa.'],
+  ]},
   {v:'v201',d:'22/11/2026',t:'Links dos representantes e dados no Google Drive',l:[
    ['g','Nova aba “🆕 CNPJs novos” (Territórios): empresas de material de construção com CNPJ aberto há pouco na Receita Federal (possíveis clientes), por estado e mesorregião, com quem atende a região. A lista chega sozinha pelo GitHub. Marca com ⚠️ quando o CNPJ novo tem o mesmo endereço, telefone ou CEP de um cliente nosso (provável mesma loja).'],
    ['g','Nova aba “📲 Links dos representantes” (Sistema): link de cada representante ativo para copiar ou enviar pelo WhatsApp, com Excel.'],
@@ -8824,6 +8829,15 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
  const FL={rg:'',uf:'',mes:'',ddd:'',q:''};
  const dddDe=(c,uf)=>{try{const k=nz(c);const r=(D.cit||[]).find(x=>nz(x[0])===k&&x[1]===uf);return r?String(r[3]||''):''}catch(_){return ''}};
  function info(a){const m=window.lcMeso;const t=String((m&&m.cidDe?m.cidDe(a):a.cid)||'').trim();const u=t.match(/([A-Za-z]{2})\.?\s*$/);const uf=u?u[1].toUpperCase():'';const city=t.replace(/[\s\-\/,]+[A-Za-z]{2}\.?\s*$/,'').trim();let mes='',mk='';try{const o=m&&m.ofCid(t);if(o){mes=o.m;mk=o.k}}catch(_){}return {uf:uf,city:city,mes:mes,mk:mk,ddd:uf?dddDe(city,uf):''}}
+ // ---- filtro também nas abas do Recrutamento (Funil, Pontuação, Checklist, Agenda e Mapa) ----
+ const okF=i=>(!FL.rg||RB[FL.rg].includes(i.uf))&&(!FL.uf||i.uf===FL.uf)&&(!FL.mes||(i.mes?i.mes+' ('+i.uf+')':'')===FL.mes)&&(!FL.ddd||i.ddd===FL.ddd);
+ window.lcFiltro={FL:FL,
+  ok:c=>{try{if(!(FL.rg||FL.uf||FL.mes||FL.ddd))return true;return okF(info(c))}catch(_){return true}},
+  cityOk:k=>{try{if(!(FL.rg||FL.uf||FL.mes||FL.ddd))return true;const p=String(k).split('|'),uf=(p[1]||'').toUpperCase();const o=window.lcMeso&&lcMeso.ofCid(p[0]+'/'+uf);return okF({uf:uf,mes:o?o.m:'',ddd:''})||(FL.ddd&&!FL.rg&&!FL.uf&&!FL.mes)}catch(_){return true}},
+  html:()=>{try{const O=fbOpts();const sl=(c,ph,arr,v)=>'<select class="'+c+'" style="flex:1 1 140px;padding:7px 9px;border:1px solid #c5d0e3;border-radius:9px;font-size:13px;background:#fff"><option value="">'+ph+'</option>'+arr.map(x=>'<option value="'+E(x[0])+'"'+(x[0]===v?' selected':'')+'>'+E(x[0])+' · '+x[1]+(c==='f2_uf'?' candidato(s)':'')+'</option>').join('')+'</select>';
+    return '<div id="mz_fb2" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 10px"><select class="f2_rg" style="flex:1 1 140px;padding:7px 9px;border:1px solid #c5d0e3;border-radius:9px;font-size:13px;background:#fff"><option value="">Região do Brasil: todas</option>'+Object.keys(RB).map(r=>'<option'+(FL.rg===r?' selected':'')+'>'+r+'</option>').join('')+'</select>'+sl('f2_uf','Estado: todos',(FL.rg?RB[FL.rg]:[].concat(...Object.values(RB))).slice().sort().map(u=>{const f=O.uf.find(x=>x[0]===u);return [u,f?f[1]:0]}),FL.uf)+sl('f2_mes','Mesorregião: todas',O.mes,FL.mes)+sl('f2_dd','DDD: todos',O.ddd,FL.ddd)+((FL.rg||FL.uf||FL.mes||FL.ddd)?'<button type="button" class="f2_lm" style="padding:7px 9px;border:1px solid #c5d0e3;border-radius:9px;background:#fff;font-size:13px">Limpar</button>':'')+'<span style="font-size:12px;color:#64748b">Vale para as abas abaixo: candidatos e pontos do mapa</span></div>'}catch(e){return ''}},
+  wire:fn=>{const b=document.getElementById('mz_fb2');if(!b)return;const on=(c,f)=>{const e=b.querySelector(c);if(e)e.onchange=()=>{f(e.value);fn()}};
+   on('.f2_rg',v=>{FL.rg=v;FL.uf='';FL.mes='';FL.ddd=''});on('.f2_uf',v=>{FL.uf=v;FL.mes='';FL.ddd=''});on('.f2_mes',v=>{FL.mes=v});on('.f2_dd',v=>{FL.ddd=v});const l=b.querySelector('.f2_lm');if(l)l.onclick=()=>{FL.rg=FL.uf=FL.mes=FL.ddd='';fn()}}};
  function fbOpts(){const all=L(),I=all.map(a=>({a:a,i:info(a)}));const c=(f)=>{const m=new Map();I.forEach(x=>{const v=f(x.i);if(v)m.set(v,(m.get(v)||0)+1)});return [...m.entries()].sort((a,b)=>String(a[0]).localeCompare(String(b[0])))};
   return {I:I,uf:c(i=>(!FL.rg||RB[FL.rg].includes(i.uf))?i.uf:''),mes:c(i=>i.mes?i.mes+' ('+i.uf+')':''),ddd:c(i=>i.ddd)}}
  function fbDraw(){const bar=document.getElementById('mz_fb');if(!bar)return;const O=fbOpts();const key=JSON.stringify([FL.rg,O.uf,O.mes,O.ddd]);
@@ -8928,6 +8942,49 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
  const rd=render;render=function(){if(VIEW==='lnv')return;return rd.apply(this,arguments)};
  const sv0=setView;setView=function(v){if(v==='lnv'){sv0(v);try{draw();if(!DADOS&&!ERR)carregar()}catch(e){console.error(e)}return}return sv0(v)};
 }catch(e){console.error('lcBT',e)}})();
+
+// ===== v201 · Aba "CNPJs fechados" (Territórios, só gestor): clientes nossos cujo CNPJ está baixado, inapto ou suspenso na Receita Federal =====
+(function(){try{if(window.__lcBU||D.rm||window.PESSOA||!window.CNPJ_CLI)return;window.__lcBU=1;
+ const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+ const SIT={'03':'Suspensa','04':'Inapta','08':'Baixada'};
+ const COR={'08':['#fee2e2','#991b1b'],'04':['#fef3c7','#92400e'],'03':['#fef3c7','#92400e']};
+ let DADOS=null,LIST=null,ERR='',ST=null,CARR=false;const F={sit:'',rep:'',dep:'',q:''};
+ const nome1=n=>String(n||'').toLowerCase().replace(/(^|\s)(\S)/g,(m,a,b)=>a+b.toUpperCase());
+ const dbr=iso=>iso?iso.slice(8,10)+'/'+iso.slice(5,7)+'/'+iso.slice(0,4):'';
+ async function sha(t){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('').slice(0,20)}
+ async function monta(){
+  const fech=new Map((DADOS.itens||[]).map(x=>[x[0],x]));const out=[];
+  const cod2=new Map();D.cli.forEach(c=>{if(!(window.lcArq&&lcArq.has(c[0])))cod2.set(String(c[0]),c)});
+  for(const cod of Object.keys(window.CNPJ_CLI)){const c=cod2.get(cod);if(!c)continue;const h=await sha('mm1:'+window.CNPJ_CLI[cod]);const f=fech.get(h);if(!f)continue;
+   const ds=String(f[2]||'');const iso=/^\d{8}$/.test(ds)?ds.slice(0,4)+'-'+ds.slice(4,6)+'-'+ds.slice(6,8):'';const dd=iso?Math.floor(Date.UTC(+iso.slice(0,4),+iso.slice(5,7)-1,+iso.slice(8,10))/864e5):0;
+   const ult=c[4]>10000?c[4]:0;const r=D.reps[c[8]];
+   out.push({cod:c[0],nome:c[1],cid:c[2],rep:r?r[1]:'',sit:f[1],iso:iso,dd:dd,ult:ult,ultIso:ult?new Date(ult*864e5).toISOString().slice(0,10):'',v12:c[7]||0,tot:c[11]||0,dep:ult&&dd&&ult>dd})}
+  out.sort((a,b)=>(b.dep-a.dep)||(b.tot-a.tot));return out}
+ async function carregar(){if(CARR)return;CARR=true;try{const r=await fetch(new URL('cnpjs_fechados.json?t='+Date.now(),location.href).href,{cache:'no-store'});if(!r.ok)throw 0;DADOS=await r.json();LIST=await monta();ERR=''}catch(e){DADOS=null;ERR='sem-lista';try{const r=await fetch(new URL('lojas_novas_status.json?t='+Date.now(),location.href).href,{cache:'no-store'});if(r.ok)ST=await r.json()}catch(_){}}CARR=false;if(VIEW==='cfe')draw()}
+ const brl=v=>'R$ '+(+v||0).toLocaleString('pt-BR',{maximumFractionDigits:0});
+ function draw(){const o=document.getElementById('v2out');if(!o)return;
+  let h='<div class="vmh"><h2>🚫 CNPJs fechados na Receita Federal</h2><p>Clientes nossos cujo CNPJ aparece como baixado, inapto ou suspenso. É só uma lista de conferência: nada é inativado nem trocado de representante sozinho. Só você vê esta tela.</p></div>';
+  if(!LIST){h+='<div class="act">'+(ERR?'A conferência ainda não chegou. Ela é feita sozinha no GitHub, duas vezes por mês.'+(ST&&ST.erro?'<br><small>Último aviso: '+E(ST.erro)+'</small>':''):'Conferindo…')+'</div>';o.innerHTML=h;if(!ERR)carregar();return}
+  const reps=[...new Set(LIST.map(x=>x.rep))].sort();const q=String(F.q||'').toUpperCase();
+  const V=LIST.filter(x=>(!F.sit||x.sit===F.sit)&&(!F.rep||x.rep===F.rep)&&(!F.dep||x.dep)&&(!q||(x.nome+' '+x.cid).toUpperCase().includes(q)));
+  const nDep=LIST.filter(x=>x.dep).length;
+  const S='padding:7px 9px;border:1px solid #c5d0e3;border-radius:9px;font-size:13px;background:#fff;flex:1 1 140px';
+  h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0"><select class="cf_sit" style="'+S+'"><option value="">Situação: todas</option>'+Object.keys(SIT).map(k=>'<option value="'+k+'"'+(F.sit===k?' selected':'')+'>'+SIT[k]+'</option>').join('')+'</select><select class="cf_rep" style="'+S+'"><option value="">Representante: todos</option>'+reps.map(r=>'<option value="'+E(r)+'"'+(F.rep===r?' selected':'')+'>'+E(nome1(r))+'</option>').join('')+'</select>'
+   +'<select class="cf_dep" style="'+S+'"><option value="">Compras: todas</option><option value="1"'+(F.dep?' selected':'')+'>⚠️ Só os que compraram depois da baixa</option></select><input class="cf_q" placeholder="🔎 Nome ou cidade" value="'+E(F.q)+'" style="'+S+';min-width:0"><button type="button" class="btn" id="cf_xl">📊 Excel</button></div>';
+  h+='<div style="font-size:12px;color:#64748b;margin:4px 0 8px" title="Conferência feita em '+E(DADOS.gerado)+' com os dados da Receita de '+E(DADOS.mes_base)+'">'+V.length+' de '+LIST.length+' clientes · '+nDep+' compraram depois da baixa · conferido em '+dbr(DADOS.gerado)+'</div>';
+  h+=V.slice(0,80).map(x=>{const c=COR[x.sit]||['#e5e7eb','#374151'];return '<div style="background:#fff;border:1px solid #d9dfe9;border-radius:12px;padding:10px 12px;margin:0 0 9px"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><b>'+E(nome1(x.nome))+'</b><span style="font-size:11.5px;border-radius:8px;padding:2px 7px;white-space:nowrap;background:'+c[0]+';color:'+c[1]+'" title="Situação do CNPJ na Receita Federal">'+(SIT[x.sit]||'Situação '+x.sit)+(x.iso?' em '+dbr(x.iso):'')+'</span></div>'
+   +'<div style="font-size:12.5px;color:#475569;margin-top:3px">cód. '+x.cod+' · '+E(x.cid)+(x.rep?' · rep. '+E(nome1(x.rep).split(' ').slice(0,2).join(' ')):'')+'</div>'
+   +'<div style="margin-top:6px;padding-top:6px;border-top:1px solid #eef1f6;font-size:12.5px">Última compra: <b>'+(x.ultIso?dbr(x.ultIso):'—')+'</b> · 12 meses: <b>'+brl(x.v12)+'</b> · total: <b>'+brl(x.tot)+'</b></div>'
+   +(x.dep?'<div style="margin-top:6px;padding:6px 8px;border-radius:9px;background:#fef3c7;color:#92400e;font-size:12.5px">⚠️ Comprou <b>depois</b> da baixa: confira se o CNPJ do cadastro é o certo (pode ter mudado de CNPJ).</div>':'')+'</div>'}).join('');
+  if(V.length>80)h+='<div style="font-size:12px;color:#64748b">… e mais '+(V.length-80)+'. Use os filtros ou o Excel.</div>';
+  o.innerHTML=h;
+  const on=(c,k)=>{const e=o.querySelector(c);if(e)e.onchange=()=>{F[k]=e.value;draw()}};on('.cf_sit','sit');on('.cf_rep','rep');on('.cf_dep','dep');
+  const qi=o.querySelector('.cf_q');qi.oninput=()=>{F.q=qi.value;const p=qi.selectionStart;draw();const n=document.querySelector('.cf_q');n.focus();try{n.setSelectionRange(p,p)}catch(_){}};
+  o.querySelector('#cf_xl').onclick=()=>{try{save(xlsx([{t:'CNPJs fechados',h:['Cód.','Cliente','Cidade/UF','Representante','Situação na Receita','Data da situação','Última compra','Vendas 12 meses','Total comprado','Comprou depois da baixa?'],ty:['n','t','t','t','t','t','t','n','n','t'],rows:V.map(x=>[x.cod,x.nome,x.cid,x.rep,SIT[x.sit]||x.sit,dbr(x.iso),dbr(x.ultIso),x.v12,x.tot,x.dep?'Sim':''])}]),'CNPJs_fechados.xlsx')}catch(e){console.error(e)}}}
+ try{const nav=document.getElementById('nav');if(nav){const b=document.createElement('button');b.dataset.v='cfe';b.className='gest';b.title='Aba exclusiva do gestor';b.textContent='🚫 CNPJs fechados';nav.appendChild(b)}}catch(e){}
+ const rd=render;render=function(){if(VIEW==='cfe')return;return rd.apply(this,arguments)};
+ const sv0=setView;setView=function(v){if(v==='cfe'){sv0(v);try{draw();if(!LIST&&!ERR)carregar()}catch(e){console.error(e)}return}return sv0(v)};
+}catch(e){console.error('lcBU',e)}})();
 
 
 </script></body></html>
