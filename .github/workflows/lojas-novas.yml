@@ -30,7 +30,7 @@ jobs:
         run: |
           git config user.name "Metalmig automático"
           git config user.email "noreply@github.com"
-          git add -f lojas_novas.json cnpjs_fechados.json lojas_novas_status.json || true
+          for f in lojas_novas.json cnpjs_fechados.json lojas_novas_status.json; do [ -f "$f" ] && git add -f "$f"; done; true
           git diff --cached --quiet || git commit -m "Lista de lojas novas atualizada"
           git pull --rebase origin main || true
           git push origin HEAD:main
