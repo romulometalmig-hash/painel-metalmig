@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Lista de lojas novas (CNAE 4744, material de construção) a partir dos dados abertos da Receita Federal.
 Roda no GitHub (Actions). Grava lojas_novas.json e lojas_novas_status.json na raiz do repositório."""
-import datetime, io, json, os, sys, time, urllib.request, urllib.error, zipfile, traceback
+import datetime, hashlib, io, json, os, sys, time, urllib.request, urllib.error, zipfile, traceback
 
 HOJE = datetime.date.today()
 JANELA = 240                      # dias: só lojas abertas nos últimos 8 meses
@@ -62,11 +62,20 @@ def main():
     os.makedirs('tmp', exist_ok=True)
     baixa(base + 'Municipios.zip', 'tmp/mun.zip')
     MUN = {l[0]: l[1] for l in linhas('tmp/mun.zip') if len(l) >= 2}
+    try:
+        HS = set(json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'clientes_hash.json')))['h'])
+    except Exception:
+        HS = set()
+    fechados = {}
     achados = {}
     for i in range(10):
         p = 'tmp/est%d.zip' % i
         baixa(base + 'Estabelecimentos%d.zip' % i, p)
         for c in linhas(p):
+            if HS and len(c) >= 21 and c[5] != '02':
+                h = hashlib.sha256(('mm1:' + c[0] + c[1] + c[2]).encode()).hexdigest()[:20]
+                if h in HS:
+                    fechados[h] = [h, c[5], c[6], c[7]]
             if len(c) < 21 or c[5] != '02' or not c[11].startswith('4744') or c[10] < CORTE:
                 continue
             cnpj = c[0] + c[1] + c[2]
@@ -90,7 +99,9 @@ def main():
     itens.sort(key=lambda x: x[2], reverse=True)
     json.dump({'gerado': HOJE.isoformat(), 'mes_base': mes, 'janela_dias': JANELA, 'total': len(itens), 'itens': itens},
               open(os.path.join(SAIDA, 'lojas_novas.json'), 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
-    STATUS['ok'] = True; STATUS['total'] = len(itens)
+    json.dump({'gerado': HOJE.isoformat(), 'mes_base': mes, 'total': len(fechados), 'itens': sorted(fechados.values())},
+              open(os.path.join(SAIDA, 'cnpjs_fechados.json'), 'w', encoding='utf-8'), separators=(',', ':'))
+    STATUS['ok'] = True; STATUS['total'] = len(itens); STATUS['fechados'] = len(fechados)
 
 if __name__ == '__main__':
     try:
