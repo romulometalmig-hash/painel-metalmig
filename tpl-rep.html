@@ -1962,7 +1962,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v208';
+const NX_VER = 'v209';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3640,6 +3640,10 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v209',d:'23/11/2026',t:'Recomprar com representante, telefone e agenda',l:[
+   ['g','Hora de recomprar e Reativar clientes: em cada cliente aparece o representante, o telefone com botão copiar e o botão Agendar conversa (cai no Hoje no dia marcado).'],
+   ['g','WhatsApp (gestor): os botões abrem o WhatsApp Web sempre na mesma aba, já com a mensagem; não reinicia mais o aplicativo.'],
+   ['g','Vendas, Representantes ativos com pedido no mês: quem também é cliente (ex.: Alexandre Fabris Lima, Reinaldo Tadeu) deixa de aparecer como INATIVO.']]},
   {v:'v208',d:'23/11/2026',t:'Conversas com representantes e Descartar lojas novas',l:[
    ['a','Conversas com representantes (só gestor): no termômetro de cada representante, botão Registrar conversa (assunto, como foi, o que foi falado) e histórico. Dá para agendar a próxima conversa: no dia ela aparece no Hoje, com WhatsApp, Conversei e Adiar. Fica guardado na nuvem.'],
    ['a','CNPJs novos: botão Descartar (sem interesse, não trabalha com nosso tipo de produto ou outro motivo), filtro Descartados e botão Restaurar. Guardado na nuvem.'],
@@ -7517,7 +7521,7 @@ body.rt-fs{overflow:hidden!important}body.rt-fs:not(.rt-nv) #lcnav{display:none!
  // ---------- marcacao das linhas
  function decora(){const o=document.getElementById('v2out');if(!o||typeof VIEW==='undefined')return;
   if(['ficha','dashrep','hoje','dash','dashboard'].includes(VIEW))return;
-  if(window.lcRowsOf){window.lcRowsOf(o).filter(r=>!(r.el.closest&&r.el.closest('.od_w,.cb_w'))).forEach(r=>{const d=dias(r.ci);if(d==null){return}
+  if(window.lcRowsOf){window.lcRowsOf(o).filter(r=>!(r.el.closest&&r.el.closest('.od_w,.cb_w'))&&!(r.el.tagName==='TR'&&r.el.closest&&r.el.closest('table.rs-t')&&D.reps.some((x,i)=>i&&+x[0]===+D.cli[r.ci][0]))).forEach(r=>{const d=dias(r.ci);if(d==null){return}
    if(r.el.tagName!=='TR'&&(r.el.offsetHeight>150||r.el.querySelectorAll('button,.btn').length>2)){r.el.classList.remove('lcq-inat');return}
    if(r.el.dataset.lcq===String(d))return;r.el.querySelectorAll('.lcq-m').forEach(x=>x.remove());r.el.classList.remove('lcq-inat');
    const nmc=nz(D.cli[r.ci][1]);const tg=r.el.tagName==='TR'?([...r.el.querySelectorAll('td')].find(t=>nz((t.innerText||'').replace(/^[★\s]+/,'').replace(/\d+ d\s*/,'')).startsWith(nmc.slice(0,12)))||r.el.querySelector('td')):r.el;if(!tg)return;
@@ -9197,6 +9201,39 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
  new MutationObserver(()=>{try{noDash()}catch(e){}}).observe(document.body,{childList:true,subtree:true});
  window.lcConv.pend=()=>pendentes().length;
 }catch(e){console.error('lcBW',e)}})();
+
+// v209 · Hora de recomprar e Reativar clientes: representante, telefone p/ copiar e "Agendar conversa" (gestor)
+(function(){try{
+ if(typeof D==='undefined'||!D.cli||!D.reps||D.rm)return;
+ const E=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+ const st=document.createElement('style');st.textContent='.lcbx{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;font-size:13px;margin:4px 0;padding-top:4px;border-top:1px solid #eef1f6}.lcbx .tel{user-select:all;font-weight:600}.lcbx button{background:#eef2f8;border:1px solid #cfd8e6;border-radius:6px;padding:3px 9px;font-size:12.5px;cursor:pointer;min-height:30px}.lcbx .ag{background:#1F4E78;color:#fff;border-color:#1F4E78}';
+ document.head.appendChild(st);
+ const dig=t=>{let d=String(t||'').replace(/\D/g,'').replace(/^0+/,'');if(d.length>11&&d.startsWith('55'))d=d.slice(2);return d};
+ const fmt=d=>d.length===11?'('+d.slice(0,2)+') '+d.slice(2,7)+'-'+d.slice(7):d.length===10?'('+d.slice(0,2)+') '+d.slice(2,6)+'-'+d.slice(6):d;
+ function rep(c){const r=D.reps[c[8]];if(!r)return '—';const ap=window.lcApel&&window.lcApel.get?window.lcApel.get(r[0]):'';return ap||String(r[1]).replace(/\s*-?\s*INATIVO/i,'')}
+ function deco(){if(typeof VIEW==='undefined'||VIEW!=='rec'&&VIEW!=='reat')return;
+  document.querySelectorAll('#v2out .lccard').forEach(card=>{if(card.querySelector('.lcbx'))return;const a=card.querySelector('a.rcf');if(!a)return;const ci=+a.dataset.ci,c=D.cli[ci];if(!c)return;
+   const d=dig(c[3]),ok=d.length>=10;
+   const w=document.createElement('div');w.className='lcbx';
+   w.innerHTML='<span>👤 <b>'+E(rep(c))+'</b></span>'+(ok?'<span class="tel">📞 '+E(fmt(d))+'</span><button class="cp" data-t="'+d+'">📋 copiar</button>':'<span class="mute">sem telefone</span>')+'<button class="ag">📅 Agendar conversa</button>';
+   const cp=w.querySelector('.cp');if(cp)cp.onclick=ev=>{ev.stopPropagation();const t=cp.dataset.t,done=()=>{cp.textContent='✔ copiado';setTimeout(()=>{cp.textContent='📋 copiar'},1500)};try{navigator.clipboard.writeText(t).then(done,()=>{const r=document.createRange();r.selectNodeContents(w.querySelector('.tel'));const g=getSelection();g.removeAllRanges();g.addRange(r)})}catch(e){}};
+   w.querySelector('.ag').onclick=ev=>{ev.stopPropagation();if(window.lcLembrar)window.lcLembrar(ci)};
+   const city=card.querySelector('.mute');if(city)city.insertAdjacentElement('afterend',w);else card.appendChild(w)})}
+ setInterval(()=>{try{deco()}catch(e){console.error('lcBX',e)}},900);
+}catch(e){console.error('lcBX',e)}})();
+
+// v209 · WhatsApp (gestor): abre sempre o WhatsApp Web na MESMA aba, já com a mensagem
+(function(){try{
+ if(typeof D==='undefined'||D.rm)return;
+ document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('a[href]');if(!a)return;
+  const h=a.getAttribute('href')||'';const m=h.match(/^https?:\/\/(?:wa\.me\/(\d+)|api\.whatsapp\.com\/send\?phone=(\d+))(?:[?&](?:.*&)?text=([^&#]*))?/i);
+  if(!m)return;const ph=m[1]||m[2];if(!ph)return;
+  const tx=m[3]||(()=>{try{return new URL(h).searchParams.get('text')?encodeURIComponent(new URL(h).searchParams.get('text')):''}catch(_){return ''}})();
+  e.preventDefault();e.stopImmediatePropagation();
+  const u='https://web.whatsapp.com/send?phone='+ph+(tx?'&text='+tx:'');
+  const w=window.open(u,'metalmig_whatsapp');if(!w)location.href=u;else{try{w.focus()}catch(_){}}
+ },true);
+}catch(e){console.error('lcBY',e)}})();
 
 
 </script></body></html>
