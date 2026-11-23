@@ -1962,7 +1962,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v212';
+const NX_VER = 'v213';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3644,11 +3644,12 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
-  {v:'v212',d:'23/11/2026',t:'Treinamento do sistema',l:[
-   ['a','Nova aba Materiais › 📘 Treinamento do sistema: guia passo a passo, em linguagem simples, de como instalar, usar cada tela e vender mais com os números. Também existe em PDF.'],
+  {v:'v213',d:'23/11/2026',t:'Voltar, telefone e mesorregião',l:[
    ['g','Repasse de clientes: ao escolher uma mesorregião, o filtro Representante atual mostra só os representantes que já venderam nela.'],
    ['a','Meus prospectos (Back Office e representantes): o telefone do cliente aparece em destaque, com o botão Copiar telefone, para colar direto no WhatsApp sem perder tempo.'],
-   ['a','Seta ← no topo (ao lado da logo) para voltar à tela anterior, e botão ← Voltar na tela cheia do Repasse. O painel de abas não fica mais preso por cima da tela: fecha sozinho ao trocar de tela.'],
+   ['a','Seta ← no topo (ao lado da logo) para voltar à tela anterior, e botão ← Voltar na tela cheia do Repasse. O painel de abas não fica mais preso por cima da tela: fecha sozinho ao trocar de tela.']]},
+  {v:'v212',d:'23/11/2026',t:'Treinamento do sistema',l:[
+   ['a','Nova aba Materiais › 📘 Treinamento do sistema: guia passo a passo, em linguagem simples, de como instalar, usar cada tela e vender mais com os números. Também existe em PDF.'],
    ['g','Links dos representantes: saiu a barra de cima (Mostrar / Representante) que só repetia o filtro; a busca por nome da própria tela continua. Representantes novos ainda sem código da fábrica (Allan e Phillip) agora aparecem na lista.'],
    ['a','Reativar clientes: novos filtros de Estado, Mesorregião e Cidade e, sempre que você escolhe um filtro, aparece a contagem "N de M clientes parados", como na tela do Repasse.']]},
   {v:'v211',d:'23/11/2026',t:'Repasse muda a carteira',l:[
