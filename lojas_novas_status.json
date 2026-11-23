@@ -1,31 +1,9 @@
 {
  "rodou_em": "2026-11-23",
- "ok": false,
- "tentativas": [
-  "https://arquivos.receitafederal.gov.br/public.php/webdav/2026-11/Estabelecimentos0.zip -> <urlopen error [Errno 104] Connection reset by peer>",
-  "https://arquivos.receitafederal.gov.br/public.php/webdav/Dados/Cadastros/CNPJ/2026-11/Estabelecimentos0.zip -> <urlopen error [Errno 104] Connection reset by peer>",
-  "https://arquivos.receitafederal.gov.br/public.php/webdav/2026-11/Estabelecimentos0.zip -> <urlopen error [Errno 104] Connection reset by peer>",
-  "https://arquivos.receitafederal.gov.br/public.php/webdav/Dados/Cadastros/CNPJ/2026-11/Estabelecimentos0.zip -> <urlopen error [Errno 104] Connection reset by peer>",
-  "https://arquivos.receitafederal.gov.br/dados/cnpj/dados_abertos_cnpj/2026-11/Estabelecimentos0.zip -> <urlopen error [Errno 104] Connection reset by peer>",
-  "https://dadosabertos.rfb.gov.br/CNPJ/dados_abertos_cnpj/2026-11/Estabelecimentos0.zip -> <urlopen error timed out>",
-  "https://arquivos.receitafederal.gov.br/public.php/webdav/2026-10/Estabelecimentos0.zip -> <urlopen error [Errno 104] Connection reset by peer>",
-  "https://arquivos.receitafederal.gov.br/public.php/webdav/Dados/Cadastros/CNPJ/2026-10/Estabelecimentos0.zip -> <urlopen error [Errno 104] Connection reset by peer>",
-  "https://arquivos.receitafederal.gov.br/public.php/webdav/2026-10/Estabelecimentos0.zip -> <urlopen error [Errno 104] Connection reset by peer>",
-  "https://arquivos.receitafederal.gov.br/public.php/webdav/Dados/Cadastros/CNPJ/2026-10/Estabelecimentos0.zip -> <urlopen error [Errno 104] Connection reset by peer>",
-  "https://arquivos.receitafederal.gov.br/dados/cnpj/dados_abertos_cnpj/2026-10/Estabelecimentos0.zip -> <urlopen error [Errno 104] Connection reset by peer>",
-  "https://dadosabertos.rfb.gov.br/CNPJ/dados_abertos_cnpj/2026-10/Estabelecimentos0.zip -> <urlopen error timed out>",
-  "https://arquivos.receitafederal.gov.br/public.php/webdav/2026-09/Estabelecimentos0.zip -> <urlopen error [Errno 104] Connection reset by peer>",
-  "https://arquivos.receitafederal.gov.br/public.php/webdav/Dados/Cadastros/CNPJ/2026-09/Estabelecimentos0.zip -> <urlopen error [Errno 104] Connection reset by peer>",
-  "https://arquivos.receitafederal.gov.br/public.php/webdav/2026-09/Estabelecimentos0.zip -> <urlopen error [Errno 104] Connection reset by peer>",
-  "https://arquivos.receitafederal.gov.br/public.php/webdav/Dados/Cadastros/CNPJ/2026-09/Estabelecimentos0.zip -> <urlopen error [Errno 104] Connection reset by peer>",
-  "https://arquivos.receitafederal.gov.br/dados/cnpj/dados_abertos_cnpj/2026-09/Estabelecimentos0.zip -> <urlopen error [Errno 104] Connection reset by peer>",
-  "https://dadosabertos.rfb.gov.br/CNPJ/dados_abertos_cnpj/2026-09/Estabelecimentos0.zip -> <urlopen error timed out>",
-  "https://arquivos.receitafederal.gov.br/public.php/webdav/2026-08/Estabelecimentos0.zip -> <urlopen error [Errno 104] Connection reset by peer>",
-  "https://arquivos.receitafederal.gov.br/public.php/webdav/Dados/Cadastros/CNPJ/2026-08/Estabelecimentos0.zip -> <urlopen error [Errno 104] Connection reset by peer>",
-  "https://arquivos.receitafederal.gov.br/public.php/webdav/2026-08/Estabelecimentos0.zip -> <urlopen error [Errno 104] Connection reset by peer>",
-  "https://arquivos.receitafederal.gov.br/public.php/webdav/Dados/Cadastros/CNPJ/2026-08/Estabelecimentos0.zip -> <urlopen error [Errno 104] Connection reset by peer>",
-  "https://arquivos.receitafederal.gov.br/dados/cnpj/dados_abertos_cnpj/2026-08/Estabelecimentos0.zip -> <urlopen error [Errno 104] Connection reset by peer>",
-  "https://dadosabertos.rfb.gov.br/CNPJ/dados_abertos_cnpj/2026-08/Estabelecimentos0.zip -> <urlopen error timed out>"
- ],
- "erro": "RuntimeError: não achei os arquivos da Receita (endereço pode ter mudado)"
+ "ok": true,
+ "tentativas": [],
+ "erro": "",
+ "mes_base": "2026-11",
+ "total": 32022,
+ "fechados": 646
 }

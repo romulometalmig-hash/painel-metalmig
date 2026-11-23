@@ -1962,7 +1962,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v209';
+const NX_VER = 'v211';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3640,6 +3640,11 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v211',d:'23/11/2026',t:'Repasse muda a carteira',l:[
+   ['g','Ao repassar um cliente, ele passa para a carteira do representante novo em todo o painel e nos relatórios, com a etiqueta "↪ Repassado de Fulano em dd/mm". Se o representante recusar ou não responder no prazo, volta sozinho para quem tinha, com aviso. Se vender, fica definitivo. Quando o ERP trouxer a carteira nova, a etiqueta some.'],
+   ['g','Nova tela "Conferir repasses antigos" (aba Repasse de clientes): lista os repasses que você já fez, com os em andamento já marcados e os encerrados desmarcados. Nada muda até apertar "Aplicar nos selecionados".']]},
+  {v:'v210',d:'23/11/2026',t:'Atualização automática',l:[
+   ['a','Quando sai uma versão nova, o painel e as páginas dos representantes atualizam sozinhos ao abrir o aplicativo, ou ao voltar a ele depois de alguns minutos. Não atualiza se a pessoa estiver digitando.']]},
   {v:'v209',d:'23/11/2026',t:'Recomprar com representante, telefone e agenda',l:[
    ['g','Hora de recomprar e Reativar clientes: em cada cliente aparece o representante, o telefone com botão copiar e o botão Agendar conversa (cai no Hoje no dia marcado).'],
    ['g','CNPJs novos liberado para o representante M4 Representações (código 2001), só da Bahia: lista com filtros, telefone para copiar, WhatsApp e Descartar. Os outros representantes não veem.'],
@@ -7133,7 +7138,7 @@ body.rt-fs{overflow:hidden!important}body.rt-fs:not(.rt-nv) #lcnav{display:none!
     if(!confirm('Passar '+cis.length+' cliente(s) para '+quem+'?'))return;
     aplicar(lista,dias,resp);cis.forEach(ci=>ST.sel.delete(ci));fecha();ST.tab=(tipo==='ina'||ST.modo!=='lista')?'par':'acomp';sv();if(fora){try{setView(VIEW)}catch(e){}}else draw();try{bigMsg('✔ '+cis.length+' cliente(s) passado(s) para '+quem,'#2E7D32')}catch(e){}}}
   pinta()}
- window.lcReat={checkVendas,draw,state:()=>R};
+ window.lcReat={checkVendas,draw,state:()=>R,est,nm:nmCod,hoje};
  setTimeout(()=>{try{checkVendas();badge();aviso();pushIdx()}catch(e){console.error('lcAM init',e)}},9000);
  setInterval(()=>{try{if(!document.hidden){checkVendas();badge()}}catch(e){}},90000);
 }catch(e){console.error('lcAM',e)}})();
@@ -9340,6 +9345,117 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
  const rd=render;render=function(){if(VIEW==='lnb')return;return rd.apply(this,arguments)};
  const sv0=setView;setView=function(v){if(v==='lnb'){sv0(v);try{draw();if(!DADOS&&!ERR)carregar()}catch(e){console.error(e)}return}return sv0(v)};
 }catch(e){console.error('lcBZ',e)}})();
+
+// ===== v210 · Atualização automática: ao abrir o aplicativo (ou voltar a ele depois de uns minutos), se houver versão nova, atualiza sozinho =====
+(function(){try{
+ if(!/^https?:/.test(location.protocol)||typeof NX_VER==='undefined'||window.__lcCA)return;window.__lcCA=1;
+ const FK='mm_auto_upd';let busy=0,hid=0;
+ async function chk(){if(busy)return;busy=1;try{const r=await fetch('versao.json?'+Date.now(),{cache:'no-store'});const j=await r.json();
+  if(j&&j.v&&j.v!==NX_VER){let f='';try{f=sessionStorage.getItem(FK)||''}catch(e){}
+   const ae=document.activeElement,edit=ae&&/^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName);   // não atualiza no meio de uma digitação
+   if(f!==j.v&&!edit){try{sessionStorage.setItem(FK,j.v)}catch(e){}
+    try{if(navigator.serviceWorker){const rs=await navigator.serviceWorker.getRegistrations();await Promise.all(rs.map(x=>x.update().catch(()=>{})))}}catch(e){}
+    location.reload()}}}catch(e){}busy=0}
+ setTimeout(chk,2500);
+ document.addEventListener('visibilitychange',()=>{if(document.hidden)hid=Date.now();else if(hid&&Date.now()-hid>60000){hid=0;chk()}});
+}catch(e){console.error('lcCA',e)}})();
+
+// ===== v211 · Repasse muda a carteira (gestor): cliente passa para o representante novo, com etiqueta, controle e conferência dos repasses antigos =====
+(function(){try{
+ if(typeof D==='undefined'||D.rm||window.__lcCB||!window.lcReat||!window.lcReat.state)return;window.__lcCB=1;
+ const KEY='metalmig_carteira_v1',L0=localStorage;
+ const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+ const ld=()=>{try{const o=JSON.parse(L0.getItem(KEY)||'null');if(o&&o.ov)return o}catch(e){}return null};
+ let S=ld();const first=!S;if(!S)S={v:1,ov:{},leg:{},done:{},av:[]};
+ S.ov=S.ov||{};S.leg=S.leg||{};S.done=S.done||{};S.av=S.av||[];
+ const sv=()=>{try{L0.setItem(KEY,JSON.stringify(S))}catch(e){}};
+ const CI=new Map();D.cli.forEach((c,i)=>CI.set(String(c[0]),i));
+ const RI=new Map();D.reps.forEach((r,i)=>{if(i)RI.set(+r[0],i)});
+ const ERP=new Map();               // carteira que veio do ERP/dados (antes de qualquer repasse)
+ const erpCod=ci=>{if(!ERP.has(ci)){const r=D.cli[ci][8];ERP.set(ci,r&&D.reps[r]?+D.reps[r][0]:0)}return ERP.get(ci)};
+ const REAT=()=>window.lcReat,R=()=>REAT().state();
+ const nm=c=>c?REAT().nm(c):'—';
+ const hoje=()=>REAT().hoje();
+ const br=s=>s?String(s).slice(0,10).split('-').reverse().slice(0,2).join('/'):'';
+ const ATIVA=['aguard','acomp','vendeu','conf'];
+ const ult=code=>{const a=R().t[code]||[];return a.length?a[a.length-1]:null};
+ const ativo=(t,code)=>{const e=REAT().est(t);return ATIVA.includes(e)};
+ // ---- primeira vez: tudo o que já existia fica "antigo" (só muda depois da sua conferência)
+ if(first){Object.keys(R().t).forEach(code=>(R().t[code]||[]).forEach(t=>{S.leg[t.id]=1}));sv()}
+ // ---- aplica / desfaz
+ let SIG='',PREV=new Set(Object.keys(S.ov));
+ function ap(){const r=R();let ch=0;
+  // 1) repasses novos (feitos depois desta versão) valem na hora
+  Object.keys(r.t).forEach(code=>{const t=ult(code);if(!t||t.dest==='ina'||!t.cod||S.leg[t.id])return;const o=S.ov[code];if(o&&o.tid===t.id)return;if(S.done[t.id])return;
+   const ci=CI.get(code);if(ci==null)return;const er=erpCod(ci);if(er===+t.cod){S.done[t.id]=1;ch++;return}
+   S.ov[code]={para:+t.cod,de:t.de&&t.de.cod?+t.de.cod:er,er,tid:t.id,d:t.ini||hoje(),f:0};ch++});
+  // 2) confere cada cliente com repasse aplicado
+  Object.keys(S.ov).forEach(code=>{const o=S.ov[code],ci=CI.get(code);if(ci==null){delete S.ov[code];ch++;return}
+   const er=erpCod(ci);
+   if(er===+o.para||er!==+o.er){delete S.ov[code];S.done[o.tid]=1;ch++;return}        // o ERP já tem a carteira nova (ou mudou): some a etiqueta
+   const t=ult(code);
+   if(!o.f){const ok=t&&t.dest!=='ina'&&ativo(t,code);
+    if(!ok){delete S.ov[code];S.done[o.tid]=1;S.av.push({c:code,para:o.para,de:o.de,d:hoje(),why:!t||t.dest==='ina'?'inativado':({recusou:'recusou',semresp:'não respondeu no prazo',sem:'prazo acabou sem pedido',enc:'foi encerrado'}[REAT().est(t)]||'encerrado')});ch++;return}}
+  });
+  // 3) aplica na carteira
+  const cs=new Set([...Object.keys(S.ov),...PREV]);cs.forEach(code=>{const ci=CI.get(code);if(ci==null)return;const o=S.ov[code];const i=RI.get(o?+o.para:erpCod(ci));if(i&&D.cli[ci][8]!==i)D.cli[ci][8]=i});
+  PREV=new Set(Object.keys(S.ov));
+  const sig=JSON.stringify(S.ov)+S.av.length;if(sig!==SIG||ch){SIG=sig;sv()}
+  return ch}
+ // marca quem o ERP já tinha antes de qualquer mudança (clientes sem registro: guarda só quando necessário)
+ D.cli.forEach((c,ci)=>erpCod(ci));
+ ap();
+ setInterval(()=>{try{const ch=ap();if(ch&&typeof VIEW!=='undefined'&&VIEW==='repas'&&window.lcReat.draw){}}catch(e){console.error('lcCB',e)}},1500);
+ window.lcCart={ov:()=>S.ov,tag:code=>{const o=S.ov[String(code)];return o?{de:nm(o.de),d:o.d}:null}};
+ // ---- etiqueta nas listas
+ const st=document.createElement('style');st.textContent=`.lccb-t{display:inline-block;background:#e8f1fb;color:#1F4E78;border:1px solid #b9cfe8;border-radius:8px;padding:1px 7px;font-size:11px;font-weight:700;margin:2px 6px 2px 0;white-space:nowrap;vertical-align:middle}
+ .lccb-ov{position:fixed;inset:0;background:rgba(10,20,40,.55);z-index:2147482500;display:flex;align-items:center;justify-content:center;padding:10px}
+ .lccb-m{background:#fff;width:min(720px,100%);max-height:92vh;overflow:auto;border-radius:14px;padding:14px 16px}
+ .lccb-m h3{margin:0 0 4px;color:#1F4E78}.lccb-s{font-weight:800;color:#1F4E78;margin:12px 0 4px}
+ .lccb-r{display:flex;gap:8px;align-items:flex-start;padding:7px 4px;border-top:1px solid #eef1f6;font-size:13.5px}.lccb-r input{margin-top:3px;width:18px;height:18px;flex:none}
+ .lccb-r small{display:block;color:#5b6b82;font-size:12px}
+ .lccb-bn{margin:10px 0;padding:10px 12px;border:1px solid #b9cfe8;border-left:5px solid #1F4E78;border-radius:12px;background:#f3f8fe}
+ .lccb-bn button,.lccb-m button{background:#1F4E78;color:#fff;border:0;border-radius:8px;padding:9px 13px;font-weight:700;cursor:pointer;min-height:38px}.lccb-m button.n,.lccb-bn button.n{background:#fff;color:#1F4E78;border:1px solid #b9c7e2}`;
+ document.head.appendChild(st);
+ function decora(){if(typeof VIEW==='undefined'||['ficha','dashrep'].includes(VIEW))return;const o=document.getElementById('v2out');if(!o||!window.lcRowsOf||!Object.keys(S.ov).length)return;
+  window.lcRowsOf(o).forEach(r=>{const code=String(D.cli[r.ci][0]),ov=S.ov[code];const old=r.el.querySelector(':scope .lccb-t,.lccb-t');
+   if(!ov){if(old&&old.dataset.k)old.remove();return}
+   const key=ov.para+'|'+ov.d;if(old&&old.dataset.k===key)return;if(old)old.remove();
+   if(r.el.tagName!=='TR'&&r.el.offsetHeight>150)return;
+   const s=document.createElement('span');s.className='lccb-t';s.dataset.k=key;s.title='O sistema já mostra este cliente na carteira do representante novo. Fica assim até o ERP trazer a carteira nova.';s.textContent='↪ Repassado de '+nm(ov.de)+' em '+br(ov.d);
+   if(r.el.tagName==='TR'){const td=r.el.querySelector('td:nth-child(2)')||r.el.querySelector('td');if(td)td.appendChild(s)}else r.el.insertBefore(s,r.el.firstChild)})}
+ setInterval(()=>{try{decora()}catch(e){}},1200);
+ if(typeof fichaShow==='function'){const f0=fichaShow;fichaShow=function(ci){f0.apply(this,arguments);try{const det=document.getElementById('f_det');if(!det)return;const o=det.querySelector('#lccb_f');if(o)o.remove();const ov=S.ov[String(D.cli[ci][0])];if(!ov)return;
+   det.insertAdjacentHTML('afterbegin','<div id="lccb_f" class="lccb-t" style="display:block;margin:6px 0;padding:6px 10px;font-size:13px">↪ Repassado de '+E(nm(ov.de))+' para '+E(nm(ov.para))+' em '+br(ov.d)+' · carteira já trocada no sistema</div>')}catch(e){}}}
+ // ---- conferência dos repasses antigos
+ function pend(){const out=[];Object.keys(R().t).forEach(code=>{const t=ult(code);if(!t||!S.leg[t.id]||S.done[t.id]||t.dest==='ina'||!t.cod)return;const ci=CI.get(code);if(ci==null)return;const er=erpCod(ci);if(er===+t.cod)return;
+   const e=REAT().est(t),arq=!!(window.lcArq&&lcArq.has(code)),on=ATIVA.includes(e)&&!arq;
+   out.push({code,ci,t,e,arq,on,er})});return out}
+ const ESC={aguard:'aguardando resposta',acomp:'em acompanhamento',vendeu:'vendeu',conf:'vendeu e confirmado',recusou:'recusou',semresp:'sem resposta no prazo',sem:'prazo acabou sem pedido',enc:'encerrado'};
+ function abre(){const P=pend();const ov=document.createElement('div');ov.className='lccb-ov';
+  const row=x=>`<label class="lccb-r"><input type="checkbox" data-c="${x.code}" ${x.on?'checked':''}><span><b>${E(String(D.cli[x.ci][1]).toLowerCase().replace(/(^|\s)(\S)/g,(m,a,b)=>a+b.toUpperCase()))}</b><small>${E(nm(x.er))} → <b>${E(nm(x.t.cod))}</b> · repassado em ${br(x.t.ini)||'—'} · ${E(ESC[x.e]||x.e)}${x.arq?' · arquivo morto':''}</small></span></label>`;
+  const a=P.filter(x=>x.on),b=P.filter(x=>!x.on);
+  ov.innerHTML=`<div class="lccb-m"><h3>🔁 Conferir repasses antigos</h3><div style="font-size:13px;color:#5b6b82">Nada muda enquanto você não apertar o botão. Os marcados passam para a carteira do representante novo (com a etiqueta "Repassado de…"). Os não marcados ficam como estão hoje.</div>
+   <div class="lccb-s">Em andamento — já marcados (${a.length})</div>${a.map(row).join('')||'<div style="color:#7b8aa0;font-size:13px">Nenhum.</div>'}
+   <div class="lccb-s">Encerrados — não marcados (${b.length})</div><div style="font-size:12px;color:#7b8aa0">Recusaram, não responderam, sem pedido ou arquivo morto. Marque só se quiser mesmo trocar a carteira.</div>${b.map(row).join('')}
+   <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap"><button id="lccb_ok">Aplicar nos selecionados</button><button class="n" id="lccb_all">Marcar todos</button><button class="n" id="lccb_no">Desmarcar todos</button><button class="n" id="lccb_x">Fechar</button></div></div>`;
+  document.body.appendChild(ov);const cks=()=>[...ov.querySelectorAll('input[type=checkbox]')];
+  const cnt=()=>{ov.querySelector('#lccb_ok').textContent='Aplicar nos '+cks().filter(k=>k.checked).length+' selecionados'};cnt();ov.addEventListener('change',cnt);
+  ov.querySelector('#lccb_all').onclick=()=>{cks().forEach(k=>k.checked=true);cnt()};ov.querySelector('#lccb_no').onclick=()=>{cks().forEach(k=>k.checked=false);cnt()};
+  ov.querySelector('#lccb_x').onclick=()=>ov.remove();ov.onclick=e=>{if(e.target===ov)ov.remove()};
+  ov.querySelector('#lccb_ok').onclick=()=>{let n=0;P.forEach(x=>{const k=ov.querySelector('input[data-c="'+x.code+'"]');S.done[x.t.id]=1;if(k&&k.checked){S.ov[x.code]={para:+x.t.cod,de:x.t.de&&x.t.de.cod?+x.t.de.cod:x.er,er:x.er,tid:x.t.id,d:x.t.ini||hoje(),f:x.on?0:1};n++}});sv();ap();ov.remove();banner(true);alert('Pronto: '+n+' cliente(s) passaram para a carteira do representante novo.')}}
+ window.lcCartConferir=abre;
+ // ---- faixa de controle na aba Repasse
+ function banner(force){if(typeof VIEW==='undefined'||VIEW!=='repas')return;const o=document.getElementById('v2out');if(!o)return;const old=o.querySelector('#lccb_bn');
+  const P=pend().length,N=Object.keys(S.ov).length,A=S.av;const key=P+'|'+N+'|'+A.length;if(old&&old.dataset.k===key&&!force)return;if(old)old.remove();if(!P&&!N&&!A.length)return;
+  const b=document.createElement('div');b.id='lccb_bn';b.className='lccb-bn';b.dataset.k=key;
+  b.innerHTML=`<b style="color:#1F4E78">🔁 Carteira por repasse</b>${N?`<div style="font-size:13px;margin-top3px">↪ <b>${N}</b> cliente(s) já estão na carteira do representante novo (etiqueta "Repassado de…"). Voltam sozinhos se ele recusar ou não responder; ficam de vez quando ele vende ou o ERP atualizar.</div>`:''}
+   ${A.length?`<div style="font-size:13px;margin-top:6px;color:#a32121"><b>↩ Voltaram para quem tinha (${A.length}):</b> ${A.slice(-6).map(x=>{const ci=CI.get(x.c);return E(ci==null?x.c:String(D.cli[ci][1]).toLowerCase().replace(/(^|\s)(\S)/g,(m,a,b)=>a+b.toUpperCase()))+' ('+E(nm(x.de))+' · '+E(x.why)+' · '+br(x.d)+')'}).join('; ')} <button class="n" id="lccb_ci" style="padding:3px 9px;min-height:28px">ok, vi</button></div>`:''}
+   ${P?`<div style="margin-top:8px"><button id="lccb_cf">Conferir ${P} repasses antigos</button></div>`:''}`;
+  const hd=o.querySelector('.vmh')||o.firstChild;if(hd&&hd.nextSibling)o.insertBefore(b,hd.nextSibling);else o.appendChild(b);
+  const cf=b.querySelector('#lccb_cf');if(cf)cf.onclick=abre;const ci=b.querySelector('#lccb_ci');if(ci)ci.onclick=()=>{S.av=[];sv();banner(true)}}
+ setInterval(()=>{try{banner()}catch(e){}},1200);
+}catch(e){console.error('lcCB',e)}})();
 
 
 </script></body></html>
