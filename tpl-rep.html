@@ -1962,7 +1962,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v207';
+const NX_VER = 'v208';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3640,6 +3640,10 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v208',d:'23/11/2026',t:'Conversas com representantes e Descartar lojas novas',l:[
+   ['a','Conversas com representantes (só gestor): no termômetro de cada representante, botão Registrar conversa (assunto, como foi, o que foi falado) e histórico. Dá para agendar a próxima conversa: no dia ela aparece no Hoje, com WhatsApp, Conversei e Adiar. Fica guardado na nuvem.'],
+   ['a','CNPJs novos: botão Descartar (sem interesse, não trabalha com nosso tipo de produto ou outro motivo), filtro Descartados e botão Restaurar. Guardado na nuvem.'],
+   ['a','Hoje, Clientes esquecidos: telefone de cada cliente na linha, com botão copiar.']]},
   {v:'v207',d:'23/11/2026',t:'Repasse: mesorregião e passar vários de uma vez',l:[
    ['a','Repasse de clientes: novo filtro de Mesorregião (junto com Estado, Cidade e Representante). Na Lista dá para marcar todos os clientes filtrados de uma vez e passar para o representante escolhido, deixar inativos ou mandar para o Arquivo morto.'],
    ['a','CNPJs novos: o botão WhatsApp agora aparece também para telefones de celular que a Receita traz sem o 9 na frente, e some para números falsos como 9999-9999.'],
@@ -4425,13 +4429,13 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
   const esq=[];ids.forEach(i=>{const c=D.cli[i],tot=c[11]||0;if(tot<10000)return;const o2=nxOrd(i);if(!o2.length)return;const dias=D.ref-o2[o2.length-1].d;if(dias<120||dias>720)return;
    if(G&&map){const v=visDe(i,map)[0];if(v){const di=(typeof isoDia==='function')?isoDia(v.d):null;if(di!=null&&D.ref-di<120)return}}esq.push({i,dias,tot})});
   esq.sort((a,b)=>b.tot-a.tot);
-  if(esq.length)h+=`<details class="lccard" style="border-left:5px solid #E08A1E"><summary style="cursor:pointer;font-weight:700">🕸️ Clientes esquecidos (${esq.length})</summary><div class="mute" style="font-size:12.5px">Compraram bem, estão há 4 meses ou mais sem comprar${G?' e sem visita':''}.</div>${esq.slice(0,8).map(x=>`<div class="lcgo" data-ci="${x.i}" style="padding:7px 0;border-top:1px solid #eef1f6;font-size:14px;cursor:pointer"><b>${E(D.cli[x.i][1])}</b><br><span class="mute">${E(D.cli[x.i][2])} · ${x.dias} dias sem comprar · já comprou ${money(x.tot)}</span></div>`).join('')}</details>`;
+  if(esq.length)h+=`<details class="lccard" style="border-left:5px solid #E08A1E"><summary style="cursor:pointer;font-weight:700">🕸️ Clientes esquecidos (${esq.length})</summary><div class="mute" style="font-size:12.5px">Compraram bem, estão há 4 meses ou mais sem comprar${G?' e sem visita':''}.</div>${esq.slice(0,8).map(x=>`<div class="lcgo" data-ci="${x.i}" style="padding:7px 0;border-top:1px solid #eef1f6;font-size:14px;cursor:pointer"><b>${E(D.cli[x.i][1])}</b><br><span class="mute">${E(D.cli[x.i][2])} · ${x.dias} dias sem comprar · já comprou ${money(x.tot)}</span>${(()=>{const t=String(D.cli[x.i][3]||'').replace(/\D/g,'');if(t.length<8)return '<span class="mute" style="font-size:12px"> · sem telefone</span>';const f=t.length>=10?'('+t.slice(0,2)+') '+t.slice(2,t.length-4)+'-'+t.slice(-4):t;return ' <span class="lcfn" title="Toque para selecionar e copiar" style="user-select:all;-webkit-user-select:all;cursor:text;font-weight:700;color:#14233f;background:#eef4fb;border-radius:7px;padding:1px 7px;margin-left:2px">📞 '+f+'</span> <button type="button" class="lcfc" data-t="'+t+'" title="Copiar o telefone" style="border:1px solid #c5d0e3;background:#fff;border-radius:7px;font-size:12px;padding:1px 7px;cursor:pointer">📋 copiar</button>'})()}</div>`).join('')}</details>`;
   // 12 cidades sem cliente perto
   if(rep&&D.rg&&D.cit){const cd=cbData(),rg=cd.repRg.get(rep);if(rg&&rg.size){const l=[];rg.forEach((n,g)=>{(cd.rgCit[g]||[]).forEach(ci=>{const m=cd.cityCli.get(ci);if(!m||![...m.values()].some(x=>x>0))l.push({c:cd.CIT[ci][0],g:cd.RG[g][1]})})});
    if(l.length)h+=`<details class="lccard" style="border-left:5px solid #1F78B4"><summary style="cursor:pointer;font-weight:700">📍 Cidades sem nenhum cliente nas suas regiões (${l.length})</summary><div class="mute" style="font-size:12.5px">Boas para prospectar.</div>${l.slice(0,15).map(x=>`<div style="padding:5px 0;border-top:1px solid #eef1f6;font-size:14px">${E(x.c)} <span class="mute">· ${E(x.g)}</span></div>`).join('')}${l.length>15?'<div class="mute" style="font-size:12.5px">e mais '+(l.length-15)+'…</div>':''}</details>`}}
   if(G)h+=`<div class="lccard"><button class="btn" id="lccmp">⚖️ Comparar dois representantes</button></div>`;
   if(!h)return;const d=document.getElementById('lcdia');const html=`<div id="lcextra">${h}</div>`;if(d)d.insertAdjacentHTML('afterend',html);else out.insertAdjacentHTML('afterbegin',html);
-  out.querySelectorAll('#lcextra .lcgo').forEach(e=>e.onclick=()=>goFicha(+e.dataset.ci));const cb=document.getElementById('lccmp');if(cb)cb.onclick=comparar}catch(e){console.error('lcG extra',e)}};
+  out.querySelectorAll('#lcextra .lcgo').forEach(e=>e.onclick=ev=>{if(ev.target.closest('.lcfn,.lcfc'))return;goFicha(+e.dataset.ci)});out.querySelectorAll('#lcextra .lcfc').forEach(b=>b.onclick=ev=>{ev.stopPropagation();const t=b.dataset.t,ok=()=>{b.textContent='✔ copiado';setTimeout(()=>{b.textContent='📋 copiar'},1500)};try{navigator.clipboard.writeText(t).then(ok,()=>{const r=document.createRange();r.selectNodeContents(b.previousElementSibling);const g=getSelection();g.removeAllRanges();g.addRange(r)})}catch(e){}});const cb=document.getElementById('lccmp');if(cb)cb.onclick=comparar}catch(e){console.error('lcG extra',e)}};
  // visDe/isoDia podem não estar no escopo deste módulo: reaproveita as globais
  function visDe(ci,m){try{const c=D.cli[ci],a=(m.get(String(c[0]))||[]).slice();return a.sort((x,y)=>String(y.d).localeCompare(String(x.d)))}catch(e){return[]}}
  function isoDia(s){const a=String(s).split('-').map(Number);return a.length===3&&a[0]?Math.round(Date.UTC(a[0],a[1]-1,a[2])/864e5):null}
@@ -8961,13 +8965,17 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
  const nz=s=>String(s||'').toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^A-Z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
  const RB={Sudeste:['MG','SP','RJ','ES'],Sul:['PR','SC','RS'],'Centro-Oeste':['DF','GO','MS','MT'],Nordeste:['AL','BA','CE','MA','PB','PE','PI','RN','SE'],Norte:['AC','AM','AP','PA','RO','RR','TO']};
  const tgW=o=>o.querySelectorAll('[data-cn]').forEach(b=>b.onclick=()=>{if(b.dataset.cn!==VIEW)setView(b.dataset.cn)});
- let DADOS=null,ST=null,ERR='',CARR=false;const F={rg:'',uf:'',mes:'',q:'',so:'',ind:''};
+ let DADOS=null,ST=null,ERR='',CARR=false;const F={rg:'',uf:'',mes:'',q:'',so:'',ind:'',ds:''};
  const HOJE=Math.floor(Date.now()/864e5);
  let CID=null;
  function cidx(){if(CID)return CID;CID=new Map();D.cli.forEach(c=>{if(window.lcArq&&lcArq.has(c[0]))return;const p=String(c[2]||'').split('/');if(p.length<2)return;const k=nz(p[0])+'|'+p[1].trim().toUpperCase();let e=CID.get(k);if(!e)CID.set(k,e={n:0,r:new Map()});e.n++;const r=D.reps[c[8]];if(r&&+r[0]>0&&r[2]&&!/inativ|metalmig/i.test(String(r[1])))e.r.set(r[1],(e.r.get(r[1])||0)+1)});return CID}
  // ---- indicação de representante para cada CNPJ novo ----
  const AK='metalmig_cnpjn_atrib';let ATR={};try{ATR=JSON.parse(localStorage.getItem(AK)||'{}')||{}}catch(_){ATR={}}
  const salvaAtr=()=>{try{localStorage.setItem(AK,JSON.stringify(ATR))}catch(_){}};
+ // ---- descartar loja (sem interesse / não trabalha com nosso produto); fica guardado e sincroniza com a nuvem junto das outras chaves metalmig_
+ const DK='metalmig_cnpjn_desc_v1';let DSC={};try{DSC=JSON.parse(localStorage.getItem(DK)||'{}')||{}}catch(_){DSC={}}
+ const salvaDsc=()=>{try{localStorage.setItem(DK,JSON.stringify(DSC))}catch(_){}};
+ const MOT={sem:'Sem interesse',tipo:'Não trabalha com o nosso tipo de produto',out:'Outro motivo'};
  const repsOk=()=>D.reps.map((r,i)=>({i:i,cod:+r[0],nome:r[1]})).filter(r=>r.cod>0&&D.reps[r.i][2]&&!/inativ|metalmig/i.test(String(r.nome))).sort((a,b)=>a.nome.localeCompare(b.nome,'pt'));
  let RS=null;
  function rstats(){if(RS)return RS;const ok=new Set(repsOk().map(r=>r.i)),byC=new Map(),byM=new Map(),tot=new Map(),pts=new Map();
@@ -9006,15 +9014,22 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
  const wa=t=>{t=String(t||'').replace(/\D/g,'');if(t.length===10&&/[6-9]/.test(t[2]))t=t.slice(0,2)+'9'+t.slice(2);return t.length===11&&t[2]==='9'&&!/^(\d{2})9(\d)\2{7}$/.test(t)?'https://wa.me/55'+t:''};
  const dbr=iso=>iso.slice(8,10)+'/'+iso.slice(5,7)+'/'+iso.slice(0,4);
  async function carregar(){if(CARR)return;CARR=true;try{const r=await fetch(new URL('lojas_novas.json?t='+Date.now(),location.href).href,{cache:'no-store'});if(r.ok)DADOS=await r.json();else throw 0}catch(e){DADOS=null;try{const r=await fetch(new URL('lojas_novas_status.json?t='+Date.now(),location.href).href,{cache:'no-store'});if(r.ok)ST=await r.json()}catch(_){}ERR='sem-lista'}CARR=false;if(VIEW==='lnv')draw()}
- function filtra(L){const q=nz(F.q);return L.filter(x=>(!F.rg||RB[F.rg].includes(x.uf))&&(!F.uf||x.uf===F.uf)&&(!F.mes||x.mes===F.mes)&&(!F.ind||(F.ind==='sem'?!x.at:!!x.at))&&(!F.so||(F.so==='dup'?!!x.mm:F.so==='sem'?x.cli===0:x.cli>0))&&(!q||nz(x.nome+' '+x.cid+' '+x.bai).includes(q)))}
+ function filtra(L){const q=nz(F.q);return L.filter(x=>(F.ds==='d'?!!DSC[x.cnpj]:!DSC[x.cnpj])&&(!F.rg||RB[F.rg].includes(x.uf))&&(!F.uf||x.uf===F.uf)&&(!F.mes||x.mes===F.mes)&&(!F.ind||(F.ind==='sem'?!x.at:!!x.at))&&(!F.so||(F.so==='dup'?!!x.mm:F.so==='sem'?x.cli===0:x.cli>0))&&(!q||nz(x.nome+' '+x.cid+' '+x.bai).includes(q)))}
+ function descarta(x){const m=document.createElement('div');m.style.cssText='position:fixed;inset:0;background:rgba(10,20,40,.55);z-index:100000;display:flex;align-items:center;justify-content:center;padding:14px';let mot='tipo';
+  const pinta=()=>{m.innerHTML='<div style="background:#fff;width:min(460px,100%);border-radius:14px;padding:16px;max-height:92vh;overflow:auto"><b style="font-size:17px">Descartar esta loja</b><div style="font-size:13px;color:#667;margin-bottom:8px">'+E(x.nome)+' · '+E(x.cid)+'/'+x.uf+'</div>'+Object.keys(MOT).map(k=>'<div class="dsc_op" data-k="'+k+'" style="border:1px solid '+(mot===k?'#1F4E78':'#c9d3e3')+';background:'+(mot===k?'#eaf1fb':'#fff')+';border-radius:10px;padding:9px 12px;margin:6px 0;font-size:14px;cursor:pointer'+(mot===k?';font-weight:700':'')+'">'+(mot===k?'● ':'')+E(MOT[k])+'</div>').join('')+'<textarea id="dsc_o" rows="2" placeholder="Observação (opcional)" style="width:100%;box-sizing:border-box;margin-top:4px;padding:8px;border:1px solid #b9c7e2;border-radius:8px;font-size:14px"></textarea><div style="display:flex;gap:8px;margin-top:10px"><button type="button" class="btn" id="dsc_x" style="flex:1">Cancelar</button><button type="button" class="btn" id="dsc_ok" style="flex:2;background:#a32121;color:#fff">Descartar</button></div><div style="font-size:12px;color:#667;text-align:center;margin-top:6px">Nada é apagado: dá para restaurar em “Descartados”.</div></div>';
+   m.querySelectorAll('.dsc_op').forEach(b=>b.onclick=()=>{const ob=(m.querySelector('#dsc_o')||{}).value||'';mot=b.dataset.k;pinta();m.querySelector('#dsc_o').value=ob});
+   m.querySelector('#dsc_x').onclick=()=>m.remove();m.onclick=e=>{if(e.target===m)m.remove()};
+   m.querySelector('#dsc_ok').onclick=()=>{const t=new Date();DSC[x.cnpj]={m:mot,o:((m.querySelector('#dsc_o')||{}).value||'').trim().slice(0,200),d:t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0')};salvaDsc();m.remove();draw()}};
+  pinta();document.body.appendChild(m)}
  function draw(){const o=document.getElementById('v2out');if(!o)return;
   let h='<div style="display:flex;gap:6px;margin:0 0 10px"><button type="button" class="btn pri" data-cn="lnv">🆕 CNPJs novos</button><button type="button" class="btn " data-cn="cfe">🚫 CNPJs fechados</button></div>'+'<div class="vmh"><h2>🆕 CNPJs novos na Receita Federal</h2><p>Empresas de material de construção que abriram CNPJ há pouco, segundo a Receita Federal. Não são clientes nossos e ainda não fizeram pedido: são possíveis clientes para o representante da região visitar. Só você vê esta tela.</p></div>';
   if(!DADOS){h+='<div class="act">'+(ERR?'A lista ainda não chegou. Ela é gerada sozinha no GitHub, duas vezes por mês.'+(ST&&ST.erro?'<br><small>Último aviso: '+E(ST.erro)+'</small>':''):'Carregando…')+'</div>';o.innerHTML=h;tgW(o);if(!ERR)carregar();return}
-  const L=lista(),V=filtra(L);const ufs=[...new Set(L.filter(x=>!F.rg||RB[F.rg].includes(x.uf)).map(x=>x.uf))].sort();const ms=[...new Set(L.filter(x=>(!F.rg||RB[F.rg].includes(x.uf))&&(!F.uf||x.uf===F.uf)&&x.mes).map(x=>x.mes))].sort();
+  const L=lista(),V=filtra(L);const nDs=L.filter(x=>DSC[x.cnpj]).length;const ufs=[...new Set(L.filter(x=>!F.rg||RB[F.rg].includes(x.uf)).map(x=>x.uf))].sort();const ms=[...new Set(L.filter(x=>(!F.rg||RB[F.rg].includes(x.uf))&&(!F.uf||x.uf===F.uf)&&x.mes).map(x=>x.mes))].sort();
   const sel=(c,ph,arr,v)=>'<select class="'+c+'" style="flex:1 1 140px;padding:7px 9px;border:1px solid #c5d0e3;border-radius:9px;font-size:13px;background:#fff"><option value="">'+ph+'</option>'+arr.map(a=>'<option'+(a===v?' selected':'')+'>'+E(a)+'</option>').join('')+'</select>';
   h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0">'+sel('ln_rg','Região do Brasil: todas',Object.keys(RB),F.rg)+sel('ln_uf','Estado: todos',ufs,F.uf)+sel('ln_mes','Mesorregião: todas',ms,F.mes)
    +'<select class="ln_so" style="flex:1 1 140px;padding:7px 9px;border:1px solid #c5d0e3;border-radius:9px;font-size:13px;background:#fff"><option value="">Cidades: todas</option><option value="sem"'+(F.so==='sem'?' selected':'')+'>Só cidades sem cliente nosso</option><option value="com"'+(F.so==='com'?' selected':'')+'>Só cidades com cliente nosso</option><option value="dup"'+(F.so==='dup'?' selected':'')+'>⚠️ Só os que já parecem ser cliente nosso</option></select>'
    +'<select class="ln_ind" style="flex:1 1 140px;padding:7px 9px;border:1px solid #c5d0e3;border-radius:9px;font-size:13px;background:#fff"><option value="">Indicação: todas</option><option value="sem"'+(F.ind==='sem'?' selected':'')+'>Sem representante indicado</option><option value="com"'+(F.ind==='com'?' selected':'')+'>Já indicados</option></select>'
+   +'<select class="ln_ds" title="Lojas que você descartou ficam guardadas aqui e dá para restaurar" style="flex:1 1 140px;padding:7px 9px;border:1px solid #c5d0e3;border-radius:9px;font-size:13px;background:#fff"><option value="">Mostrar: ativos ('+(L.length-nDs)+')</option><option value="d"'+(F.ds==='d'?' selected':'')+'>Descartados ('+nDs+')</option></select>'
    +'<input class="ln_q" placeholder="🔎 Nome, cidade ou bairro" value="'+E(F.q)+'" style="flex:1 1 150px;min-width:0;padding:7px 9px;border:1px solid #c5d0e3;border-radius:9px;font-size:13px"><button type="button" class="btn" id="ln_xl">📊 Excel</button></div>';
   h+='<div style="font-size:12px;color:#64748b;margin:4px 0 8px" title="Lista atualizada em '+E(DADOS.gerado)+' · mês base da Receita: '+E(DADOS.mes_base)+'">'+V.length+' de '+L.length+' CNPJs novos · abertos nos últimos '+DADOS.janela_dias+' dias · lista de '+dbr(DADOS.gerado)+'</div>';
   h+=V.slice(0,60).map(x=>{const f=fone(x.tel),w=wa(x.tel);return '<div style="background:#fff;border:1px solid #d9dfe9;border-radius:12px;padding:10px 12px;margin:0 0 9px"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><b>'+E(x.nome)+'</b><span style="font-size:11.5px;color:#1F4E78;background:#eef4fb;border-radius:8px;padding:2px 7px;white-space:nowrap" title="Data de abertura do CNPJ na Receita Federal">CNPJ aberto há '+x.dias+' dias</span></div>'
@@ -9025,18 +9040,20 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
    +(x.at?'<button type="button" class="ln_en btn'+(x.at.env?'':' pri')+'" data-c="'+x.cnpj+'">'+(x.at.env?'✔ Enviado · reenviar':'📨 Enviar ao representante')+'</button>':'')+'</div>'
    +(x.at?'<div style="margin-top:4px;color:#166534">✅ Indicado para <b>'+E(nomeRep(D.reps.findIndex(r=>+r[0]===+x.at.c)))+'</b>'+(x.at.env?' · aviso enviado em '+new Date(x.at.env).toLocaleDateString('pt-BR'):'')+'</div>':'')+'</div>')
    +'<div style="margin-top:6px;font-size:12.5px;padding-top:6px;border-top:1px solid #eef1f6">'+(x.cli?'Já temos <b>'+x.cli+'</b> cliente(s) nesta cidade · atendem: '+E(x.reps.slice(0,2).map(n=>curto(n)).join(', ')||'—'):'<b style="color:#b45309">Cidade sem cliente nosso</b>')+'</div>'
-   +'<div style="display:flex;gap:8px;margin-top:7px;flex-wrap:wrap">'+(f?'<span style="font-size:13px">📞 '+f+'</span>':'<span style="font-size:12.5px;color:#94a3b8">sem telefone</span>')+(w?'<a href="'+w+'" target="_blank" rel="noopener" style="font-size:13px;padding:5px 10px;border-radius:9px;background:#16a34a;color:#fff;text-decoration:none">💬 WhatsApp</a>':'')+'</div></div>'}).join('');
+   +'<div style="display:flex;gap:8px;margin-top:7px;flex-wrap:wrap">'+(f?'<span style="font-size:13px">📞 '+f+'</span>':'<span style="font-size:12.5px;color:#94a3b8">sem telefone</span>')+(w?'<a href="'+w+'" target="_blank" rel="noopener" style="font-size:13px;padding:5px 10px;border-radius:9px;background:#16a34a;color:#fff;text-decoration:none">💬 WhatsApp</a>':'')+(DSC[x.cnpj]?'':'<button type="button" class="ln_dc" data-c="'+x.cnpj+'" title="Sem interesse ou não trabalha com o nosso tipo de produto: sai da lista, dá para restaurar" style="font-size:13px;padding:5px 10px;border-radius:9px;background:#fff;color:#a32121;border:1px solid #d9a3a3;cursor:pointer">⛔ Descartar</button>')+'</div>'+(DSC[x.cnpj]?'<div style="margin-top:7px;padding:7px 9px;border-radius:9px;background:#fdf2f2;font-size:12.5px;color:#7f1d1d">⛔ Descartado em '+dbr(DSC[x.cnpj].d)+' · <b>'+E(MOT[DSC[x.cnpj].m]||DSC[x.cnpj].m)+'</b>'+(DSC[x.cnpj].o?' · '+E(DSC[x.cnpj].o):'')+' <button type="button" class="ln_rs" data-c="'+x.cnpj+'" style="margin-left:6px;font-size:12.5px;padding:3px 9px;border-radius:8px;border:1px solid #c5d0e3;background:#fff;cursor:pointer">↩ Restaurar</button></div>':'')+'</div>'}).join('');
   if(V.length>60)h+='<div style="font-size:12px;color:#64748b">… e mais '+(V.length-60)+'. Use os filtros ou o Excel para ver todas.</div>';
   o.innerHTML=h;tgW(o);
   o.querySelectorAll('.ln_rp').forEach(e=>e.onchange=()=>{if(e.value)ATR[e.dataset.c]={c:+e.value,ts:Date.now(),env:(ATR[e.dataset.c]&&+ATR[e.dataset.c].c===+e.value)?ATR[e.dataset.c].env:0};else delete ATR[e.dataset.c];salvaAtr();draw()});
   o.querySelectorAll('.ln_ac').forEach(e=>e.onclick=()=>{ATR[e.dataset.c]={c:+e.dataset.r,ts:Date.now(),env:0};salvaAtr();draw()});
   const byc={};L.forEach(x=>byc[x.cnpj]=x);
+  o.querySelectorAll('.ln_rs').forEach(e=>e.onclick=()=>{delete DSC[e.dataset.c];salvaDsc();draw()});
+  o.querySelectorAll('.ln_dc').forEach(e=>e.onclick=()=>{const x=byc[e.dataset.c];if(x)descarta(x)});
   o.querySelectorAll('.ln_en').forEach(e=>e.onclick=async()=>{const x=byc[e.dataset.c],a=ATR[e.dataset.c];if(!x||!a)return;e.disabled=true;e.textContent='Enviando…';
    const f=fone(x.tel),tx=('Indicação de loja nova (CNPJ aberto há '+x.dias+' dias): '+x.nome+' · '+x.cid+'/'+x.uf+(x.bai?' · '+x.bai:'')+(x.end?' · '+x.end:'')+(f?' · tel. '+f:'')+'. Ainda não é cliente da Metalmig: vale uma visita ou contato para apresentar nossa linha.').slice(0,600);
    try{const u=(()=>{let u=(localStorage.getItem('metalmig_bkp_syncurl')||'').trim();if(!u){try{const c=JSON.parse(localStorage.getItem('metalmig_bkp_drvcfg')||'null');u=(c&&c.u)||''}catch(_){}}return u})();if(!u)throw new Error('sem endereço');
     const r=await fetch(u,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({k:'',rep:a.c,t:'recado',acao:'enviar',texto:tx,de:(window.lcQuem?window.lcQuem():'Romulo')})});const j=await r.json();if(!j||!j.ok)throw new Error(j&&j.erro||'falha');
     a.env=Date.now();salvaAtr();draw()}catch(er){e.disabled=false;e.textContent='Não consegui enviar · tentar de novo'}});
-  const on=(c,k,reset)=>{const e=o.querySelector(c);if(e)e.onchange=()=>{F[k]=e.value;(reset||[]).forEach(r=>F[r]='');draw()}};on('.ln_rg','rg',['uf','mes']);on('.ln_uf','uf',['mes']);on('.ln_mes','mes');on('.ln_so','so');on('.ln_ind','ind');
+  const on=(c,k,reset)=>{const e=o.querySelector(c);if(e)e.onchange=()=>{F[k]=e.value;(reset||[]).forEach(r=>F[r]='');draw()}};on('.ln_rg','rg',['uf','mes']);on('.ln_uf','uf',['mes']);on('.ln_mes','mes');on('.ln_so','so');on('.ln_ind','ind');on('.ln_ds','ds');
   const qi=o.querySelector('.ln_q');qi.oninput=()=>{F.q=qi.value;const p=qi.selectionStart;draw();const n=document.querySelector('.ln_q');n.focus();try{n.setSelectionRange(p,p)}catch(_){}};
   o.querySelector('#ln_xl').onclick=()=>{try{save(xlsx([{t:'CNPJs novos',h:['Empresa (CNPJ novo)','Aberta em','Cidade','UF','Mesorregião','Bairro','Endereço','Telefone','CNPJ','CNAE','Clientes nossos na cidade','Quem atende','Parece ser cliente nosso?','Representante indicado','Representante sugerido'],ty:['t','t','t','t','t','t','t','t','t','t','n','t','t','t','t'],rows:V.map(x=>[x.nome,dbr(x.ab),x.cid,x.uf,x.mes,x.bai,x.end,fone(x.tel),x.cnpj,x.cnae,x.cli,x.reps.slice(0,3).join(', '),x.mm?'Sim, cód. '+x.mm.r.cod+' '+x.mm.r.nome+' ('+x.mm.m+')':'',x.at?nomeRep(D.reps.findIndex(r=>+r[0]===+x.at.c)):'',x.sg?nomeRep(x.sg.i)+' ('+x.sg.m+')':''])}]),'CNPJs_novos.xlsx')}catch(e){console.error(e)}}}
  try{const nav=document.getElementById('nav');if(nav){const b=document.createElement('button');b.dataset.v='lnv';b.className='gest';b.title='Aba exclusiva do gestor';b.textContent='🏛 CNPJs na Receita';nav.appendChild(b)}}catch(e){}
@@ -9100,6 +9117,86 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
  window.lcApel={get:c=>String(AP[c]||''),set:(c,v)=>{v=String(v||'').trim();if(v)AP[c]=v;else AP[c]='';salva();aplicar();try{render()}catch(_){}}};
  salva();
 }catch(e){console.error('lcBV',e)}})();
+
+// ===== v208 · Conversas com representantes (só gestor): registrar o que foi falado, agendar a próxima conversa (cai no Hoje) =====
+(function(){try{
+ if(window.__lcBW||typeof D==='undefined'||D.rm||window.PESSOA||typeof lcRepTerm!=='function')return;window.__lcBW=1;
+ const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+ const K='metalmig_conv_v1';   // começa com metalmig_: sincroniza sozinho com a nuvem (junta item por item pelo id)
+ const ld=()=>{try{const v=JSON.parse(localStorage.getItem(K)||'[]');return Array.isArray(v)?v:[]}catch(_){return[]}};
+ const sv=a=>{try{localStorage.setItem(K,JSON.stringify(a))}catch(_){}};
+ const ASS=[['comb','Combinado'],['recl','Reclamação'],['meta','Meta'],['aten','Atenção'],['rel','Relacionamento'],['out','Outro']];
+ const VIA=[['wa','WhatsApp'],['lig','Ligação'],['pes','Pessoalmente']];
+ const CORA={recl:['#fdecec','#a32121'],aten:['#fff3e6','#C55A11']};
+ const pad=n=>String(n).padStart(2,'0'),iso=t=>t.getFullYear()+'-'+pad(t.getMonth()+1)+'-'+pad(t.getDate()),hojeIso=()=>iso(new Date());
+ const dbr=s=>s?String(s).slice(8,10)+'/'+String(s).slice(5,7)+'/'+String(s).slice(0,4):'';
+ const addDias=(s,n)=>{const t=new Date(+s.slice(0,4),+s.slice(5,7)-1,+s.slice(8,10));t.setDate(t.getDate()+n);return iso(t)};
+ const dif=(a,b)=>Math.round((Date.UTC(+a.slice(0,4),+a.slice(5,7)-1,+a.slice(8,10))-Date.UTC(+b.slice(0,4),+b.slice(5,7)-1,+b.slice(8,10)))/864e5);
+ const rIdx=cod=>D.reps.findIndex(r=>+r[0]===+cod);
+ const rNome=cod=>{const i=rIdx(cod);return i>=0?String(D.reps[i][1]||''):'Representante '+cod};
+ const rCurto=cod=>{const n=rNome(cod).toLowerCase().replace(/(^|\s)(\S)/g,(m,a,b)=>a+b.toUpperCase()).split(' ');return n.slice(0,/^(Da|De|Do|Das|Dos|E)$/.test(n[1]||'')?3:2).join(' ')};
+ const nomeAss=k=>(ASS.find(x=>x[0]===k)||[0,'Outro'])[1],nomeVia=k=>(VIA.find(x=>x[0]===k)||[0,''])[1];
+ const chip=(t,k)=>'<span style="display:inline-block;border-radius:12px;padding:2px 9px;font-size:12px;margin-right:4px;background:'+((CORA[k]||['#eef4fb'])[0])+';color:'+((CORA[k]||[0,'#1F4E78'])[1])+'">'+E(t)+'</span>';
+ const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+ const refresh=()=>{try{const o=document.getElementById('cv_hj');if(o)o.remove();try{noDash()}catch(e){}if(VIEW==='hoje')renderHoje();else if(VIEW==='repterm'&&lcRepTerm.last)lcRepTermGo(lcRepTerm.last.r)}catch(e){}};
+
+ // ---------- janela: registrar conversa ----------
+ function registrar(cod,pre){
+  const m=document.createElement('div');m.style.cssText='position:fixed;inset:0;background:rgba(10,20,40,.55);z-index:100000;display:flex;align-items:center;justify-content:center;padding:12px';
+  let as=(pre&&pre.as)||'comb',via=(pre&&pre.via)||'wa',tx='',pd=(pre&&pre.pd)||'',ph='',pm=(pre&&pre.pm)||'';
+  const chips=(arr,v,c)=>arr.map(x=>'<span class="'+c+'" data-k="'+x[0]+'" style="display:inline-block;border:1px solid '+(v===x[0]?'#1F4E78':'#c9d3e3')+';background:'+(v===x[0]?'#eaf1fb':'#fff')+';border-radius:10px;padding:8px 12px;margin:3px 4px 3px 0;font-size:14px;cursor:pointer'+(v===x[0]?';font-weight:700':'')+'">'+E(x[1])+'</span>').join('');
+  const pinta=()=>{m.innerHTML='<div style="background:#fff;width:min(560px,100%);border-radius:14px;padding:16px;max-height:94vh;overflow:auto"><b style="font-size:17px">Registrar conversa</b><div style="font-size:13px;color:#667;margin-bottom:8px">'+E(rNome(cod))+'</div>'
+   +'<div style="font-size:13px;color:#667">Assunto</div><div>'+chips(ASS,as,'cv_as')+'</div><div style="font-size:13px;color:#667;margin-top:6px">Como foi</div><div>'+chips(VIA,via,'cv_via')+'</div>'
+   +'<div style="font-size:13px;color:#667;margin-top:6px">O que foi falado</div><textarea id="cv_tx" rows="4" style="width:100%;box-sizing:border-box;padding:8px;border:1px solid #b9c7e2;border-radius:8px;font-size:14px"></textarea>'
+   +'<div style="margin-top:10px;padding:10px;background:#f4f7fc;border-radius:10px"><b>📅 Agendar próxima conversa</b> <span style="font-size:12px;color:#667">(opcional · cai no Hoje)</span><div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap"><input type="date" id="cv_pd" value="'+E(pd)+'" style="padding:7px;border:1px solid #b9c7e2;border-radius:8px"><input type="time" id="cv_ph" value="'+E(ph)+'" style="padding:7px;border:1px solid #b9c7e2;border-radius:8px"><input id="cv_pm" placeholder="Motivo (ex.: cobrar visita em Divinópolis)" value="'+E(pm)+'" style="flex:1 1 200px;min-width:0;padding:7px;border:1px solid #b9c7e2;border-radius:8px"></div></div>'
+   +'<div style="display:flex;gap:8px;margin-top:12px"><button type="button" class="btn" id="cv_x" style="flex:1">Cancelar</button><button type="button" class="btn" id="cv_ok" style="flex:2;background:#16a34a;color:#fff;font-weight:700">Salvar conversa</button></div><div style="font-size:12px;color:#667;text-align:center;margin-top:6px">Só você vê. Os representantes não recebem nada disso.</div></div>';
+   const keep=()=>{tx=m.querySelector('#cv_tx').value;pd=m.querySelector('#cv_pd').value;ph=m.querySelector('#cv_ph').value;pm=m.querySelector('#cv_pm').value};
+   m.querySelector('#cv_tx').value=tx;
+   m.querySelectorAll('.cv_as').forEach(b=>b.onclick=()=>{keep();as=b.dataset.k;pinta()});m.querySelectorAll('.cv_via').forEach(b=>b.onclick=()=>{keep();via=b.dataset.k;pinta()});
+   m.querySelector('#cv_x').onclick=()=>m.remove();m.onclick=e=>{if(e.target===m)m.remove()};
+   m.querySelector('#cv_ok').onclick=()=>{keep();tx=tx.trim();if(!tx&&!pd){alert('Escreva o que foi falado ou agende a próxima conversa.');return}
+    const a=ld(),o={id:uid(),rep:+cod,d:hojeIso(),as:as,via:via,tx:tx.slice(0,1500)};if(pd)o.pr={d:pd,h:ph||'',mo:pm.trim().slice(0,160)};a.push(o);sv(a);m.remove();refresh()}};
+  pinta();document.body.appendChild(m)}
+ window.lcConv={registrar:registrar};
+
+ // ---------- janela: adiar ----------
+ function adiar(id){const a=ld(),o=a.find(x=>x.id===id);if(!o||!o.pr)return;const m=document.createElement('div');m.style.cssText='position:fixed;inset:0;background:rgba(10,20,40,.55);z-index:100000;display:flex;align-items:center;justify-content:center;padding:12px';
+  m.innerHTML='<div style="background:#fff;width:min(380px,100%);border-radius:14px;padding:16px"><b>Adiar a conversa com '+E(rCurto(o.rep))+'</b><div style="display:flex;gap:6px;flex-wrap:wrap;margin:10px 0"><button class="btn cv_ad" data-n="1">Amanhã</button><button class="btn cv_ad" data-n="3">3 dias</button><button class="btn cv_ad" data-n="7">7 dias</button></div><div style="display:flex;gap:6px"><input type="date" id="cv_nd" style="flex:1;padding:7px;border:1px solid #b9c7e2;border-radius:8px"><button class="btn" id="cv_ndok">Outra data</button></div><button class="btn" id="cv_adx" style="margin-top:10px;width:100%">Cancelar</button></div>';
+  const fim=d=>{const b=ld(),x=b.find(y=>y.id===id);if(x&&x.pr){x.pr.d=d;sv(b)}m.remove();refresh()};
+  m.querySelectorAll('.cv_ad').forEach(b=>b.onclick=()=>fim(addDias(hojeIso(),+b.dataset.n)));m.querySelector('#cv_ndok').onclick=()=>{const v=m.querySelector('#cv_nd').value;if(v)fim(v)};m.querySelector('#cv_adx').onclick=()=>m.remove();m.onclick=e=>{if(e.target===m)m.remove()};document.body.appendChild(m)}
+
+ // ---------- bloco "Conversas com este representante" (termômetro) ----------
+ function ultimaConv(cod){return ld().filter(x=>+x.rep===+cod&&x.tx).sort((a,b)=>String(b.d).localeCompare(String(a.d)))[0]||null}
+ function blocoRep(cod){const L=ld().filter(x=>+x.rep===+cod).sort((a,b)=>String(b.d+b.id).localeCompare(String(a.d+a.id)));
+  const it=x=>'<div style="border-top:1px solid #eef1f6;padding:9px 0"><div>'+chip(nomeAss(x.as),x.as)+chip(nomeVia(x.via))+'<span style="font-size:12px;color:#667">'+dbr(x.d)+'</span></div>'+(x.tx?'<div style="margin:4px 0;white-space:pre-wrap;font-size:14px">'+E(x.tx)+'</div>':'')
+   +(x.pr?'<div style="font-size:12.5px;color:'+(x.pr.ok?'#166534':'#C55A11')+'">'+(x.pr.ok?'✔ conversa de '+dbr(x.pr.d)+' feita':'📅 próxima conversa: <b>'+dbr(x.pr.d)+(x.pr.h?' '+E(x.pr.h):'')+'</b>'+(x.pr.mo?' · '+E(x.pr.mo):''))+'</div>':'')
+   +'<div style="margin-top:3px"><button type="button" class="cv_del" data-id="'+x.id+'" style="border:0;background:none;color:#a32121;font-size:12px;cursor:pointer;padding:0">🗑 apagar</button></div></div>';
+  return '<div id="cv_bl" style="background:#fff;border:1px solid #d9dfe9;border-radius:12px;padding:12px 14px;margin:0 0 10px"><div style="font-weight:800;font-size:15px;color:#14233f">🗣 Conversas com este representante <span style="font-weight:400;font-size:12px;color:#667">· só você vê</span></div>'+(L.length?L.slice(0,30).map(it).join('')+(L.length>30?'<div style="font-size:12px;color:#667">… e mais '+(L.length-30)+' mais antigas</div>':''):'<div style="font-size:13px;color:#667;margin-top:6px">Nenhuma conversa registrada ainda. Toque em “Registrar conversa” depois de falar com ele.</div>')+'</div>'}
+ function injeta(){const b=document.getElementById('rtpauta');if(!b||document.getElementById('cv_btn')||!lcRepTerm.last)return;const cod=D.reps[lcRepTerm.last.r]&&D.reps[lcRepTerm.last.r][0];if(!cod)return;
+  const w=b.parentElement,bt=document.createElement('div');bt.style.cssText='margin:0 0 10px';bt.innerHTML='<button id="cv_btn" style="width:100%;min-height:46px;border:0;border-radius:12px;background:#C55A11;color:#fff;font-weight:700;font-size:15px">📝 Registrar conversa</button>';
+  w.insertAdjacentElement('afterend',bt);bt.querySelector('#cv_btn').onclick=()=>registrar(cod);
+  const bl=document.createElement('div');bl.innerHTML=blocoRep(cod);bt.insertAdjacentElement('afterend',bl.firstChild);
+  document.querySelectorAll('.cv_del').forEach(x=>x.onclick=()=>{if(!confirm('Apagar esta anotação?'))return;sv(ld().filter(y=>y.id!==x.dataset.id));refresh()})}
+ new MutationObserver(()=>{try{injeta()}catch(e){}}).observe(document.body,{childList:true,subtree:true});
+
+ // ---------- bloco no Hoje ----------
+ function pendentes(){const h=hojeIso();return ld().filter(x=>x.pr&&!x.pr.ok&&x.pr.d&&x.pr.d<=h).sort((a,b)=>String(a.pr.d+(a.pr.h||'')).localeCompare(String(b.pr.d+(b.pr.h||''))))}
+ function caixaHoje(){const P=pendentes();if(!P.length)return null;const h=hojeIso(),b=document.createElement('div');b.id='cv_hj';b.style.cssText='background:#fff;border:1px solid #d9dfe9;border-left:5px solid #C55A11;border-radius:12px;padding:12px 14px;margin:0 0 10px';
+  b.innerHTML='<b style="font-size:15px" title="Conversas que você agendou com representantes. Só você vê.">📅 Conversas com representantes · '+P.length+'</b>'+P.map(x=>{const at=dif(h,x.pr.d),u=ultimaConv(x.rep);
+   return '<div style="border-top:1px solid #eef1f6;margin-top:8px;padding-top:8px"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><div style="min-width:0"><b>'+E(rNome(x.rep))+'</b> '+(at>0?'<span style="font-size:11.5px;border-radius:10px;padding:2px 8px;background:#fdecec;color:#a32121">atrasada '+at+' dia'+(at>1?'s':'')+'</span>':'<span style="font-size:11.5px;border-radius:10px;padding:2px 8px;background:#fff3e6;color:#C55A11">hoje'+(x.pr.h?' '+E(x.pr.h):'')+'</span>')
+    +'<div style="font-size:12.5px;color:#667">'+(x.pr.mo?E(x.pr.mo):'Nova conversa')+(u?' · última conversa: '+dbr(u.d)+' ('+E(nomeAss(u.as).toLowerCase())+')':'')+'</div></div>'
+    +'<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap"><a class="btn" target="_blank" rel="noopener" style="background:#16a34a;color:#fff;text-decoration:none;display:inline-block;padding:8px 12px;border-radius:9px;font-weight:600" href="https://wa.me/?text='+encodeURIComponent('Olá, '+rCurto(x.rep).split(' ')[0]+'! '+(x.pr.mo||'Podemos conversar hoje?'))+'">💬 WhatsApp</a><button class="btn cv_ok" data-id="'+x.id+'">✔ Conversei</button><button class="btn cv_adi" data-id="'+x.id+'">Adiar</button></div></div></div>'}).join('');
+  b.querySelectorAll('.cv_ok').forEach(e=>e.onclick=()=>{const a=ld(),o=a.find(y=>y.id===e.dataset.id);if(!o)return;o.pr.ok=hojeIso();sv(a);registrar(o.rep);refresh()});
+  b.querySelectorAll('.cv_adi').forEach(e=>e.onclick=()=>adiar(e.dataset.id));return b}
+ if(typeof renderHoje==='function'){const rh=renderHoje;renderHoje=function(){rh.apply(this,arguments);try{const out=document.getElementById('v2out');if(!out||out.querySelector('#cv_hj'))return;const b=caixaHoje();if(!b)return;const vmh=out.querySelector('.vmh');if(vmh)vmh.insertAdjacentElement('afterend',b);else out.prepend(b)}catch(e){console.error('lcBW hoje',e)}}}
+ // painel inicial do Hoje (onde fica o cartão "Dia"): põe o bloco logo acima dele
+ function noDash(){const d=document.getElementById('lcdia');if(!d)return;const o=document.getElementById('cv_hj'),P=pendentes();
+  if(!P.length){if(o)o.remove();return}
+  const key=JSON.stringify(P.map(x=>[x.id,x.pr.d,x.pr.h]));if(o&&o.dataset.k===key)return;if(o)o.remove();
+  const b=caixaHoje();if(!b)return;b.dataset.k=key;d.insertAdjacentElement('beforebegin',b)}
+ new MutationObserver(()=>{try{noDash()}catch(e){}}).observe(document.body,{childList:true,subtree:true});
+ window.lcConv.pend=()=>pendentes().length;
+}catch(e){console.error('lcBW',e)}})();
 
 
 </script></body></html>
