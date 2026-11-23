@@ -4,7 +4,7 @@ Roda no GitHub (Actions). Grava lojas_novas.json e lojas_novas_status.json na ra
 import datetime, hashlib, io, json, os, sys, time, urllib.request, urllib.error, zipfile, traceback
 
 HOJE = datetime.date.today()
-JANELA = 240                      # dias: só lojas abertas nos últimos 8 meses
+JANELA = max(240, (HOJE - HOJE.replace(month=1, day=1)).days)   # dias: tudo que abriu desde 1º de janeiro do ano (mínimo 8 meses)
 CORTE = (HOJE - datetime.timedelta(days=JANELA)).strftime('%Y%m%d')
 SAIDA = os.environ.get('SAIDA', '.')
 STATUS = {'rodou_em': HOJE.isoformat(), 'ok': False, 'tentativas': [], 'erro': ''}
