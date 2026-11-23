@@ -1962,7 +1962,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v214';
+const NX_VER = 'v215';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3644,6 +3644,8 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v215',d:'23/11/2026',t:'Estados no Repasse',l:[
+   ['g','Repasse de clientes: o filtro Estado lista todos os estados que têm clientes parados e mostra quantos estão disponíveis (ex.: “DF · 3 de 16”: os outros já estão em repasse ou no Arquivo morto).']]},
   {v:'v214',d:'23/11/2026',t:'O que fazer com cada cliente',l:[
    ['a','Nova tela Clientes › 🧭 O que fazer com cada cliente: um bloco para cada tipo (ativos, em risco, inativos, prospectados, passados) com os números, o que fazer e o botão que abre a tela certa.'],
    ['a','Quadro 📋 Como trabalhar no topo de Meus prospectos, Reativar clientes e Hora de recomprar, com o passo a passo de cada tipo. Dá para recolher na setinha.'],
@@ -7047,7 +7049,8 @@ body.rt-fs{overflow:hidden!important}body.rt-fs:not(.rt-nv) #lcnav{display:none!
   o.querySelectorAll('.rt-pp').forEach(b=>b.onclick=()=>{const v=b.dataset.p;passar([ci],/^bo/.test(v)?v:+v)});
   o.querySelectorAll('.rt-k').forEach(b=>b.onclick=()=>{R.cfg.raio=+b.dataset.k;sv();draw()})}
  // ---- filtros e telas
- function listaPar(P){const ufs=[...new Set(P.map(x=>UFof(x.c)).filter(u=>u.length===2))].sort();
+ function ufStat(P){const av=new Map(),tot=new Map();P.forEach(x=>{const u=UFof(x.c);if(u.length===2)av.set(u,(av.get(u)||0)+1)});D.cli.forEach((c,ci)=>{const u=UFof(c);if(u.length!==2)return;const o=ordens(ci);if(!o.length)return;if(D.ref-o[o.length-1].d<180)return;tot.set(u,(tot.get(u)||0)+1)});return{av,tot}}
+ function listaPar(P){const US=ufStat(P),ufs=[...new Set([...US.av.keys(),...US.tot.keys()])].sort();
   const reps=[...new Map(P.map(x=>[x.c[8],rN(x.c[8])])).entries()].filter(x=>x[0]).sort((a,b)=>String(a[1]).localeCompare(String(b[1])));
   const repsV=ST.meso?reps.filter(r=>String(r[0])===ST.rep||msReps(ST.meso).has(+r[0])):reps;
   const base=filtra(P,true),cm=new Map();base.forEach(x=>{const k=CK(x.c);cm.set(k,(cm.get(k)||0)+1)});const cids=[...cm.entries()].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0]));
@@ -7055,7 +7058,7 @@ body.rt-fs{overflow:hidden!important}body.rt-fs:not(.rt-nv) #lcnav{display:none!
   {const ix0=L.findIndex(x=>x.ci===ST.cur);if(ix0>=0)ST.lastIx=ix0;else ST.cur=L.length?L[Math.min(ST.lastIx||0,L.length-1)].ci:null}
   const cn=[...ST.cid].map(k=>k.split('/')[0]);const cbt=ST.cid.size?cn.slice(0,2).join(', ')+(cn.length>2?' +'+(cn.length-2):''):'Todas';
   const msM=new Map();P.forEach(x=>{if(ST.uf&&UFof(x.c)!==ST.uf)return;const m=mesoOf(x.c);if(m)msM.set(m,(msM.get(m)||0)+1)});const msOpts=[...msM.entries()].sort((a,b)=>a[0].localeCompare(b[0],'pt')).map(([m,n])=>`<option value="${E(m)}"${ST.meso===m?' selected':''}>${E(m)} (${n})</option>`).join('');
-  const filtros=`<div class="rt-fb"><div class="rt-sl"><small>Estado</small><select id="rt_uf"><option value="">Todos</option>${ufs.map(u=>`<option${ST.uf===u?' selected':''}>${u}</option>`).join('')}</select></div>
+  const filtros=`<div class="rt-fb"><div class="rt-sl"><small>Estado</small><select id="rt_uf"><option value="">Todos</option>${ufs.map(u=>{const a=US.av.get(u)||0,t=US.tot.get(u)||0;return `<option value="${u}"${ST.uf===u?' selected':''}>${u} · ${a}${a<t?' de '+t:''}</option>`}).join('')}</select></div>
   <div class="rt-sl"><small>Mesorregião</small><select id="rt_ms"><option value="">Todas</option>${msOpts}</select></div>
   <div class="rt-sl" style="position:relative"><small>Cidade (uma ou mais)</small><button class="rt-cb" id="rt_cb">${E(cbt)} ▾</button><div class="rt-cd" id="rt_cd" hidden><input type="text" id="rt_cs" placeholder="🔎 buscar cidade"><div class="rt-cl">${cids.map(([k,n])=>`<label data-cn="${E(fNorm(k))}"><input type="checkbox" data-ck2="${E(k)}"${ST.cidD.has(k)?' checked':''}> <span>${E(ST.uf?k.split('/')[0]:k.replace('/',' · '))}</span><em>${n} cliente${n>1?'s':''}</em></label>`).join('')||'<div class="rt-m" style="padding:8px">Sem cidades neste filtro.</div>'}</div><div class="rt-f" style="margin-top:6px"><button class="rt-bt s" id="rt_cc" style="flex:1">Limpar</button><button class="rt-bt s p" id="rt_ca" style="flex:1">Aplicar</button></div></div></div>
   <div class="rt-sl"><small title="Com uma mesorregião escolhida, aparecem só os representantes que já venderam nela.">Representante atual${ST.meso?' (já vendeu aqui)':''}</small><select id="rt_rp"><option value="">Todos</option>${repsV.map(r=>`<option value="${r[0]}"${ST.rep===String(r[0])?' selected':''}>${E(first2(tc(r[1])))}</option>`).join('')}</select></div>
