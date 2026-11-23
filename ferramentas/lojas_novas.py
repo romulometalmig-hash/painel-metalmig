@@ -72,7 +72,7 @@ def main():
             cnpj = c[0] + c[1] + c[2]
             tel = (c[21] + c[22]).strip()
             fim = ' '.join(x for x in [c[13], c[14], c[15]] if x).strip()
-            achados[cnpj] = {'b': c[0], 'f': c[4], 'a': c[10], 'c': MUN.get(c[20], c[20]), 'u': c[19], 'bai': c[17], 'e': fim, 't': tel, 'n': c[11]}
+            achados[cnpj] = {'b': c[0], 'f': c[4], 'a': c[10], 'c': MUN.get(c[20], c[20]), 'u': c[19], 'bai': c[17], 'e': fim, 't': tel, 'n': c[11], 'cep': c[18]}
         os.remove(p)
     basicos = {v['b'] for v in achados.values()}
     razao = {}
@@ -86,7 +86,7 @@ def main():
     itens = []
     for cnpj, v in achados.items():
         nome = (v['f'] or razao.get(v['b'], '') or 'CNPJ ' + cnpj).title()
-        itens.append([cnpj, nome, '%s-%s-%s' % (v['a'][:4], v['a'][4:6], v['a'][6:8]), v['c'], v['u'], v['bai'].title(), v['e'].title(), v['t'], v['n']])
+        itens.append([cnpj, nome, '%s-%s-%s' % (v['a'][:4], v['a'][4:6], v['a'][6:8]), v['c'], v['u'], v['bai'].title(), v['e'].title(), v['t'], v['n'], v['cep']])
     itens.sort(key=lambda x: x[2], reverse=True)
     json.dump({'gerado': HOJE.isoformat(), 'mes_base': mes, 'janela_dias': JANELA, 'total': len(itens), 'itens': itens},
               open(os.path.join(SAIDA, 'lojas_novas.json'), 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
