@@ -1977,7 +1977,7 @@ const nxDB=d=>{if(!d)return'';const p=String(d).slice(0,10).split('-');return p.
 const nxLink=c=>{const d=waNum(c[3]);const o={};if(d.length===11&&d[2]==='9')o.wa='https://wa.me/55'+d;if(d.length>=10)o.tel='tel:+55'+d;return o};
 const nxIsoDay=d=>new Date(d*864e5).toISOString().slice(0,10);
 const nxDayIso=v=>Math.floor(Date.parse(String(v).slice(0,10)+'T00:00:00Z')/864e5);
-const nxFicha=ci=>{FCI=ci;FQ=D.cli[ci][1];setView('ficha')};
+const nxFicha=ci=>{FCI=ci;FQ=D.cli[ci][1];window.__nxF=1;setView('ficha');window.__nxF=0};
 const NXF={pre:null,orc:'a',oco:'a',cn:null};
 // ---- dados ----
 let ORC=nxLS(nxK('orc'),[]),OCO=nxLS(nxK('oco'),[]),CON=nxLS(nxK('con'),[]);
@@ -2236,7 +2236,7 @@ const nx2Ids=()=>{const r=nxRep();return nxCli(r)};
 const nxMesIso=d=>{const t=new Date(d*864e5);return t.getUTCFullYear()+'-'+pad(t.getUTCMonth()+1)};
 const nxMesNm=m=>m.slice(5)+'/'+m.slice(0,4);
 const nxRepSel=(id,r,fn)=>D.rm?'':`<label>Representante<select id="${id}">${repOpts(r)}</select></label>`;
-const nxRepBind=(id,fn)=>{const e=$('#'+id);if(e)e.onchange=ev=>{sel.value=ev.target.value;fn()}};
+const nxRepBind=(id,fn)=>{const e=$('#'+id),v0=VIEW;if(e)e.onchange=ev=>{sel.value=ev.target.value;if(VIEW!==v0){try{sel.dispatchEvent(new Event('change',{bubbles:true}))}catch(_){}return}fn()}};
 const nxGestOnly=()=>{if(D.rm){ctl('');$('#v2out').innerHTML='<div class="act">Esta aba é exclusiva do gestor.</div>';return true}return false};
 const nxTbl=(h,rows,al)=>`<div style="overflow:auto"><table class="cmpt"><tr>${h.map(x=>`<th>${x}</th>`).join('')}</tr>${rows.map(r=>`<tr>${r.map((c,i)=>`<td${al&&al[i]?` style="text-align:${al[i]}"`:''}>${c}</td>`).join('')}</tr>`).join('')}</table></div>`;
 const nxCsv=(nome,linhas)=>{const t='﻿'+linhas.map(l=>l.map(c=>'"'+String(c==null?'':c).replace(/"/g,'""')+'"').join(';')).join('\r\n');save(new Blob([t],{type:'text/csv'}),nome)};
@@ -3643,6 +3643,7 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
   {v:'v209',d:'23/11/2026',t:'Recomprar com representante, telefone e agenda',l:[
    ['g','Hora de recomprar e Reativar clientes: em cada cliente aparece o representante, o telefone com botão copiar e o botão Agendar conversa (cai no Hoje no dia marcado).'],
    ['g','WhatsApp (gestor): os botões abrem o WhatsApp Web sempre na mesma aba, já com a mensagem; não reinicia mais o aplicativo.'],
+   ['g','Reativar clientes: botão Passar para… em cada cliente (abre a janela do Repasse). Ficha aberta por Recomprar e Reativar não vem mais em branco. Botões dos cartões menores.'],
    ['g','Vendas, Representantes ativos com pedido no mês: quem também é cliente (ex.: Alexandre Fabris Lima, Reinaldo Tadeu) deixa de aparecer como INATIVO.']]},
   {v:'v208',d:'23/11/2026',t:'Conversas com representantes e Descartar lojas novas',l:[
    ['a','Conversas com representantes (só gestor): no termômetro de cada representante, botão Registrar conversa (assunto, como foi, o que foi falado) e histórico. Dá para agendar a próxima conversa: no dia ela aparece no Hoje, com WhatsApp, Conversei e Adiar. Fica guardado na nuvem.'],
@@ -6355,7 +6356,7 @@ window.LC_RK={"20001": "7bf33d9a4d61fc268efcf90c32605dd0", "20002": "66ec6407a6e
 (function(){try{
  if(window.__lcAH||typeof setView!=='function')return;window.__lcAH=1;
  const sv0=setView;
- setView=function(v){try{if(v==='ficha'&&VIEW!=='ficha'){FQ='';FCI=null;FCID='';FREP='';window.lcUF='';window.lcSIT='';window.lcSITS=[];if(window.lcFabcReset)window.lcFabcReset()}}catch(e){console.error(e)}return sv0.apply(this,arguments)};
+ setView=function(v){try{if(v==='ficha'&&VIEW!=='ficha'){if(window.__nxF){window.__nxF=0}else{FQ='';FCI=null;FCID='';FREP='';window.lcUF='';window.lcSIT='';window.lcSITS=[];if(window.lcFabcReset)window.lcFabcReset()}}}catch(e){console.error(e)}return sv0.apply(this,arguments)};
 }catch(e){console.error('lcAH',e)}})();
 // ===== v163 · PDF da viagem: carteira visitada discriminada por representante (sem seletor) =====
 (function(){try{
@@ -6735,7 +6736,7 @@ window.lcRelPos=function(w,S){
  const aqLd=()=>{try{return JSON.parse(L0.getItem(AQK)||'{}')||{}}catch(e){return{}}};let AQ=aqLd();const aqSv=()=>{try{L0.setItem(AQK,JSON.stringify(AQ))}catch(e){}};
  const arqHas=code=>!!AQ[String(code)];
  window.lcArq={has:arqHas,all:()=>AQ,reload:()=>{AQ=aqLd()}};
- window.lcRep={arquivar:function(ci){arquivar([ci])},inativar:function(ci){passar([ci],'ina')}};
+ window.lcRep={passar:function(ci){passar([ci],null,true)},arquivar:function(ci){arquivar([ci])},inativar:function(ci){passar([ci],'ina')}};
  const AQM=['Fechou o negócio','Compra para uso próprio','Mudou de ramo','Não quer comprar','Outro motivo'];
  function parados(){const out=[];D.cli.forEach((c,ci)=>{const o=ordens(ci);if(!o.length)return;const last=o[o.length-1].d,since=D.ref-last;if(since<180)return;
   const code=String(c[0]),a=R.t[code]||[],cur=a.length?a[a.length-1]:null;if(arqHas(code))return;if(cur&&(emCurso(cur)||cur.st==='conf'))return;if(cur&&cur.st==='ina'&&!ST.ina)return;if(!(cur&&cur.st==='ina')&&ST.ina)return;
@@ -7101,7 +7102,7 @@ body.rt-fs{overflow:hidden!important}body.rt-fs:not(.rt-nv) #lcnav{display:none!
   pinta()}
  // ---- passar clientes
  const cargaBO=cod=>{let n=0;Object.keys(R.t).forEach(code=>{const t=ult(code);if(t&&t.dest==='bo'&&+t.cod===+cod&&['acomp','sem'].includes(t.st))n++});return n};
- function passar(cis,pre){if(!cis.length)return;const m=document.createElement('div');m.className='rt-ov';document.body.appendChild(m);
+ function passar(cis,pre,fora){if(!cis.length)return;const m=document.createElement('div');m.className='rt-ov';document.body.appendChild(m);
   let tipo=cis.length>1?'div':'rep',repSel=0,dias=R.cfg.dias,resp=R.cfg.resp;if(pre!=null){if(typeof pre==='string')tipo=pre;else{tipo='rep';repSel=pre}}let asg=new Map();
   const near=cis.length===1?perto(cis[0],R.cfg.raio).l:[];const perCods=new Set(near.map(x=>x.cod));
   const dividir=()=>{const cnt=new Map(INT.map(c=>[c,cargaBO(c)]));asg=new Map();cis.forEach(ci=>{let b=INT[0];INT.forEach(c=>{if(cnt.get(c)<cnt.get(b))b=c});asg.set(ci,b);cnt.set(b,cnt.get(b)+1)})};dividir();
@@ -7129,7 +7130,7 @@ body.rt-fs{overflow:hidden!important}body.rt-fs:not(.rt-nv) #lcnav{display:none!
     else lista=cis.map(ci=>({ci,tipo:'ina',cod:0}));
     const quem=tipo==='rep'?nmCod(repSel):tipo==='ina'?'ninguém (inativo)':tipo==='div'?INT.map(nmCod).join(' e '):nmCod(+tipo.slice(2));
     if(!confirm('Passar '+cis.length+' cliente(s) para '+quem+'?'))return;
-    aplicar(lista,dias,resp);cis.forEach(ci=>ST.sel.delete(ci));fecha();ST.tab=(tipo==='ina'||ST.modo!=='lista')?'par':'acomp';sv();draw();try{bigMsg('✔ '+cis.length+' cliente(s) passado(s) para '+quem,'#2E7D32')}catch(e){}}}
+    aplicar(lista,dias,resp);cis.forEach(ci=>ST.sel.delete(ci));fecha();ST.tab=(tipo==='ina'||ST.modo!=='lista')?'par':'acomp';sv();if(fora){try{setView(VIEW)}catch(e){}}else draw();try{bigMsg('✔ '+cis.length+' cliente(s) passado(s) para '+quem,'#2E7D32')}catch(e){}}}
   pinta()}
  window.lcReat={checkVendas,draw,state:()=>R};
  setTimeout(()=>{try{checkVendas();badge();aviso();pushIdx()}catch(e){console.error('lcAM init',e)}},9000);
@@ -9206,7 +9207,7 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
 (function(){try{
  if(typeof D==='undefined'||!D.cli||!D.reps||D.rm)return;
  const E=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
- const st=document.createElement('style');st.textContent='.lcbx{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;font-size:13px;margin:4px 0;padding-top:4px;border-top:1px solid #eef1f6}.lcbx .tel{user-select:all;font-weight:600}.lcbx button{background:#eef2f8;border:1px solid #cfd8e6;border-radius:6px;padding:3px 9px;font-size:12.5px;cursor:pointer;min-height:30px}.lcbx .ag{background:#1F4E78;color:#fff;border-color:#1F4E78}';
+ const st=document.createElement('style');st.textContent='.lcbx{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;font-size:12.5px;margin:3px 0;padding-top:3px;border-top:1px solid #eef1f6}.lcbx .tel{user-select:all;font-weight:600}.lcbx button{color:#1F4E78!important;background:#fff!important;border:1px solid #cfd8e6!important;border-radius:5px;padding:1px 7px!important;font-size:11px!important;font-weight:600;cursor:pointer;min-height:22px!important;height:22px!important;line-height:1;width:auto!important;flex:none}.lcbx button:hover{background:#eef2f8!important}';
  document.head.appendChild(st);
  const dig=t=>{let d=String(t||'').replace(/\D/g,'').replace(/^0+/,'');if(d.length>11&&d.startsWith('55'))d=d.slice(2);return d};
  const fmt=d=>d.length===11?'('+d.slice(0,2)+') '+d.slice(2,7)+'-'+d.slice(7):d.length===10?'('+d.slice(0,2)+') '+d.slice(2,6)+'-'+d.slice(6):d;
@@ -9215,8 +9216,9 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
   document.querySelectorAll('#v2out .lccard').forEach(card=>{if(card.querySelector('.lcbx'))return;const a=card.querySelector('a.rcf');if(!a)return;const ci=+a.dataset.ci,c=D.cli[ci];if(!c)return;
    const d=dig(c[3]),ok=d.length>=10;
    const w=document.createElement('div');w.className='lcbx';
-   w.innerHTML='<span>👤 <b>'+E(rep(c))+'</b></span>'+(ok?'<span class="tel">📞 '+E(fmt(d))+'</span><button class="cp" data-t="'+d+'">📋 copiar</button>':'<span class="mute">sem telefone</span>')+'<button class="ag">📅 Agendar conversa</button>';
-   const cp=w.querySelector('.cp');if(cp)cp.onclick=ev=>{ev.stopPropagation();const t=cp.dataset.t,done=()=>{cp.textContent='✔ copiado';setTimeout(()=>{cp.textContent='📋 copiar'},1500)};try{navigator.clipboard.writeText(t).then(done,()=>{const r=document.createRange();r.selectNodeContents(w.querySelector('.tel'));const g=getSelection();g.removeAllRanges();g.addRange(r)})}catch(e){}};
+   w.innerHTML='<span>👤 <b>'+E(rep(c))+'</b></span>'+(ok?'<span class="tel">📞 '+E(fmt(d))+'</span><button class="cp" data-t="'+d+'" title="Copiar telefone">📋</button>':'<span class="mute">sem telefone</span>')+(VIEW==='reat'&&window.lcRep&&window.lcRep.passar?'<button class="ps" title="Passar este cliente para outro representante">↪ Passar para…</button>':'')+'<button class="ag" title="Agendar nova conversa (cai no Hoje)">📅 Agendar</button>';
+   const cp=w.querySelector('.cp');if(cp)cp.onclick=ev=>{ev.stopPropagation();const t=cp.dataset.t,done=()=>{cp.textContent='✔';setTimeout(()=>{cp.textContent='📋'},1500)};try{navigator.clipboard.writeText(t).then(done,()=>{const r=document.createRange();r.selectNodeContents(w.querySelector('.tel'));const g=getSelection();g.removeAllRanges();g.addRange(r)})}catch(e){}};
+   const ps=w.querySelector('.ps');if(ps)ps.onclick=ev=>{ev.stopPropagation();window.lcRep.passar(ci)};
    w.querySelector('.ag').onclick=ev=>{ev.stopPropagation();if(window.lcLembrar)window.lcLembrar(ci)};
    const city=card.querySelector('.mute');if(city)city.insertAdjacentElement('afterend',w);else card.appendChild(w)})}
  setInterval(()=>{try{deco()}catch(e){console.error('lcBX',e)}},900);
