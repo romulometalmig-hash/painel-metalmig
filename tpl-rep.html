@@ -1962,7 +1962,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v202';
+const NX_VER = 'v203';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3640,6 +3640,10 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v203',d:'22/11/2026',t:'CNPJs novos e fechados na mesma aba',l:[
+   ['g','CNPJs novos: o sistema sugere o representante mais apropriado (quem atende a cidade, depois a mesorregião, depois o mais perto), você escolhe quem fica e envia a indicação por recado ao representante.'],
+   ['g','As abas “CNPJs novos” e “CNPJs fechados” viraram uma só, “🏛 CNPJs na Receita” (Territórios), com a escolha entre as duas, como a Curva ABC escolhe cliente ou produto.'],
+  ]},
   {v:'v202',d:'22/11/2026',t:'CNPJs fechados e filtro no Recrutamento',l:[
    ['g','Nova aba “🚫 CNPJs fechados” (Territórios): clientes nossos com CNPJ baixado, inapto ou suspenso na Receita Federal, com aviso de quem comprou depois da baixa. Só consulta: nada é inativado sozinho.'],
    ['g','Recrutamento (Funil, Pontuação, Checklist, Agenda e Mapa): filtro por região do Brasil, estado, mesorregião e DDD também nessas abas e no mapa.'],
@@ -8896,10 +8900,32 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
  const nz=s=>String(s||'').toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^A-Z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
  const RB={Sudeste:['MG','SP','RJ','ES'],Sul:['PR','SC','RS'],'Centro-Oeste':['DF','GO','MS','MT'],Nordeste:['AL','BA','CE','MA','PB','PE','PI','RN','SE'],Norte:['AC','AM','AP','PA','RO','RR','TO']};
- let DADOS=null,ST=null,ERR='',CARR=false;const F={rg:'',uf:'',mes:'',q:'',so:''};
+ const tgW=o=>o.querySelectorAll('[data-cn]').forEach(b=>b.onclick=()=>{if(b.dataset.cn!==VIEW)setView(b.dataset.cn)});
+ let DADOS=null,ST=null,ERR='',CARR=false;const F={rg:'',uf:'',mes:'',q:'',so:'',ind:''};
  const HOJE=Math.floor(Date.now()/864e5);
  let CID=null;
  function cidx(){if(CID)return CID;CID=new Map();D.cli.forEach(c=>{if(window.lcArq&&lcArq.has(c[0]))return;const p=String(c[2]||'').split('/');if(p.length<2)return;const k=nz(p[0])+'|'+p[1].trim().toUpperCase();let e=CID.get(k);if(!e)CID.set(k,e={n:0,r:new Map()});e.n++;const r=D.reps[c[8]];if(r&&+r[0]>0&&r[2]&&!/inativ|metalmig/i.test(String(r[1])))e.r.set(r[1],(e.r.get(r[1])||0)+1)});return CID}
+ // ---- indicação de representante para cada CNPJ novo ----
+ const AK='metalmig_cnpjn_atrib';let ATR={};try{ATR=JSON.parse(localStorage.getItem(AK)||'{}')||{}}catch(_){ATR={}}
+ const salvaAtr=()=>{try{localStorage.setItem(AK,JSON.stringify(ATR))}catch(_){}};
+ const repsOk=()=>D.reps.map((r,i)=>({i:i,cod:+r[0],nome:r[1]})).filter(r=>r.cod>0&&D.reps[r.i][2]&&!/inativ|metalmig/i.test(String(r.nome))).sort((a,b)=>a.nome.localeCompare(b.nome,'pt'));
+ let RS=null;
+ function rstats(){if(RS)return RS;const ok=new Set(repsOk().map(r=>r.i)),byC=new Map(),byM=new Map(),tot=new Map(),pts=new Map();
+  const G=new Map();try{Object.keys(lcGeo.d).forEach(uf=>lcGeo.d[uf].forEach(q=>G.set(nz(q[0])+'|'+uf,[q[1],q[2]])))}catch(_){}
+  D.cli.forEach(c=>{if(window.lcArq&&lcArq.has(c[0]))return;const i=c[8];if(!ok.has(i))return;const pp=String(c[2]||'').split('/');if(pp.length<2)return;const nm=pp[0].trim(),uf=pp[1].trim().toUpperCase(),k=nz(nm)+'|'+uf;
+   tot.set(i,(tot.get(i)||0)+1);const m1=byC.get(k)||byC.set(k,new Map()).get(k);m1.set(i,(m1.get(i)||0)+1);
+   let mz='';try{const o=window.lcMeso&&lcMeso.ofCid(nm+'/'+uf);mz=o?o.m+'|'+uf:''}catch(_){}if(mz){const m2=byM.get(mz)||byM.set(mz,new Map()).get(mz);m2.set(i,(m2.get(i)||0)+1)}
+   const g=G.get(k);if(g){const l=pts.get(i)||pts.set(i,new Map()).get(i);if(!l.has(k))l.set(k,[g[0],g[1],nm])}});
+  RS={byC:byC,byM:byM,tot:tot,pts:pts,G:G};return RS}
+ const km=(a,b)=>{const R=6371,t=x=>x*Math.PI/180,dl=t(b[0]-a[0]),dn=t(b[1]-a[1]),h=Math.sin(dl/2)**2+Math.cos(t(a[0]))*Math.cos(t(b[0]))*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(h))};
+ const melhor=(m,tot)=>{let b=null;m.forEach((n,i)=>{const t=tot.get(i)||0;if(!b||n>b.n||(n===b.n&&t<b.t))b={i:i,n:n,t:t}});return b};
+ function sugere(x){if(x.mm)return null;const S=rstats(),k=nz(x.cidRaw)+'|'+x.uf;let b=S.byC.get(k);
+  if(b&&b.size){const r=melhor(b,S.tot);return {i:r.i,m:'atende '+r.n+' cliente'+(r.n>1?'s':'')+' em '+x.cid}}
+  let mz='';try{const o=window.lcMeso&&lcMeso.ofCid(x.cid+'/'+x.uf);mz=o?o.m+'|'+x.uf:''}catch(_){}
+  b=mz&&S.byM.get(mz);if(b&&b.size){const r=melhor(b,S.tot);return {i:r.i,m:'atende '+r.n+' cliente'+(r.n>1?'s':'')+' na mesorregião '+x.mes}}
+  const g=S.G.get(k);if(g){let best=null;S.pts.forEach((l,i)=>l.forEach(v=>{const d=km(g,v);if(!best||d<best.d||(d===best.d&&(S.tot.get(i)||0)<(S.tot.get(best.i)||0)))best={i:i,d:d,c:v[2]}}));if(best)return {i:best.i,m:'o mais perto: tem cliente em '+nome1(best.c)+' (a cerca de '+Math.round(best.d)+' km)'}}
+  return null}
+ const nomeRep=i=>{const r=D.reps[i];return r?curto(r[1]):''};
  let AI=null;
  const via=s=>nz(String(s||'').replace(/^\s*(RUA|R|AVENIDA|AV|AL|ALAMEDA|TRAVESSA|TV|ESTRADA|ROD|RODOVIA|PRACA|PC|BECO|VIA)\.?\s+/i,''));
  const numDe=s=>{const m=String(s||'').match(/[,\s]\s*(\d{1,6})\b/);return m?m[1]:''};
@@ -8913,32 +8939,47 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
   const cp=String(x.cep||'').replace(/\D/g,'');if(cp.length===8&&n){const r=A.c.get(cp+'|'+n);if(r)return {r:r,m:'mesmo CEP e número'}}
   return null}
  const mes=(cid,uf)=>{try{const o=window.lcMeso&&lcMeso.ofCid(cid+'/'+uf);return o?o.m:''}catch(_){return ''}};
+ const curto=n=>{const w=String(n||'').toLowerCase().replace(/(^|\s)(\S)/g,(m,a,b)=>a+b.toUpperCase()).split(' ');return w.slice(0,/^(Da|De|Do|Das|Dos|E)$/.test(w[1]||'')?3:2).join(' ')};
  const nome1=n=>String(n||'').toLowerCase().replace(/(^|\s)(\S)/g,(m,a,b)=>a+b.toUpperCase());
- function lista(){const C=cidx();return ((DADOS&&DADOS.itens)||[]).map(x=>{const dd=Date.UTC(+x[2].slice(0,4),+x[2].slice(5,7)-1,+x[2].slice(8,10))/864e5;const e=C.get(nz(x[3])+'|'+x[4]);const o={cnpj:x[0],nome:x[1],ab:x[2],dias:HOJE-Math.floor(dd),cid:nome1(x[3]),uf:x[4],bai:x[5],end:x[6],tel:x[7],cnae:x[8],cep:x[9]||'',cidRaw:x[3],endRaw:x[6],mes:mes(nome1(x[3]),x[4]),cli:e?e.n:0,reps:e?[...e.r.entries()].sort((a,b)=>b[1]-a[1]).map(z=>z[0]):[]};o.mm=mesma(o);return o})}
+ function lista(){const C=cidx();return ((DADOS&&DADOS.itens)||[]).map(x=>{const dd=Date.UTC(+x[2].slice(0,4),+x[2].slice(5,7)-1,+x[2].slice(8,10))/864e5;const e=C.get(nz(x[3])+'|'+x[4]);const o={cnpj:x[0],nome:x[1],ab:x[2],dias:HOJE-Math.floor(dd),cid:nome1(x[3]),uf:x[4],bai:x[5],end:x[6],tel:x[7],cnae:x[8],cep:x[9]||'',cidRaw:x[3],endRaw:x[6],mes:mes(nome1(x[3]),x[4]),cli:e?e.n:0,reps:e?[...e.r.entries()].sort((a,b)=>b[1]-a[1]).map(z=>z[0]):[]};o.mm=mesma(o);o.sg=sugere(o);o.at=ATR[o.cnpj]||null;return o})}
  const fone=t=>{t=String(t||'').replace(/\D/g,'');if(t.length<10)return '';return '('+t.slice(0,2)+') '+t.slice(2,t.length-4)+'-'+t.slice(-4)};
  const wa=t=>{t=String(t||'').replace(/\D/g,'');return t.length===11&&t[2]==='9'?'https://wa.me/55'+t:''};
  const dbr=iso=>iso.slice(8,10)+'/'+iso.slice(5,7)+'/'+iso.slice(0,4);
  async function carregar(){if(CARR)return;CARR=true;try{const r=await fetch(new URL('lojas_novas.json?t='+Date.now(),location.href).href,{cache:'no-store'});if(r.ok)DADOS=await r.json();else throw 0}catch(e){DADOS=null;try{const r=await fetch(new URL('lojas_novas_status.json?t='+Date.now(),location.href).href,{cache:'no-store'});if(r.ok)ST=await r.json()}catch(_){}ERR='sem-lista'}CARR=false;if(VIEW==='lnv')draw()}
- function filtra(L){const q=nz(F.q);return L.filter(x=>(!F.rg||RB[F.rg].includes(x.uf))&&(!F.uf||x.uf===F.uf)&&(!F.mes||x.mes===F.mes)&&(!F.so||(F.so==='dup'?!!x.mm:F.so==='sem'?x.cli===0:x.cli>0))&&(!q||nz(x.nome+' '+x.cid+' '+x.bai).includes(q)))}
+ function filtra(L){const q=nz(F.q);return L.filter(x=>(!F.rg||RB[F.rg].includes(x.uf))&&(!F.uf||x.uf===F.uf)&&(!F.mes||x.mes===F.mes)&&(!F.ind||(F.ind==='sem'?!x.at:!!x.at))&&(!F.so||(F.so==='dup'?!!x.mm:F.so==='sem'?x.cli===0:x.cli>0))&&(!q||nz(x.nome+' '+x.cid+' '+x.bai).includes(q)))}
  function draw(){const o=document.getElementById('v2out');if(!o)return;
-  let h='<div class="vmh"><h2>🆕 CNPJs novos na Receita Federal</h2><p>Empresas de material de construção que abriram CNPJ há pouco, segundo a Receita Federal. Não são clientes nossos e ainda não fizeram pedido: são possíveis clientes para o representante da região visitar. Só você vê esta tela.</p></div>';
-  if(!DADOS){h+='<div class="act">'+(ERR?'A lista ainda não chegou. Ela é gerada sozinha no GitHub, duas vezes por mês.'+(ST&&ST.erro?'<br><small>Último aviso: '+E(ST.erro)+'</small>':''):'Carregando…')+'</div>';o.innerHTML=h;if(!ERR)carregar();return}
+  let h='<div style="display:flex;gap:6px;margin:0 0 10px"><button type="button" class="btn pri" data-cn="lnv">🆕 CNPJs novos</button><button type="button" class="btn " data-cn="cfe">🚫 CNPJs fechados</button></div>'+'<div class="vmh"><h2>🆕 CNPJs novos na Receita Federal</h2><p>Empresas de material de construção que abriram CNPJ há pouco, segundo a Receita Federal. Não são clientes nossos e ainda não fizeram pedido: são possíveis clientes para o representante da região visitar. Só você vê esta tela.</p></div>';
+  if(!DADOS){h+='<div class="act">'+(ERR?'A lista ainda não chegou. Ela é gerada sozinha no GitHub, duas vezes por mês.'+(ST&&ST.erro?'<br><small>Último aviso: '+E(ST.erro)+'</small>':''):'Carregando…')+'</div>';o.innerHTML=h;tgW(o);if(!ERR)carregar();return}
   const L=lista(),V=filtra(L);const ufs=[...new Set(L.filter(x=>!F.rg||RB[F.rg].includes(x.uf)).map(x=>x.uf))].sort();const ms=[...new Set(L.filter(x=>(!F.rg||RB[F.rg].includes(x.uf))&&(!F.uf||x.uf===F.uf)&&x.mes).map(x=>x.mes))].sort();
   const sel=(c,ph,arr,v)=>'<select class="'+c+'" style="flex:1 1 140px;padding:7px 9px;border:1px solid #c5d0e3;border-radius:9px;font-size:13px;background:#fff"><option value="">'+ph+'</option>'+arr.map(a=>'<option'+(a===v?' selected':'')+'>'+E(a)+'</option>').join('')+'</select>';
   h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0">'+sel('ln_rg','Região do Brasil: todas',Object.keys(RB),F.rg)+sel('ln_uf','Estado: todos',ufs,F.uf)+sel('ln_mes','Mesorregião: todas',ms,F.mes)
    +'<select class="ln_so" style="flex:1 1 140px;padding:7px 9px;border:1px solid #c5d0e3;border-radius:9px;font-size:13px;background:#fff"><option value="">Cidades: todas</option><option value="sem"'+(F.so==='sem'?' selected':'')+'>Só cidades sem cliente nosso</option><option value="com"'+(F.so==='com'?' selected':'')+'>Só cidades com cliente nosso</option><option value="dup"'+(F.so==='dup'?' selected':'')+'>⚠️ Só os que já parecem ser cliente nosso</option></select>'
+   +'<select class="ln_ind" style="flex:1 1 140px;padding:7px 9px;border:1px solid #c5d0e3;border-radius:9px;font-size:13px;background:#fff"><option value="">Indicação: todas</option><option value="sem"'+(F.ind==='sem'?' selected':'')+'>Sem representante indicado</option><option value="com"'+(F.ind==='com'?' selected':'')+'>Já indicados</option></select>'
    +'<input class="ln_q" placeholder="🔎 Nome, cidade ou bairro" value="'+E(F.q)+'" style="flex:1 1 150px;min-width:0;padding:7px 9px;border:1px solid #c5d0e3;border-radius:9px;font-size:13px"><button type="button" class="btn" id="ln_xl">📊 Excel</button></div>';
   h+='<div style="font-size:12px;color:#64748b;margin:4px 0 8px" title="Lista atualizada em '+E(DADOS.gerado)+' · mês base da Receita: '+E(DADOS.mes_base)+'">'+V.length+' de '+L.length+' CNPJs novos · abertos nos últimos '+DADOS.janela_dias+' dias · lista de '+dbr(DADOS.gerado)+'</div>';
   h+=V.slice(0,60).map(x=>{const f=fone(x.tel),w=wa(x.tel);return '<div style="background:#fff;border:1px solid #d9dfe9;border-radius:12px;padding:10px 12px;margin:0 0 9px"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><b>'+E(x.nome)+'</b><span style="font-size:11.5px;color:#1F4E78;background:#eef4fb;border-radius:8px;padding:2px 7px;white-space:nowrap" title="Data de abertura do CNPJ na Receita Federal">CNPJ aberto há '+x.dias+' dias</span></div>'
-   +'<div style="font-size:13px;color:#475569;margin-top:3px">📍 '+E(x.cid)+'/'+x.uf+(x.mes?' · '+E(x.mes):'')+(x.bai?' · '+E(x.bai):'')+'</div>'+(x.end?'<div style="font-size:12.5px;color:#64748b">'+E(x.end)+'</div>':'')+(x.mm?'<div style="margin-top:6px;padding:6px 8px;border-radius:9px;background:#fef3c7;color:#92400e;font-size:12.5px" title="O endereço, o telefone ou o CEP deste CNPJ novo é igual ao de um cliente nosso: pode ser a mesma loja com CNPJ novo">⚠️ Provável <b>mesma loja</b> do cliente '+E(nome1(x.mm.r.nome))+' (cód. '+x.mm.r.cod+') · '+x.mm.m+(x.mm.r.rep?' · rep. '+E(nome1(x.mm.r.rep).split(' ').slice(0,2).join(' ')):'')+'</div>':'')
-   +'<div style="margin-top:6px;font-size:12.5px;padding-top:6px;border-top:1px solid #eef1f6">'+(x.cli?'Já temos <b>'+x.cli+'</b> cliente(s) nesta cidade · atendem: '+E(x.reps.slice(0,2).map(n=>nome1(n).split(' ').slice(0,2).join(' ')).join(', ')||'—'):'<b style="color:#b45309">Cidade sem cliente nosso</b>')+'</div>'
+   +'<div style="font-size:13px;color:#475569;margin-top:3px">📍 '+E(x.cid)+'/'+x.uf+(x.mes?' · '+E(x.mes):'')+(x.bai?' · '+E(x.bai):'')+'</div>'+(x.end?'<div style="font-size:12.5px;color:#64748b">'+E(x.end)+'</div>':'')+(x.mm?'<div style="margin-top:6px;padding:6px 8px;border-radius:9px;background:#fef3c7;color:#92400e;font-size:12.5px" title="O endereço, o telefone ou o CEP deste CNPJ novo é igual ao de um cliente nosso: pode ser a mesma loja com CNPJ novo">⚠️ Provável <b>mesma loja</b> do cliente '+E(nome1(x.mm.r.nome))+' (cód. '+x.mm.r.cod+') · '+x.mm.m+(x.mm.r.rep?' · rep. '+E(curto(x.mm.r.rep)):'')+'</div>':'')
+   +(x.mm?'':'<div style="margin-top:6px;padding-top:6px;border-top:1px solid #eef1f6;font-size:12.5px">'+(x.sg?'<div style="color:#1F4E78" title="Escolhido pelo sistema: 1º quem atende clientes na cidade, 2º na mesorregião, 3º o mais perto; empate: carteira menor">💡 Sugestão: <b>'+E(nomeRep(x.sg.i))+'</b> · '+E(x.sg.m)+'</div>':'<div style="color:#94a3b8">Sem sugestão (cidade sem referência)</div>')
+   +'<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:6px"><select class="ln_rp" data-c="'+x.cnpj+'" style="flex:1 1 160px;padding:6px 8px;border:1px solid #c5d0e3;border-radius:9px;font-size:13px;background:#fff"><option value="">— Representante deste cliente —</option>'+repsOk().map(r=>'<option value="'+r.cod+'"'+(x.at&&+x.at.c===r.cod?' selected':'')+'>'+E(nome1(r.nome))+'</option>').join('')+'</select>'
+   +(!x.at&&x.sg?'<button type="button" class="ln_ac btn" data-c="'+x.cnpj+'" data-r="'+(D.reps[x.sg.i]?D.reps[x.sg.i][0]:'')+'">Aceitar sugestão</button>':'')
+   +(x.at?'<button type="button" class="ln_en btn'+(x.at.env?'':' pri')+'" data-c="'+x.cnpj+'">'+(x.at.env?'✔ Enviado · reenviar':'📨 Enviar ao representante')+'</button>':'')+'</div>'
+   +(x.at?'<div style="margin-top:4px;color:#166534">✅ Indicado para <b>'+E(nomeRep(D.reps.findIndex(r=>+r[0]===+x.at.c)))+'</b>'+(x.at.env?' · aviso enviado em '+new Date(x.at.env).toLocaleDateString('pt-BR'):'')+'</div>':'')+'</div>')
+   +'<div style="margin-top:6px;font-size:12.5px;padding-top:6px;border-top:1px solid #eef1f6">'+(x.cli?'Já temos <b>'+x.cli+'</b> cliente(s) nesta cidade · atendem: '+E(x.reps.slice(0,2).map(n=>curto(n)).join(', ')||'—'):'<b style="color:#b45309">Cidade sem cliente nosso</b>')+'</div>'
    +'<div style="display:flex;gap:8px;margin-top:7px;flex-wrap:wrap">'+(f?'<span style="font-size:13px">📞 '+f+'</span>':'<span style="font-size:12.5px;color:#94a3b8">sem telefone</span>')+(w?'<a href="'+w+'" target="_blank" rel="noopener" style="font-size:13px;padding:5px 10px;border-radius:9px;background:#16a34a;color:#fff;text-decoration:none">💬 WhatsApp</a>':'')+'</div></div>'}).join('');
   if(V.length>60)h+='<div style="font-size:12px;color:#64748b">… e mais '+(V.length-60)+'. Use os filtros ou o Excel para ver todas.</div>';
-  o.innerHTML=h;
-  const on=(c,k,reset)=>{const e=o.querySelector(c);if(e)e.onchange=()=>{F[k]=e.value;(reset||[]).forEach(r=>F[r]='');draw()}};on('.ln_rg','rg',['uf','mes']);on('.ln_uf','uf',['mes']);on('.ln_mes','mes');on('.ln_so','so');
+  o.innerHTML=h;tgW(o);
+  o.querySelectorAll('.ln_rp').forEach(e=>e.onchange=()=>{if(e.value)ATR[e.dataset.c]={c:+e.value,ts:Date.now(),env:(ATR[e.dataset.c]&&+ATR[e.dataset.c].c===+e.value)?ATR[e.dataset.c].env:0};else delete ATR[e.dataset.c];salvaAtr();draw()});
+  o.querySelectorAll('.ln_ac').forEach(e=>e.onclick=()=>{ATR[e.dataset.c]={c:+e.dataset.r,ts:Date.now(),env:0};salvaAtr();draw()});
+  const byc={};L.forEach(x=>byc[x.cnpj]=x);
+  o.querySelectorAll('.ln_en').forEach(e=>e.onclick=async()=>{const x=byc[e.dataset.c],a=ATR[e.dataset.c];if(!x||!a)return;e.disabled=true;e.textContent='Enviando…';
+   const f=fone(x.tel),tx=('Indicação de loja nova (CNPJ aberto há '+x.dias+' dias): '+x.nome+' · '+x.cid+'/'+x.uf+(x.bai?' · '+x.bai:'')+(x.end?' · '+x.end:'')+(f?' · tel. '+f:'')+'. Ainda não é cliente da Metalmig: vale uma visita ou contato para apresentar nossa linha.').slice(0,600);
+   try{const u=(()=>{let u=(localStorage.getItem('metalmig_bkp_syncurl')||'').trim();if(!u){try{const c=JSON.parse(localStorage.getItem('metalmig_bkp_drvcfg')||'null');u=(c&&c.u)||''}catch(_){}}return u})();if(!u)throw new Error('sem endereço');
+    const r=await fetch(u,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({k:'',rep:a.c,t:'recado',acao:'enviar',texto:tx,de:(window.lcQuem?window.lcQuem():'Romulo')})});const j=await r.json();if(!j||!j.ok)throw new Error(j&&j.erro||'falha');
+    a.env=Date.now();salvaAtr();draw()}catch(er){e.disabled=false;e.textContent='Não consegui enviar · tentar de novo'}});
+  const on=(c,k,reset)=>{const e=o.querySelector(c);if(e)e.onchange=()=>{F[k]=e.value;(reset||[]).forEach(r=>F[r]='');draw()}};on('.ln_rg','rg',['uf','mes']);on('.ln_uf','uf',['mes']);on('.ln_mes','mes');on('.ln_so','so');on('.ln_ind','ind');
   const qi=o.querySelector('.ln_q');qi.oninput=()=>{F.q=qi.value;const p=qi.selectionStart;draw();const n=document.querySelector('.ln_q');n.focus();try{n.setSelectionRange(p,p)}catch(_){}};
-  o.querySelector('#ln_xl').onclick=()=>{try{save(xlsx([{t:'CNPJs novos',h:['Empresa (CNPJ novo)','Aberta em','Cidade','UF','Mesorregião','Bairro','Endereço','Telefone','CNPJ','CNAE','Clientes nossos na cidade','Quem atende','Parece ser cliente nosso?'],ty:['t','t','t','t','t','t','t','t','t','t','n','t','t'],rows:V.map(x=>[x.nome,dbr(x.ab),x.cid,x.uf,x.mes,x.bai,x.end,fone(x.tel),x.cnpj,x.cnae,x.cli,x.reps.slice(0,3).join(', '),x.mm?'Sim, cód. '+x.mm.r.cod+' '+x.mm.r.nome+' ('+x.mm.m+')':''])}]),'CNPJs_novos.xlsx')}catch(e){console.error(e)}}}
- try{const nav=document.getElementById('nav');if(nav){const b=document.createElement('button');b.dataset.v='lnv';b.className='gest';b.title='Aba exclusiva do gestor';b.textContent='🆕 CNPJs novos';nav.appendChild(b)}}catch(e){}
+  o.querySelector('#ln_xl').onclick=()=>{try{save(xlsx([{t:'CNPJs novos',h:['Empresa (CNPJ novo)','Aberta em','Cidade','UF','Mesorregião','Bairro','Endereço','Telefone','CNPJ','CNAE','Clientes nossos na cidade','Quem atende','Parece ser cliente nosso?','Representante indicado','Representante sugerido'],ty:['t','t','t','t','t','t','t','t','t','t','n','t','t','t','t'],rows:V.map(x=>[x.nome,dbr(x.ab),x.cid,x.uf,x.mes,x.bai,x.end,fone(x.tel),x.cnpj,x.cnae,x.cli,x.reps.slice(0,3).join(', '),x.mm?'Sim, cód. '+x.mm.r.cod+' '+x.mm.r.nome+' ('+x.mm.m+')':'',x.at?nomeRep(D.reps.findIndex(r=>+r[0]===+x.at.c)):'',x.sg?nomeRep(x.sg.i)+' ('+x.sg.m+')':''])}]),'CNPJs_novos.xlsx')}catch(e){console.error(e)}}}
+ try{const nav=document.getElementById('nav');if(nav){const b=document.createElement('button');b.dataset.v='lnv';b.className='gest';b.title='Aba exclusiva do gestor';b.textContent='🏛 CNPJs na Receita';nav.appendChild(b)}}catch(e){}
  const rd=render;render=function(){if(VIEW==='lnv')return;return rd.apply(this,arguments)};
  const sv0=setView;setView=function(v){if(v==='lnv'){sv0(v);try{draw();if(!DADOS&&!ERR)carregar()}catch(e){console.error(e)}return}return sv0(v)};
 }catch(e){console.error('lcBT',e)}})();
@@ -8948,7 +8989,9 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
  const SIT={'03':'Suspensa','04':'Inapta','08':'Baixada'};
  const COR={'08':['#fee2e2','#991b1b'],'04':['#fef3c7','#92400e'],'03':['#fef3c7','#92400e']};
+ const tgW=o=>o.querySelectorAll('[data-cn]').forEach(b=>b.onclick=()=>{if(b.dataset.cn!==VIEW)setView(b.dataset.cn)});
  let DADOS=null,LIST=null,ERR='',ST=null,CARR=false;const F={sit:'',rep:'',dep:'',q:''};
+ const curto=n=>{const w=String(n||'').toLowerCase().replace(/(^|\s)(\S)/g,(m,a,b)=>a+b.toUpperCase()).split(' ');return w.slice(0,/^(Da|De|Do|Das|Dos|E)$/.test(w[1]||'')?3:2).join(' ')};
  const nome1=n=>String(n||'').toLowerCase().replace(/(^|\s)(\S)/g,(m,a,b)=>a+b.toUpperCase());
  const dbr=iso=>iso?iso.slice(8,10)+'/'+iso.slice(5,7)+'/'+iso.slice(0,4):'';
  async function sha(t){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('').slice(0,20)}
@@ -8963,8 +9006,8 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
  async function carregar(){if(CARR)return;CARR=true;try{const r=await fetch(new URL('cnpjs_fechados.json?t='+Date.now(),location.href).href,{cache:'no-store'});if(!r.ok)throw 0;DADOS=await r.json();LIST=await monta();ERR=''}catch(e){DADOS=null;ERR='sem-lista';try{const r=await fetch(new URL('lojas_novas_status.json?t='+Date.now(),location.href).href,{cache:'no-store'});if(r.ok)ST=await r.json()}catch(_){}}CARR=false;if(VIEW==='cfe')draw()}
  const brl=v=>'R$ '+(+v||0).toLocaleString('pt-BR',{maximumFractionDigits:0});
  function draw(){const o=document.getElementById('v2out');if(!o)return;
-  let h='<div class="vmh"><h2>🚫 CNPJs fechados na Receita Federal</h2><p>Clientes nossos cujo CNPJ aparece como baixado, inapto ou suspenso. É só uma lista de conferência: nada é inativado nem trocado de representante sozinho. Só você vê esta tela.</p></div>';
-  if(!LIST){h+='<div class="act">'+(ERR?'A conferência ainda não chegou. Ela é feita sozinha no GitHub, duas vezes por mês.'+(ST&&ST.erro?'<br><small>Último aviso: '+E(ST.erro)+'</small>':''):'Conferindo…')+'</div>';o.innerHTML=h;if(!ERR)carregar();return}
+  let h='<div style="display:flex;gap:6px;margin:0 0 10px"><button type="button" class="btn" data-cn="lnv">🆕 CNPJs novos</button><button type="button" class="btn pri" data-cn="cfe">🚫 CNPJs fechados</button></div>'+'<div class="vmh"><h2>🚫 CNPJs fechados na Receita Federal</h2><p>Clientes nossos cujo CNPJ aparece como baixado, inapto ou suspenso. É só uma lista de conferência: nada é inativado nem trocado de representante sozinho. Só você vê esta tela.</p></div>';
+  if(!LIST){h+='<div class="act">'+(ERR?'A conferência ainda não chegou. Ela é feita sozinha no GitHub, duas vezes por mês.'+(ST&&ST.erro?'<br><small>Último aviso: '+E(ST.erro)+'</small>':''):'Conferindo…')+'</div>';o.innerHTML=h;tgW(o);if(!ERR)carregar();return}
   const reps=[...new Set(LIST.map(x=>x.rep))].sort();const q=String(F.q||'').toUpperCase();
   const V=LIST.filter(x=>(!F.sit||x.sit===F.sit)&&(!F.rep||x.rep===F.rep)&&(!F.dep||x.dep)&&(!q||(x.nome+' '+x.cid).toUpperCase().includes(q)));
   const nDep=LIST.filter(x=>x.dep).length;
@@ -8973,17 +9016,17 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
    +'<select class="cf_dep" style="'+S+'"><option value="">Compras: todas</option><option value="1"'+(F.dep?' selected':'')+'>⚠️ Só os que compraram depois da baixa</option></select><input class="cf_q" placeholder="🔎 Nome ou cidade" value="'+E(F.q)+'" style="'+S+';min-width:0"><button type="button" class="btn" id="cf_xl">📊 Excel</button></div>';
   h+='<div style="font-size:12px;color:#64748b;margin:4px 0 8px" title="Conferência feita em '+E(DADOS.gerado)+' com os dados da Receita de '+E(DADOS.mes_base)+'">'+V.length+' de '+LIST.length+' clientes · '+nDep+' compraram depois da baixa · conferido em '+dbr(DADOS.gerado)+'</div>';
   h+=V.slice(0,80).map(x=>{const c=COR[x.sit]||['#e5e7eb','#374151'];return '<div style="background:#fff;border:1px solid #d9dfe9;border-radius:12px;padding:10px 12px;margin:0 0 9px"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><b>'+E(nome1(x.nome))+'</b><span style="font-size:11.5px;border-radius:8px;padding:2px 7px;white-space:nowrap;background:'+c[0]+';color:'+c[1]+'" title="Situação do CNPJ na Receita Federal">'+(SIT[x.sit]||'Situação '+x.sit)+(x.iso?' em '+dbr(x.iso):'')+'</span></div>'
-   +'<div style="font-size:12.5px;color:#475569;margin-top:3px">cód. '+x.cod+' · '+E(x.cid)+(x.rep?' · rep. '+E(nome1(x.rep).split(' ').slice(0,2).join(' ')):'')+'</div>'
+   +'<div style="font-size:12.5px;color:#475569;margin-top:3px">cód. '+x.cod+' · '+E(x.cid)+(x.rep?' · rep. '+E(curto(x.rep)):'')+'</div>'
    +'<div style="margin-top:6px;padding-top:6px;border-top:1px solid #eef1f6;font-size:12.5px">Última compra: <b>'+(x.ultIso?dbr(x.ultIso):'—')+'</b> · 12 meses: <b>'+brl(x.v12)+'</b> · total: <b>'+brl(x.tot)+'</b></div>'
    +(x.dep?'<div style="margin-top:6px;padding:6px 8px;border-radius:9px;background:#fef3c7;color:#92400e;font-size:12.5px">⚠️ Comprou <b>depois</b> da baixa: confira se o CNPJ do cadastro é o certo (pode ter mudado de CNPJ).</div>':'')+'</div>'}).join('');
   if(V.length>80)h+='<div style="font-size:12px;color:#64748b">… e mais '+(V.length-80)+'. Use os filtros ou o Excel.</div>';
-  o.innerHTML=h;
+  o.innerHTML=h;tgW(o);
   const on=(c,k)=>{const e=o.querySelector(c);if(e)e.onchange=()=>{F[k]=e.value;draw()}};on('.cf_sit','sit');on('.cf_rep','rep');on('.cf_dep','dep');
   const qi=o.querySelector('.cf_q');qi.oninput=()=>{F.q=qi.value;const p=qi.selectionStart;draw();const n=document.querySelector('.cf_q');n.focus();try{n.setSelectionRange(p,p)}catch(_){}};
   o.querySelector('#cf_xl').onclick=()=>{try{save(xlsx([{t:'CNPJs fechados',h:['Cód.','Cliente','Cidade/UF','Representante','Situação na Receita','Data da situação','Última compra','Vendas 12 meses','Total comprado','Comprou depois da baixa?'],ty:['n','t','t','t','t','t','t','n','n','t'],rows:V.map(x=>[x.cod,x.nome,x.cid,x.rep,SIT[x.sit]||x.sit,dbr(x.iso),dbr(x.ultIso),x.v12,x.tot,x.dep?'Sim':''])}]),'CNPJs_fechados.xlsx')}catch(e){console.error(e)}}}
- try{const nav=document.getElementById('nav');if(nav){const b=document.createElement('button');b.dataset.v='cfe';b.className='gest';b.title='Aba exclusiva do gestor';b.textContent='🚫 CNPJs fechados';nav.appendChild(b)}}catch(e){}
+ 
  const rd=render;render=function(){if(VIEW==='cfe')return;return rd.apply(this,arguments)};
- const sv0=setView;setView=function(v){if(v==='cfe'){sv0(v);try{draw();if(!LIST&&!ERR)carregar()}catch(e){console.error(e)}return}return sv0(v)};
+ const sv0=setView;setView=function(v){if(v==='cfe'){sv0(v);try{document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.v==='lnv'));draw();if(!LIST&&!ERR)carregar()}catch(e){console.error(e)}return}return sv0(v)};
 }catch(e){console.error('lcBU',e)}})();
 
 
