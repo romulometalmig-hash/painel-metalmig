@@ -687,8 +687,9 @@ function renderMapa(){
 function apEnv(ri,mes){
  const rp=D.reps[ri],cod=rp[0],keep=[];const mvT=new Set();try{const m_=rtAll();D.cli.forEach((c,o)=>{const x=m_[c[0]];if(x&&c[8]===ri&&rtIdx(x.t,x.tn)===ri)mvT.add(o)})}catch(e){}for(let i=0;i<N;i++)if(L.R[i]===ri||mvT.has(L.C[i]))keep.push(i);
  const cm=new Map(),cl=[],om=new Map(),ord=[];
- const addC=o=>{if(!cm.has(o)){cm.set(o,cl.length);const c=D.cli[o].slice();c[8]=(c[8]===ri?1:0);cl.push(c)}return cm.get(o)};
- D.cli.forEach((c,o)=>{if(c[8]===ri)addC(o)});
+ const arqX=c=>!!(window.lcArq&&window.lcArq.has(c[0]));
+ const addC=o=>{if(!cm.has(o)){cm.set(o,cl.length);const c=D.cli[o].slice();c[8]=(c[8]===ri&&!arqX(c)?1:0);cl.push(c)}return cm.get(o)};
+ D.cli.forEach((c,o)=>{if(c[8]===ri&&!arqX(c))addC(o)});
  const L2={D:[],R:[],C:[],P:[],Q:[],V:[],O:[]};
  keep.forEach(i=>{L2.D.push(L.D[i]);L2.R.push(1);L2.C.push(addC(L.C[i]));L2.P.push(L.P[i]);L2.Q.push(L.Q[i]);L2.V.push(L.V[i]);const o=L.O[i];if(!om.has(o)){om.set(o,ord.length);ord.push(D.ord[o])}L2.O.push(om.get(o))});
  let ob=null;if(D.obj){const T=Object.assign({},D.obj.t,{obj:0,v:0,f:0,fd:0}),r={};const o=D.obj.r&&D.obj.r[cod];if(o)r[cod]=[0,o[1],o[2],o[3],o[4]];ob={t:T,r}}
@@ -1962,7 +1963,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v243';
+const NX_VER = 'v244';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3649,6 +3650,15 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v244',d:'24/11/2026',t:'Cabeçalho recolhível e nuvem no topo',l:[
+   ['a','Setinha "▲ recolher cabeçalho" em todas as telas: esconde o topo e os filtros para sobrar espaço para a lista. Toque de novo para mostrar.'],
+   ['a','O selo da nuvem foi para o cabeçalho e não cobre mais os botões do menu.'],
+   ['a','Aviso "Enviando seus dados… não feche esta tela" enquanto algo sobe para a nuvem, e "Tudo enviado, pode fechar" quando termina.'],
+   ['a','Pedidos: quando a Metalmig recebe pelo envio automático, o cartão mostra "✔ Metalmig recebeu" em vez de "Não enviado".'],
+   ['g','Cartão do cliente unificado também em Hoje (retornos) e no painel do Repasse: Representantes, Observações, contato registrado e Ações.'],
+   ['g','Arquivo morto: o cliente fica inativo, some das páginas dos representantes e volta sozinho às listas se fizer novo pedido.'],
+   ['g','Registros dos representantes: tela mais limpa (contatos, observações, pedidos e revisões em português) e cada representante começa como "visto".'],
+  ]},
   {v:'v243',d:'24/11/2026',t:'Cartão unificado',l:[
    ['g','Novo cartão do cliente na Ficha, Recomprar e Reativar: Representantes (atual e já atenderam), Observações com histórico, faixa verde "Contato registrado" e bloco AÇÕES com botões redondos (Ligar, Catálogo, Registrar contato, Passar, Inativo, Arquivo morto, Ficha, Pular).'],
   ]},
@@ -4108,7 +4118,7 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  // ---- aba Novidades e versões
  try{const nb=document.createElement('button');nb.dataset.v='nov';nb.textContent='Novidades e versões';const nav=document.getElementById('nav');if(nav)nav.appendChild(nb)}catch(e){}
  const rd0=render;render=function(){if(VIEW==='nov')return;return rd0.apply(this,arguments)};
- function renderNov(){ctl('');$('#v2out').innerHTML=`<div class="vmh"><h2>✨ Novidades e versões</h2><p>O que mudou em cada versão do painel. A versão que você está usando agora é a <b>${E(NX_VER)}</b>.</p></div>`+NOVS.map((n,i)=>`<div style="background:#fff;border:1px solid #d9dfe9;border-left:5px solid ${i===0?'#2E7D32':'#9aa5b5'};border-radius:10px;padding:12px 14px;margin-bottom:10px"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><b style="font-size:17px">${i===0?'🆕 ':''}${E(n.v)} — ${E(n.t)}</b><span class="mute">${E(n.d)}</span></div><ul style="margin:8px 0 0;padding-left:20px;line-height:1.5;font-size:14.5px">${n.l.filter(x=>x[0]==='a'||G).map(x=>`<li>${E(x[1])}</li>`).join('')}</ul></div>`).join('')}
+ function renderNov(){ctl('');$('#v2out').innerHTML=`<div class="vmh"><h2>✨ Novidades e versões</h2><p>O que mudou em cada versão do painel. A versão que você está usando agora é a <b>${E(NX_VER)}</b>.</p></div>`+NOVS.filter(n=>n.l.some(x=>x[0]==='a'||G)).map((n,i)=>`<div style="background:#fff;border:1px solid #d9dfe9;border-left:5px solid ${i===0?'#2E7D32':'#9aa5b5'};border-radius:10px;padding:12px 14px;margin-bottom:10px"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><b style="font-size:17px">${i===0?'🆕 ':''}${E(n.v)} — ${E(n.t)}</b><span class="mute">${E(n.d)}</span></div><ul style="margin:8px 0 0;padding-left:20px;line-height:1.5;font-size:14.5px">${n.l.filter(x=>x[0]==='a'||G).map(x=>`<li>${E(x[1])}</li>`).join('')}</ul></div>`).join('')}
  const sv1=setView;setView=function(v){if(v==='nov'){sv1('nov');try{renderNov()}catch(e){console.error(e)}return}return sv1(v)};
  // ---- pizza
  const PM_K=nxK('pie');let PM=nxLS(PM_K,{all:'g',m:{}});
@@ -6052,9 +6062,9 @@ body.lcqk #vsheet{visibility:hidden}
  // marca a hora de cada alteração local
  SP.setItem=function(k,v){const mexe=this===L0&&!applying&&ok(k),ant=mexe?gs(k):null;const r=rawSet.apply(this,arguments);if(mexe&&ant!==String(v)){TS[k]=Date.now();svTs();agenda()}return r};   // v196: gravar o mesmo valor de novo não conta como alteração (era isso que deixava um aparelho parado ganhar do outro)
  SP.removeItem=function(k){const mexe=this===L0&&!applying&&ok(k),ant=mexe?gs(k):null;const r=rawRem.apply(this,arguments);if(mexe&&ant!=null){TS[k]=Date.now();svTs();agenda()}return r};
- function status(t,c){try{rawSet.call(L0,STK,JSON.stringify({t:Date.now(),m:t,c:c||''}))}catch(e){}const b=document.getElementById('lct_sy');if(b){const s=b.querySelector('small');if(s)s.textContent=t}}
+ function status(t,c){if(c==='ok')window.__lcPend=0;try{rawSet.call(L0,STK,JSON.stringify({t:Date.now(),m:t,c:c||''}))}catch(e){}const b=document.getElementById('lct_sy');if(b){const s=b.querySelector('small');if(s)s.textContent=t}}
  const hh=t=>new Date(t).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
- function agenda(){if(!url())return;clearTimeout(timer);timer=setTimeout(()=>sync(false),4000)}
+ function agenda(){if(!url())return;window.__lcPend=Date.now();clearTimeout(timer);timer=setTimeout(()=>sync(false),4000)}
 
  // v196: juntar item por item (3 vias): o que mudou aqui + o que mudou no outro aparelho + a última cópia em comum
  const BK='metalmig_bkp_base';
@@ -7051,11 +7061,13 @@ body.rt-fs{overflow:hidden!important}body.rt-fs:not(.rt-nv) #lcnav{display:none!
   const nomes=cis.map(ci=>tc(D.cli[ci][1]));
   m.innerHTML=`<div class="rt-sh" style="width:min(520px,100%)"><div style="display:flex;justify-content:space-between;align-items:center"><div><b style="font-size:17px">🗄 Mandar para o arquivo morto</b><div class="rt-m">${E(nomes.slice(0,3).join(' · '))}${cis.length>3?' …':''}</div></div><button class="rt-bt s" id="aq_x">Cancelar</button></div>
   <div class="rt-b" style="margin-top:10px"><h3>Motivo</h3><select id="aq_m" style="width:100%;padding:9px;border:1px solid #b9c7e2;border-radius:9px;font-size:14px">${AQM.map(x=>`<option${x===mot0?' selected':''}>${x}</option>`).join('')}</select><input id="aq_o" type="text" placeholder="Observação (opcional)" style="width:100%;margin-top:8px;padding:9px;border:1px solid #b9c7e2;border-radius:9px;font-size:14px;box-sizing:border-box"></div>
-  <div class="rt-b"><div class="rt-m">Nada é apagado: histórico de compras e atendimentos continuam guardados. O cliente sai do Repasse e das listas de trabalho, e você pode restaurar quando quiser na aba <b>Arquivo morto</b>. Isso não muda o representante dele.</div></div>
+  <div class="rt-b"><div class="rt-m">Nada é apagado: histórico de compras e atendimentos continuam guardados. O cliente sai do Repasse e das listas de trabalho, e você pode restaurar quando quiser na aba <b>Arquivo morto</b>. Ele também fica <b>inativo</b> e some das páginas dos representantes. Se voltar a comprar, volta sozinho para as listas. Isso não muda o representante dele.</div></div>
   <div class="rt-f"><button class="rt-bt" id="aq_c" style="flex:1">Cancelar</button><button class="rt-bt p" id="aq_ok" style="flex:2">Confirmar arquivo morto</button></div></div>`;
   const f=()=>m.remove();m.querySelector('#aq_x').onclick=f;m.querySelector('#aq_c').onclick=f;m.onclick=e=>{if(e.target===m)f()};
-  m.querySelector('#aq_ok').onclick=()=>{const mot=m.querySelector('#aq_m').value,obs=m.querySelector('#aq_o').value.trim();cis.forEach(ci=>{AQ[String(D.cli[ci][0])]={d:hoje(),mot,obs}});aqSv();f();ST.sel.clear&&cis.forEach(ci=>ST.sel.delete(ci));sv();draw();try{if(typeof VIEW!=='undefined'&&(VIEW==='reat'||VIEW==='rec'))setView(VIEW)}catch(e){}try{bigMsg('🗄 '+cis.length+' cliente(s) no arquivo morto','#455A64')}catch(e){}}}
+  m.querySelector('#aq_ok').onclick=()=>{const mot=m.querySelector('#aq_m').value,obs=m.querySelector('#aq_o').value.trim();cis.forEach(ci=>{const code=String(D.cli[ci][0]);AQ[code]={d:hoje(),mot,obs};const a=R.t[code]||[],cur=a.length?a[a.length-1]:null;if(!(cur&&cur.st==='ina'))nova(ci,'ina',0,0,0,null)});aqSv();f();ST.sel.clear&&cis.forEach(ci=>ST.sel.delete(ci));sv();draw();try{if(typeof VIEW!=='undefined'&&(VIEW==='reat'||VIEW==='rec'))setView(VIEW)}catch(e){}try{bigMsg('🗄 '+cis.length+' cliente(s) no arquivo morto','#455A64')}catch(e){}}}
  window.lcArquivar=cis=>arquivar(cis);
+ function arqVolta(){try{let mud=false;Object.keys(AQ).forEach(code=>{const ci=CI.get(code);if(ci==null)return;const o=ordens(ci);if(!o.length)return;const u=o[o.length-1].d,d=AQ[code]&&AQ[code].d;if(!d||!(u>dn(d)))return;delete AQ[code];mud=true;const a=R.t[code]||[],cur=a.length?a[a.length-1]:null;if(cur&&cur.st==='ina'){a.pop();if(!a.length)delete R.t[code]}});if(mud){aqSv();sv();try{window.lcBigToast&&lcBigToast('🗄 Cliente do arquivo morto voltou a comprar: voltou para as listas','#2E7D32')}catch(e){}}}catch(e){console.error('arqVolta',e)}}
+ if(!D.rm){setTimeout(arqVolta,2500);setInterval(arqVolta,60000)}
  document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('.ar_rs');if(!b)return;const code=b.dataset.code;if(!confirm('Restaurar este cliente? Ele volta para as listas de trabalho e para o Repasse.'))return;delete AQ[code];aqSv();draw()});
  document.addEventListener('change',e=>{const t=e.target;if(t.classList&&t.classList.contains('ar_mt')){AF.mot=t.value;draw()}});
  document.addEventListener('input',e=>{const t=e.target;if(t.classList&&t.classList.contains('ar_q')){AF.q=t.value;const p=t.selectionStart;draw();const n=document.querySelector('.ar_q');if(n){n.focus();try{n.setSelectionRange(p,p)}catch(x){}}}});
@@ -10089,7 +10101,10 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
  const riDe=c=>D.reps.findIndex(r=>+r[0]===+c),tc=c=>{const i=riDe(c);return i<0?String(c):String(D.reps[i][1]).replace(/\s*-?\s*INATIVO/i,'').split(' ').slice(0,2).join(' ')};
  const hh=t=>t?new Date(t).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
  let busy=false;
- const OKK=/(_ctt_|_visitas_|_rt_v1|_cliinfo_|_novos_|_mpr|_pedidos_.*_pedidos$|_rev_v1|_semwa_|_arqmorto_|_notas_|_lembretes_|_orc_|_oco_)/;
+ const OKK0=/(_ctt_|_visitas_|_rt_v1|_cliinfo_|_novos_|_pedidos_.*_pedidos$|_rev_v1|_semwa_|_arqmorto_|_notas_|_lembretes_|_orc_|_oco_)/;const OKK={test:k=>OKK0.test(k)&&!/prosp|_pr_v|_mpr/.test(k)};
+ const LAB=k=>/_visitas_|_ctt_/.test(k)?'📞 Contato':/_cliinfo_/.test(k)?'📝 Observação':/_pedidos_/.test(k)?'🛒 Pedido':/_rev_v1/.test(k)?'🔎 Revisão de cliente':/_arqmorto_/.test(k)?'🗄 Arquivo morto':/_semwa_/.test(k)?'🚫 Sem WhatsApp':/_rt_v1/.test(k)?'🔁 Repasse':/_notas_|_lembretes_/.test(k)?'🔔 Lembrete':nome(k);
+ const RESP={nao:'Não atendeu',conv:'Conversou',int:'Interessado',ret:'Pediu retorno',cat:'Catálogo enviado',ped:'Fez pedido',sem:'Sem interesse',pedido:'Pedido feito',pensar:'Vai pensar',semint:'Sem interesse',novo:'Cliente novo',ausente:'Não estava',rel:'Visita de relacionamento',lig:'Ligação',ativo:'Continua ativo',fechou:'Fechou o negócio',voltar:'Voltar a contatar',outra:'Outro / outra loja'};
+ const dt=t=>String(t).replace(/(\d{4})-(\d\d)-(\d\d)(?:T(\d\d):(\d\d))?/g,(m,a,b,c,h,mi)=>c+'/'+b+'/'+a+(h?' '+h+':'+mi:''));
  const hs=str=>{let h=5381;for(let i=0;i<str.length;i++)h=((h<<5)+h+str.charCodeAt(i))|0;return h};
  const SN='metalmig_rr_snap_v1',IT='metalmig_rr_itens_v1',ldx=k=>{try{return JSON.parse(gs(k)||'{}')||{}}catch(e){return{}}};
  const CI=(()=>{let m=null;return c=>{if(!m){m=new Map();D.cli.forEach(x=>m.set(String(x[0]),x[1]))}return m.get(String(c))}})();
@@ -10101,12 +10116,12 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
  const SKIP=/^(id|ts|h|hist|fotos?|foto)$/;
  function linha(it){const o=it.o,nome=o.cliNome||o.nome||CI(it.cli)||'';const partes=[];
   Object.keys(o).forEach(k=>{if(SKIP.test(k))return;const x=o[k];if(x==null||x===''||typeof x==='object')return;if(['cli','cliNome','nome','cid','rep','repNome','src'].indexOf(k)>=0)return;let t=String(x);if(/^\d{13}$/.test(t))t=new Date(+t).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});partes.push((k.length<=2||/^(obs|res|data|hora|valor|texto|nota)$/.test(k)?'':k+': ')+(t.length>140?t.slice(0,140)+'…':t))});
-  return {nome,cli:it.cli,txt:partes.slice(0,6).join(' · ')}}
+  return {nome,cli:it.cli,txt:dt(partes.slice(0,6).map(t=>RESP[t]||t).join(' · '))}}
  async function puxa(cod,u){const k=(window.LC_RK||{})[String(cod)];if(!k)return null;const t0=Date.now();
   const j=await post(u,{k,rep:String(cod),t:'rsync',last:t0,dados:{ls:{},ts:{}}});if(!j||!j.ok)return null;
   const M=j.dados||{ls:{},ts:{}},S=ld(),x=S[cod]=S[cod]||{vis:{},busca:0},SNP=ldx(SN),ITM=ldx(IT);x.busca=Date.now();x.fim=t0;
-  const snap=SNP[cod]=SNP[cod]||{},novos=[];
-  Object.keys(M.ls||{}).forEach(key=>{if(!OKK.test(key))return;const sn=snap[key]||{};achata(key,M.ls[key]).forEach(it=>{if(sn[it.id]!==it.h)novos.push({key,id:it.id,h:it.h,l:linha(it)})})});
+  const snap=SNP[cod]=SNP[cod]||{},novos=[];const prim=!x.base;
+  Object.keys(M.ls||{}).forEach(key=>{if(!OKK.test(key))return;const sn=snap[key]||{};achata(key,M.ls[key]).forEach(it=>{if(sn[it.id]!==it.h){if(prim){(snap[key]=snap[key]||{})[it.id]=it.h}else novos.push({key,id:it.id,h:it.h,l:linha(it)})}})});x.base=1;
   ITM[cod]=novos.slice(0,80);x.nNovos=novos.length;
   x.ultimo=Math.max(0,...Object.values(M.ts||{}).map(v=>+v||0));x.cur={};Object.keys(M.ls||{}).forEach(key=>{if(OKK.test(key)){x.cur[key]=1}});
   sv(S);ss(SN,JSON.stringify(SNP));ss(IT,JSON.stringify(ITM));window.__rrRaw=window.__rrRaw||{};window.__rrRaw[cod]=M.ls;return x}
@@ -10122,7 +10137,7 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
     const lista=c.pgreps.map(cod=>({cod,x:S[cod]||{}})).sort((a,b)=>(b.x.ultimo||0)-(a.x.ultimo||0));
     const ITM=ldx(IT);
     box.innerHTML=lista.map(({cod,x})=>{const it=ITM[cod]||[],n=x.nNovos||0;
-     return `<div class="rt-b"><b>${E(tc(cod))}</b> <span class="rt-m">· última atividade: ${hh(x.ultimo)}</span><div style="margin-top:4px;font-size:13px">${n?'<b>'+n+' novidade(s)</b>':'<span class="rt-m">'+(x.busca?'Sem novidades.':'Ainda não sincronizou com a nuvem.')+'</span>'}</div>${it.slice(0,30).map(i=>`<div class="rt-m" style="padding:4px 0;border-top:1px solid #eef1f6"><b>${E(i.l.nome||'')}</b>${i.l.cli?' <span style="opacity:.7">cód '+E(i.l.cli)+'</span>':''} · <i>${E(nome(i.key))}</i><div>${E(i.l.txt)}</div></div>`).join('')}${n>30?'<div class="rt-m">… e mais '+(n-30)+' (marque como visto para zerar)</div>':''}${n?`<button class="rt-bt s rr_v" data-c="${E(cod)}" style="margin-top:6px">Marcar como visto</button>`:''}</div>`}).join('');
+     return `<div class="rt-b"><b>${E(tc(cod))}</b> <span class="rt-m">· última atividade: ${hh(x.ultimo)}</span><div style="margin-top:4px;font-size:13px">${n?'<b>'+n+' novidade(s)</b>':'<span class="rt-m">'+(x.busca?'Sem novidades.':'Ainda não sincronizou com a nuvem.')+'</span>'}</div>${it.slice(0,30).map(i=>`<div class="rt-m" style="padding:4px 0;border-top:1px solid #eef1f6"><b>${E(i.l.nome||'')}</b> · <i>${E(LAB(i.key))}</i><div>${E(i.l.txt)}</div></div>`).join('')}${n>30?'<div class="rt-m">… e mais '+(n-30)+' (marque como visto para zerar)</div>':''}${n?`<button class="rt-bt s rr_v" data-c="${E(cod)}" style="margin-top:6px">Marcar como visto</button>`:''}</div>`}).join('');
     box.querySelectorAll('.rr_v').forEach(b=>b.onclick=async()=>{b.textContent='Marcando…';const cod=b.dataset.c;if(!(window.__rrRaw||{})[cod]){const c2=await cfg();try{await puxa(cod,c2.u)}catch(e){}}marca(cod);pinta()})};
    pinta();ciclo(true).then(pinta)}
   window.lcRegRep=tela;
@@ -10153,7 +10168,7 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
  function blocks(ci){const code=cod(ci),c=D.cli[ci];const j=ja(ci),ar=window.lcArq&&lcArq.has(code);
   const rg=reg7(code),ob=window.lcCliInfo?lcCliInfo.list(code):[];
   let h='';
-  if(rg){const hoje=rg.data===new Date().toISOString().slice(0,10);h+='<div class="cq-b cq-ok" data-k="hist">✔ Contato registrado '+(hoje?'hoje':String(rg.data).slice(8,10)+'/'+String(rg.data).slice(5,7))+(rg.hora?', '+E(rg.hora):'')+' · Resultado: <b>'+E(RES[rg.res]||rg.res||'—')+'</b>'+(rg.obs&&rg.obs!=='Lembrete de retorno'?' · Obs.: '+E(rg.obs):'')+'</div>'}
+  if(rg){const hoje=rg.data===new Date().toISOString().slice(0,10);h+='<div class="cq-b cq-ok" data-k="hist">✔ Contato registrado '+(hoje?'hoje':String(rg.data).slice(8,10)+'/'+String(rg.data).slice(5,7))+(rg.hora?', '+E(rg.hora):'')+' · Resultado: <b>'+E(RES[rg.res]||rg.res||'—')+'</b>'+(rg.obs&&rg.obs!=='Lembrete de retorno'?' · Obs.: '+E(rg.obs):'')+' <span style="color:#1F4E78;font-weight:700">· toque para ver o histórico</span></div>'}
   h+='<div class="cq-b"><div class="tt">Representantes</div>Atual: <b>'+E(repN(c[8]))+'</b>'+(j.length?'<br>Já atenderam: '+j.map(n=>'<span class="cq-ch">'+E(n)+'</span>').join(''):'')+(ar?'<br><span class="cq-ch" style="background:#fdecea">🗄 Arquivo morto</span>':'')+'</div>';
   h+='<div class="cq-b"><div class="tt">📝 Observações'+(ob.length>1?'<span class="cq-tg" data-k="tg">'+(window['__cqo'+code]?'▴':'▾')+' '+ob.length+'</span>':'')+'</div><div class="cq-ob"><input placeholder="Escrever observação…" maxlength="500"><button data-k="add">Salvar</button></div><div class="cq-h">'
    +ob.slice(0,window['__cqo'+code]?99:1).map(o=>'<div><small>'+fd(o.d)+'</small> '+E(o.t)+'</div>').join('')+'</div></div>';
@@ -10161,12 +10176,12 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
  const BT=[['tel','📞','Ligar'],['cat','📖','Catálogo'],['reg','📝','Registrar contato'],['pas','🔁','Passar p/ outro rep.'],['ina','⛔','Deixar inativo'],['arq','🗄','Arquivo morto'],['fi','👤','Ficha'],['pu','⏭','Pular']];
  function acoes(ci,ficha,fire){const c=D.cli[ci];const d=String(c[3]||'').replace(/\D/g,'').replace(/^0+/,'');const ok=d.length>=10;
   return '<div class="cq-ac"><div class="tt">Ações</div><div class="cq-tel">'+(ok?'📞 '+E(d.length===11?'('+d.slice(0,2)+') '+d.slice(2,7)+'-'+d.slice(7):d.length===10?'('+d.slice(0,2)+') '+d.slice(2,6)+'-'+d.slice(6):c[3])+'<button data-k="cp">📋 Copiar</button>':'<span style="color:#667">sem telefone</span>')+'</div><div class="cq-r">'
-   +BT.filter(b=>!(ficha&&(b[0]==='fi'||b[0]==='pu'))).map(b=>'<button data-k="'+b[0]+'"'+((b[0]==='tel'&&!ok)?' disabled':'')+'><i>'+b[1]+'</i>'+b[2]+'</button>').join('')+'</div></div>'}
+   +BT.filter(b=>!(ficha&&(b[0]==='fi'||b[0]==='pu'))).map(b=>'<button data-k="'+b[0]+'"'+((b[0]==='tel'&&!ok)?' disabled':'')+'><i>'+b[1]+'</i>'+(b[0]==='reg'&&reg7(String(c[0]))?'Registrar outro contato':b[2])+'</button>').join('')+'</div></div>'}
  function wire(box,ci,fire){box.onclick=e=>{const t=e.target.closest('[data-k]');if(!t)return;const k=t.dataset.k,code=cod(ci);e.preventDefault();e.stopPropagation();
    if(k==='add'){const i=box.querySelector('.cq-ob input');if(window.lcCliInfo&&lcCliInfo.add(code,i.value)){i.value='';box.dataset.sig='';refresh()}return}
    if(k==='tg'){window['__cqo'+code]=!window['__cqo'+code];box.dataset.sig='';refresh();return}
    if(k==='cp'){const d=String(D.cli[ci][3]||'').replace(/\D/g,'');try{navigator.clipboard.writeText(d);t.textContent='✔ Copiado';setTimeout(()=>{t.textContent='📋 Copiar'},1500)}catch(x){}return}
-   if(k==='hist'){if(window.lcCliHist)lcCliHist(ci);return}
+   if(k==='hist'){if(window.lcCliHist)lcCliHist(ci);else if(typeof fichaShow==='function'){try{window.__nxF=1;if(typeof VIEW!=='undefined'&&VIEW!=='ficha')setView('ficha');fichaShow(ci)}catch(x){}}return}
    fire(k,ci)}}
  let busy=0;
  function refresh(){if(busy)return;busy=1;try{
@@ -10178,6 +10193,18 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
    if(!box){box=document.createElement('div');box.className='cq';box.onclick=null;el.appendChild(box);if(old)old.classList.add('cq-x')}
    box.dataset.sig=sig;box.innerHTML=blocks(ci)+acoes(ci,true);
    wire(box,ci,(k,ci)=>{const o=el.querySelector('.fcb [data-k="'+(k==='tel'?'tel':k)+'"]');if(o)o.click()})});
+  // Hoje (retornos agendados)
+  if(V==='hoje')document.querySelectorAll('.lcvh > div.lcbx-c').forEach(card=>{const ff=card.querySelector('.lc_ff');if(!ff)return;const ci=D.cli.findIndex(c=>String(c[0])===String(ff.dataset.c));if(ci<0)return;
+   const sig=cod(ci)+'|'+(window.lcCliInfo?lcCliInfo.list(cod(ci)).length:0)+'|'+(reg7(cod(ci))||{}).hora+'|'+(window.lcArq&&lcArq.has(cod(ci)))+'|'+D.cli[ci][8]+'|'+(window['__cqo'+cod(ci)]?1:0);
+   let box=card.querySelector('.cq');if(box&&box.dataset.sig===sig)return;
+   if(!box){box=document.createElement('div');box.className='cq';card.querySelectorAll('.lcbx-i,.lcbx-b').forEach(x=>x.classList.add('cq-x'));card.appendChild(box)}
+   box.dataset.sig=sig;box.innerHTML=blocks(ci)+acoes(ci,false).replace('<div class="cq-r">','<div class="cq-r">'+'<button data-k="fe"><i>✔</i>Feito</button><button data-k="nr"><i>🔁</i>Novo retorno</button>').replace('repeat(8','repeat(10');
+   wire(box,ci,(k,ci)=>{const q=s=>{const x=card.querySelector(s);if(x)x.click()};
+    if(k==='fe')q('.lcbx-b [data-k=fe]');else if(k==='nr')q('.lcbx-b [data-k=nr]');else if(k==='tel')q('.lcbx-b [data-k=lig]');else if(k==='cat')q('.lcbx-b [data-k=ct]');else if(k==='fi')q('.lcbx-b [data-k=fi]');
+    else if(k==='reg'&&window.__agForm){window.__agForm(ci,window.__agHoje)}else if(k==='pas'&&window.lcRep)lcRep.passar(ci);else if(k==='ina'&&window.lcRep)lcRep.inativar(ci);else if(k==='arq'&&window.lcRep)lcRep.arquivar(ci);else if(k==='pu')q('.lcbx-b [data-k=fe]')})});
+  // Repasse (painel do cliente selecionado)
+  {const d=document.getElementById('rt_det'),sel=document.querySelector('.rt-it.sel');if(d&&sel){const ci=+sel.dataset.it;if(D.cli[ci]){const sig=cod(ci)+'|'+(window.lcCliInfo?lcCliInfo.list(cod(ci)).length:0)+'|'+(reg7(cod(ci))||{}).hora+'|'+(window.lcArq&&lcArq.has(cod(ci)))+'|'+D.cli[ci][8]+'|'+(window['__cqo'+cod(ci)]?1:0);
+   let box=d.querySelector('.cq');if(!box||box.dataset.sig!==sig){if(!box){box=document.createElement('div');box.className='cq';const f=d.querySelector('.rt-b');if(f)f.insertAdjacentElement('afterend',box);else d.prepend(box)}box.dataset.sig=sig;box.innerHTML=blocks(ci);wire(box,ci,()=>{})}}}}
   // Recomprar / Reativar
   if(V==='rec'||V==='reat')document.querySelectorAll('#v2out .lccard.lcbx-k').forEach(card=>{const a=card.querySelector('a.rcf');if(!a)return;const ci=+a.dataset.ci;if(!D.cli[ci])return;
    const sig=cod(ci)+'|'+(window.lcCliInfo?lcCliInfo.list(cod(ci)).length:0)+'|'+(reg7(cod(ci))||{}).hora+'|'+(window.lcArq&&lcArq.has(cod(ci)))+'|'+D.cli[ci][8]+'|'+(window['__cqo'+cod(ci)]?1:0);
@@ -10192,6 +10219,40 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
  window.lcCQ={refresh};
  setInterval(refresh,1000);
 }catch(e){console.error('lcCQ',e)}})();
+
+// v244 · setinha que recolhe o cabeçalho (todas as telas), selo da nuvem no topo e aviso "enviando dados"
+(function(){try{
+ if(window.__lcCR||typeof D==='undefined')return;window.__lcCR=1;
+ const L0=localStorage,gs=k=>{try{return L0.getItem(k)}catch(e){return null}},ss=(k,v)=>{try{L0.setItem(k,v)}catch(e){}};
+ const st=document.createElement('style');st.textContent='body.lcup #lctop,body.lcup #nvh,body.lcup #v2bar,body.lcup #nx3t,body.lcup #f_st,body.lcup #pedTop,body.lcup #alertbar,body.lcup [data-lcabc]{display:none!important}'
+ +'#lcupb{position:fixed;right:10px;z-index:2147480400;border:1px solid #b9c7e2;background:#fff;color:#1F4E78;border-radius:0 0 10px 10px;padding:0 12px;height:20px;font:700 12px/18px Arial;cursor:pointer;box-shadow:0 2px 4px #0003;opacity:.92}'
+  +'#lcsel.lcs-fx{position:fixed!important;bottom:auto!important;left:auto!important;right:172px!important;height:20px!important;box-sizing:border-box;display:flex;align-items:center;padding:0 9px!important;border-radius:0 0 10px 10px!important;font-size:11px!important;opacity:.95;z-index:2147480400!important}'
+ +'#lcenv{position:fixed;left:50%;transform:translateX(-50%);top:calc(6px + env(safe-area-inset-top,0px));z-index:2147480700;max-width:94vw;background:#1F4E78;color:#fff;border-radius:12px;padding:7px 14px;font:700 13px/1.25 Arial;box-shadow:0 3px 10px #0005;text-align:center}'
+ +'#lcenv.ok{background:#2E7D32}#lcenv.off{background:#b45309}';
+ document.head.appendChild(st);
+ // ---- setinha
+ const b=document.createElement('button');b.id='lcupb';b.type='button';
+ const paint=()=>{const on=document.body.classList.contains('lcup');const t=on?'▼ mostrar cabeçalho':'▲ recolher cabeçalho';if(b.textContent!==t)b.textContent=t;b.title=on?'Mostrar de novo o cabeçalho e os filtros da tela':'Esconder o cabeçalho e os filtros para ganhar espaço e ver só a lista';
+  const top=on?0:(()=>{const h=document.getElementById('lctop')||document.getElementById('pedTop');const r=h&&h.offsetHeight?h.getBoundingClientRect():null;return r?Math.max(0,Math.round(r.bottom)):0})();
+  const v=top+'px';if(b.style.top!==v)b.style.top=v};
+ b.onclick=()=>{document.body.classList.toggle('lcup');ss('metalmig_hdr_off',document.body.classList.contains('lcup')?'1':'0');paint()};
+ const ini=()=>{document.body.appendChild(b);if(gs('metalmig_hdr_off')==='1')document.body.classList.add('lcup');paint()};
+ if(document.body)ini();else addEventListener('DOMContentLoaded',ini);
+ // ---- selo da nuvem no cabeçalho
+ const abc=()=>{document.querySelectorAll('#v2out > div:not([data-lcabc])').forEach(d=>{if(/^Classe ABC:/.test((d.textContent||'').trim().slice(0,14)))d.setAttribute('data-lcabc','1')})};
+ const selo=()=>{const e=document.getElementById('lcsel');if(!e)return;if(!e.classList.contains('lcs-fx'))e.classList.add('lcs-fx');const v=b.style.top||'0px';if(e.style.top!==v)e.style.top=v};
+ // ---- aviso de envio (só nas páginas dos representantes)
+ let env=null,viuPend=false,tmr=0;
+ const aviso=(t,c)=>{if(!env){env=document.createElement('div');env.id='lcenv';document.body.appendChild(env)}if(env.textContent!==t)env.textContent=t;if(env.className!==c)env.className=c};
+ const tira=()=>{if(env){env.remove();env=null}};
+ const tick=()=>{try{paint();selo();abc();
+  if(!D.rm)return;
+  const p=+window.__lcPend||0,on=navigator.onLine!==false;
+  if(p>0){viuPend=true;clearTimeout(tmr);tmr=0;if(on)aviso('☁ Enviando seus dados… não feche esta tela','');else aviso('Sem internet. Seus dados estão salvos no aparelho e sobem quando a conexão voltar.','off')}
+  else if(viuPend){viuPend=false;aviso('✔ Tudo enviado, pode fechar','ok');tmr=setTimeout(()=>{tira();tmr=0},3000)}}catch(e){}};
+ setInterval(tick,700);
+ addEventListener('beforeunload',e=>{if(D.rm&&(+window.__lcPend||0)>0&&navigator.onLine!==false){e.preventDefault();e.returnValue=''}});
+}catch(e){console.error('lcCR',e)}})();
 
 
 </script></body></html>
