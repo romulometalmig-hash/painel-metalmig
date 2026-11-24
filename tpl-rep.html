@@ -1962,7 +1962,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v225';
+const NX_VER = 'v226';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3649,6 +3649,9 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v226',d:'24/11/2026',t:'Nomes dos representantes na conferência de aprovação',l:[
+   ['g','Recrutamento › Conferir antes de aprovar: além de "comporta N, tem N", aparecem os nomes dos representantes que já atendem a região.'],
+  ]},
   {v:'v225',d:'24/11/2026',t:'Quem já tirou pedido com o cliente, no Repasse',l:[
    ['a','Hora de recomprar e Reativar: novo botão 🚫 Sem whats no bloco Ações — marca o cliente que não tem WhatsApp (aparece a etiqueta "sem whats" no cartão e o registro no Histórico), para arrumar o cadastro depois.'],
    ['a','Hora de recomprar: nova mensagem pronta ("Ola , tudo joia? … peça ao representante para te fazer uma visita…"), copiada pelo botão Copiar mensagem.'],
@@ -8920,12 +8923,12 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
  window.addEventListener('click',e=>{const t=e.target&&e.target.closest&&e.target.closest('.prc a[href*="wa.me"],.prc a[href*="whatsapp"]');if(!t)return;const c=t.closest('.prc');const a=cand(c&&c.dataset.id);if(!a)return;e.preventDefault();e.stopImmediatePropagation();waMenu(a)},true);
 
  // ===== 3) Conferência antes de aprovar =====
- function conf(a,btn){const m=window.lcMeso;let reg='',falta=null,outros=[];try{const o=m.ofCid(m.cidDe(a));if(o){const e=m.stats()[o.k],p=m.opo(e);reg=o.m;falta=p;outros=L().filter(x=>String(x.id)!==String(a.id)&&['d','a','v'].includes(ST(x))&&(()=>{const q=m.ofCid(m.cidDe(x));return q&&q.k===o.k})())}}catch(_){}
+ function conf(a,btn){const m=window.lcMeso;let reg='',falta=null,outros=[],rnm=[];try{const o=m.ofCid(m.cidDe(a));if(o){const e=m.stats()[o.k],p=m.opo(e);reg=o.m;falta=p;rnm=e.rn?[...e.rn.entries()].sort((x,y)=>y[1]-x[1]).map(x=>String(x[0]).toLowerCase().replace(/\b\w/g,l=>l.toUpperCase())):[];outros=L().filter(x=>String(x.id)!==String(a.id)&&['d','a','v'].includes(ST(x))&&(()=>{const q=m.ofCid(m.cidDe(x));return q&&q.k===o.k})())}}catch(_){}
   const card=btn.closest('.prc'),ja=card?(card.textContent.match(/Já atendida:[^\n]*?(?=Recebido|$)/)||[''])[0].trim():'';
   const ck=(ok,t)=>'<div class="mz_ck"><span>'+(ok===true?'✅':ok===false?'⚠️':'☐')+'</span><div>'+t+'</div></div>';
   const mk=(a.marcas||[]).join(', ');
   const o=ov('<div class="mz_md"><h3>✅ Conferir antes de aprovar</h3><div style="color:#64748b;margin-bottom:6px"><b>'+E(a.nome)+'</b> · '+E(m&&m.cidDe?m.cidDe(a):a.cid||'')+'</div>'
-   +(falta?ck(falta.falta>0,'<b>Região '+E(reg)+'</b>: comporta '+falta.cab+' representantes, tem '+falta.tem+(falta.falta>0?' · faltam '+falta.falta:' · <b>já está completa</b>')):ck(null,'Região não identificada pela cidade'))
+   +(falta?ck(falta.falta>0,'<b>Região '+E(reg)+'</b>: comporta '+falta.cab+' representantes, tem '+falta.tem+(falta.falta>0?' · faltam '+falta.falta:' · <b>já está completa</b>')+(rnm.length?'<div style="margin-top:3px;color:#334155">👥 <b>Quem já atende:</b> '+rnm.map(E).join(' · ')+'</div>':'<div style="margin-top:3px;color:#b91c1c">👥 Nenhum representante nosso vendeu aqui nos últimos 12 meses.</div>')):ck(null,'Região não identificada pela cidade'))
    +ck(outros.length?false:true,outros.length?'<b>'+outros.length+' outro(s) candidato(s)</b> na mesma região: '+E(outros.slice(0,4).map(x=>x.nome.split(' ')[0]).join(', ')):'Nenhum outro candidato na mesma região')
    +ck(ja?false:true,ja?E(ja):'Nenhum cliente nosso nas cidades citadas')
    +ck(null,'Carteira informada: <b>'+E(a.cli||'—')+'</b> · tempo como rep.: <b>'+E(a.tempo||'—')+'</b>')
