@@ -1962,7 +1962,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v232';
+const NX_VER = 'v233';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3649,6 +3649,9 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v233',d:'24/11/2026',t:'Hora de recomprar: filtros reorganizados',l:[
+   ['g','Hora de recomprar: saíram os dois filtros do topo (Mostrar e Representante); o filtro de Representante agora fica depois de Cidade, junto dos outros.'],
+  ]},
   {v:'v232',d:'24/11/2026',t:'Passar para outro representante na Ficha',l:[
    ['g','Repasse › Acompanhamento: novos filtros Estado, Mesorregião (só as do estado), Cidade (uma ou mais), Está com (representante) e Buscar.'],
    ['g','Ficha e lista de clientes: "Representante atual" agora é sempre o último para quem o cliente foi repassado; em "Anteriores" ficam os representantes que já atenderam o cliente.'],
@@ -5081,7 +5084,7 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
   g('s').oninput=e=>{const q=e.target.value.toLowerCase();d.querySelectorAll('label').forEach(l=>l.style.display=!q||l.dataset.n.includes(q)?'':'none')};
   g('c').onclick=()=>{sel.clear();again()};g('a').onclick=()=>{sel.clear();d.querySelectorAll('input[type=checkbox]:checked').forEach(k=>sel.add(k.value));again()}};
 
- function renderRec(){const r=nxRep();ctl(nxRepSel('rec_rep',r));nxRepBind('rec_rep',renderRec);
+ function renderRec(){const r=nxRep();ctl('');
   const all0=recList(nx2Ids());all0.forEach(o=>o.g=rgeo(o.ci));
   const rufs=[...new Set(all0.map(o=>o.g.uf).filter(Boolean))].sort();if(RQ.uf&&!rufs.includes(RQ.uf))RQ.uf='';
   const r1=all0.filter(o=>!RQ.uf||o.g.uf===RQ.uf),rmes=[...new Set(r1.map(o=>o.g.mes).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt'));if(RQ.mes&&!rmes.includes(RQ.mes))RQ.mes='';
@@ -5096,11 +5099,11 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
    <div style="font-size:13.5px;margin:4px 0">Compra a cada <b>~${Math.round(x.cyc)} dias</b> · última há <b>${s.since} dias</b> (${dstr(x.last)}) · pedido típico <b>${R0(x.typ)}</b></div><div>${n3Btn(n3Wa(c[3],msg),'💬 WhatsApp')}</div></div>`};
   $('#v2out').innerHTML=`<div class="vmh"><h2>🔁 Hora de recomprar</h2><p>Cada cliente tem o seu ritmo: calculei o intervalo normal entre os pedidos dele (mediana dos últimos pedidos). Aqui estão os que <b>estão na hora</b>, <b>passaram um pouco do ritmo</b> ou <b>chegam nas próximas 3 semanas</b>. Quem esfriou de vez está em <b>Reativar clientes</b>. Só entram clientes com 3 pedidos ou mais. Dados até ${dstr(D.ref)}.</p></div>
   <button id="k_xl" style="display:none"></button>
-  <div class="lcgf" style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0"><label style="flex:1 1 120px;font-size:12px;color:#5b6b82">Estado<select id="rq_uf" style="width:100%;padding:7px;border:1px solid #c5d0e3;border-radius:9px;font-size:14px"><option value="">Todos</option>${rufs.map(u=>`<option${u===RQ.uf?' selected':''}>${E(u)}</option>`).join('')}</select></label><label style="flex:1 1 170px;font-size:12px;color:#5b6b82">Mesorregião<select id="rq_mes" style="width:100%;padding:7px;border:1px solid #c5d0e3;border-radius:9px;font-size:14px"><option value="">Todas</option>${rmes.map(u=>`<option${u===RQ.mes?' selected':''}>${E(u)}</option>`).join('')}</select></label>${cbHtml("rq",rcid,RQ.cs)}</div>
+  <div class="lcgf" style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0"><label style="flex:1 1 120px;font-size:12px;color:#5b6b82">Estado<select id="rq_uf" style="width:100%;padding:7px;border:1px solid #c5d0e3;border-radius:9px;font-size:14px"><option value="">Todos</option>${rufs.map(u=>`<option${u===RQ.uf?' selected':''}>${E(u)}</option>`).join('')}</select></label><label style="flex:1 1 170px;font-size:12px;color:#5b6b82">Mesorregião<select id="rq_mes" style="width:100%;padding:7px;border:1px solid #c5d0e3;border-radius:9px;font-size:14px"><option value="">Todas</option>${rmes.map(u=>`<option${u===RQ.mes?' selected':''}>${E(u)}</option>`).join('')}</select></label>${cbHtml("rq",rcid,RQ.cs)}${D.rm?'':`<label style="flex:1 1 200px;font-size:12px;color:#5b6b82">Representante<select id="rec_rep" style="width:100%;padding:7px;border:1px solid #c5d0e3;border-radius:9px;font-size:14px">${repOpts(r)}</select></label>`}</div>
   <div class="lcqk"><div><b>${H.n}</b><small>na hora · ${R0(H.v)}</small></div><div><b>${A.n}</b><small>passaram do ritmo · ${R0(A.v)}</small></div><div><b>${B.n}</b><small>nas próximas 3 semanas · ${R0(B.v)}</small></div></div>
   <div class="lcqf">${[['all','Todos ('+all.length+')'],['hora','Na hora ('+H.n+')'],['atr','Passou do ritmo ('+A.n+')'],['breve','Em breve ('+B.n+')']].map(([k,t])=>`<button class="rqk${RQ.k===k?' on':''}" data-k="${k}">${t}</button>`).join('')}</div>
   ${l.length?l.map(rowH).join('')+(tot>80?`<div class="mute">Mostrando os 80 de maior valor de ${tot}. Use o Excel para a lista completa.</div>`:''):'<div class="act">Nenhum cliente nesta situação agora.</div>'}`;
-  [['rq_uf','uf'],['rq_mes','mes']].forEach(([id,k])=>{const e=document.getElementById(id);if(e)e.onchange=()=>{RQ[k]=e.value;if(k==='uf'){RQ.mes='';RQ.cs.clear()}if(k==='mes')RQ.cs.clear();renderRec()}});cbBind('rq',RQ.cs,renderRec);
+  [['rq_uf','uf'],['rq_mes','mes']].forEach(([id,k])=>{const e=document.getElementById(id);if(e)e.onchange=()=>{RQ[k]=e.value;if(k==='uf'){RQ.mes='';RQ.cs.clear()}if(k==='mes')RQ.cs.clear();renderRec()}});cbBind('rq',RQ.cs,renderRec);nxRepBind('rec_rep',renderRec);
   document.querySelectorAll('.rqk').forEach(b=>b.onclick=()=>{RQ.k=b.dataset.k;renderRec()});
   document.querySelectorAll('.rcf').forEach(a=>a.onclick=e=>{e.preventDefault();nxFicha(+a.dataset.ci)});
   const xb=document.getElementById('k_xl');if(xb)xb.onclick=()=>{if(window.lcXls)lcXls('Hora de recomprar',all.filter(o=>RQ.k==='all'||o.s.k===RQ.k).map(o=>o.ci))}}
