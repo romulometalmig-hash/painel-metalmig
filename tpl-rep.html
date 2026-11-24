@@ -1963,7 +1963,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v244';
+const NX_VER = 'v245';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3650,6 +3650,9 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v245',d:'24/11/2026',t:'Clientes passados a representante novo',l:[
+   ['g','Corrigido: ao passar um cliente para um representante novo (tela Objetivos), ele voltava a aparecer depois de sair e entrar na tela ou recarregar o painel. Agora a passagem fica gravada e é reaplicada sozinha.'],
+  ]},
   {v:'v244',d:'24/11/2026',t:'Cabeçalho recolhível e nuvem no topo',l:[
    ['a','Setinha "▲ recolher cabeçalho" em todas as telas: esconde o topo e os filtros para sobrar espaço para a lista. Toque de novo para mostrar.'],
    ['a','O selo da nuvem foi para o cabeçalho e não cobre mais os botões do menu.'],
@@ -7693,8 +7696,10 @@ body.rt-fs{overflow:hidden!important}body.rt-fs:not(.rt-nv) #lcnav{display:none!
  const NP=D.np||[];
  const ridxOf=c=>D.reps.findIndex(r=>r[0]===c);
  // reaplica as passagens de carteira que o gestor autorizou
- function reaplica(){ld().forEach(a=>{const i=D.cli.findIndex(c=>c[0]===a.c),r=ridxOf(a.para);if(i>=0&&r>0)D.cli[i][8]=r})}
+ let _ci=null;function reaplica(re){if(!_ci){_ci=new Map();D.cli.forEach((c,i)=>_ci.set(c[0],i))}ld().forEach(a=>{const i=_ci.get(a.c),r=ridxOf(a.para);if(i==null||!(r>0))return;if(D.cli[i][8]===r)return;if(re){const rd=ridxOf(a.de);if(D.cli[i][8]!==rd)return}D.cli[i][8]=r})}
  reaplica();
+ // v245: os representantes novos entram em D.reps depois do carregamento; reaplica até a carteira ficar certa (só se o cliente ainda está com o representante de origem)
+ setInterval(()=>{try{reaplica(true)}catch(e){}},1500);
  const st=document.createElement('style');st.textContent=`
  .lcq-d{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:middle}
  .lcq-n{font-size:11px;font-weight:700;margin-left:6px;color:#556;white-space:nowrap}
