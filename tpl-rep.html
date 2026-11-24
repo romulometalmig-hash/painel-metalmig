@@ -1962,7 +1962,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v237';
+const NX_VER = 'v238';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3649,6 +3649,9 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v238',d:'24/11/2026',t:'Clientes do Ferreira na carteira',l:[
+   ['g','Corrigido: os clientes repassados para o Ferreira Garra agora aparecem na carteira dele (o código dele estava duplicado com outro candidato).'],
+  ]},
   {v:'v237',d:'24/11/2026',t:'Mesorregião na Ficha',l:[
    ['g','Ficha do cliente: filtro de Mesorregião (só as do estado escolhido) e, na ficha, a linha "Mesorregião · quem atende" com os representantes e quantos clientes cada um tem lá.'],
   ]},
