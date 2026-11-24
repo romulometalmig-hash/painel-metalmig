@@ -1962,7 +1962,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v241';
+const NX_VER = 'v242';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3649,6 +3649,9 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v242',d:'24/11/2026',t:'Registros: conteúdo',l:[
+   ['g','"📥 Registros dos representantes" agora mostra o conteúdo de cada registro novo (cliente, data, resultado, observação), por representante, com "Marcar como visto".'],
+  ]},
   {v:'v241',d:'24/11/2026',t:'Registros dos representantes',l:[
    ['g','Novo botão em Links: "📥 Registros dos representantes" — mostra, por representante, o que ele registrou na página dele (visitas, retornos, contatos, pedidos…) e quando foi a última atividade. Chega pela nuvem, alguns minutos depois.'],
    ['a','Seus registros passam a ir para a nuvem sozinhos (cópia automática), para o gestor acompanhar.'],
@@ -10083,11 +10086,28 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
  const riDe=c=>D.reps.findIndex(r=>+r[0]===+c),tc=c=>{const i=riDe(c);return i<0?String(c):String(D.reps[i][1]).replace(/\s*-?\s*INATIVO/i,'').split(' ').slice(0,2).join(' ')};
  const hh=t=>t?new Date(t).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
  let busy=false;
+ const OKK=/(_ctt_|_visitas_|_rt_v1|_cliinfo_|_novos_|_mpr|_pedidos_.*_pedidos$|_rev_v1|_semwa_|_arqmorto_|_notas_|_lembretes_|_orc_|_oco_)/;
+ const hs=str=>{let h=5381;for(let i=0;i<str.length;i++)h=((h<<5)+h+str.charCodeAt(i))|0;return h};
+ const SN='metalmig_rr_snap_v1',IT='metalmig_rr_itens_v1',ldx=k=>{try{return JSON.parse(gs(k)||'{}')||{}}catch(e){return{}}};
+ const CI=(()=>{let m=null;return c=>{if(!m){m=new Map();D.cli.forEach(x=>m.set(String(x[0]),x[1]))}return m.get(String(c))}})();
+ function achata(key,txt){let v;try{v=JSON.parse(txt)}catch(e){return[]}const out=[];
+  const add=(id,cli,o)=>out.push({id:String(id),cli,o,h:hs(JSON.stringify(o))});
+  if(Array.isArray(v))v.forEach((o,i)=>{if(o&&typeof o==='object')add(o.id!=null?o.id:'i'+i,o.cli!=null?o.cli:o.cliente,o)});
+  else if(v&&typeof v==='object')Object.keys(v).forEach(k=>{const x=v[k];if(Array.isArray(x))x.forEach((o,i)=>{if(o&&typeof o==='object')add(k+'#'+(o.id!=null?o.id:i),k,o)});else if(x&&typeof x==='object')add(k,k,x)});
+  return out}
+ const SKIP=/^(id|ts|h|hist|fotos?|foto)$/;
+ function linha(it){const o=it.o,nome=o.cliNome||o.nome||CI(it.cli)||'';const partes=[];
+  Object.keys(o).forEach(k=>{if(SKIP.test(k))return;const x=o[k];if(x==null||x===''||typeof x==='object')return;if(['cli','cliNome','nome','cid','rep','repNome','src'].indexOf(k)>=0)return;let t=String(x);if(/^\d{13}$/.test(t))t=new Date(+t).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});partes.push((k.length<=2||/^(obs|res|data|hora|valor|texto|nota)$/.test(k)?'':k+': ')+(t.length>140?t.slice(0,140)+'…':t))});
+  return {nome,cli:it.cli,txt:partes.slice(0,6).join(' · ')}}
  async function puxa(cod,u){const k=(window.LC_RK||{})[String(cod)];if(!k)return null;const t0=Date.now();
   const j=await post(u,{k,rep:String(cod),t:'rsync',last:t0,dados:{ls:{},ts:{}}});if(!j||!j.ok)return null;
-  const M=j.dados||{ls:{},ts:{}},S=ld(),x=S[cod]=S[cod]||{vis:{},busca:0};x.busca=Date.now();x.fim=t0;
-  const mud={};Object.keys(M.ts||{}).forEach(key=>{const ts=+M.ts[key]||0,n=M.ls&&M.ls[key]!=null?M.ls[key].length:0;if(ts>(x.vis[key]||0)){mud[key]={ts,n}}});
-  x.mud=mud;x.ultimo=Math.max(0,...Object.values(M.ts||{}).map(v=>+v||0));sv(S);return x}
+  const M=j.dados||{ls:{},ts:{}},S=ld(),x=S[cod]=S[cod]||{vis:{},busca:0},SNP=ldx(SN),ITM=ldx(IT);x.busca=Date.now();x.fim=t0;
+  const snap=SNP[cod]=SNP[cod]||{},novos=[];
+  Object.keys(M.ls||{}).forEach(key=>{if(!OKK.test(key))return;const sn=snap[key]||{};achata(key,M.ls[key]).forEach(it=>{if(sn[it.id]!==it.h)novos.push({key,id:it.id,h:it.h,l:linha(it)})})});
+  ITM[cod]=novos.slice(0,80);x.nNovos=novos.length;
+  x.ultimo=Math.max(0,...Object.values(M.ts||{}).map(v=>+v||0));x.cur={};Object.keys(M.ls||{}).forEach(key=>{if(OKK.test(key)){x.cur[key]=1}});
+  sv(S);ss(SN,JSON.stringify(SNP));ss(IT,JSON.stringify(ITM));window.__rrRaw=window.__rrRaw||{};window.__rrRaw[cod]=M.ls;return x}
+  function marca(cod){const S=ld(),SNP=ldx(SN),ITM=ldx(IT),raw=(window.__rrRaw||{})[cod];if(!raw)return false;const snap={};Object.keys(raw).forEach(key=>{if(!OKK.test(key))return;snap[key]={};achata(key,raw[key]).forEach(it=>{snap[key][it.id]=it.h})});SNP[cod]=snap;ITM[cod]=[];if(S[cod])S[cod].nNovos=0;sv(S);ss(SN,JSON.stringify(SNP));ss(IT,JSON.stringify(ITM));return true}
   async function ciclo(force){if(busy||document.hidden)return;const c=await cfg();if(!c||!c.u||!Array.isArray(c.pgreps))return;busy=true;
    try{const V=(await post(c.u,{k:GK,t:'visto_lista'})).visto||{},S=ld();
     for(const cod of c.pgreps){const v=V[cod]||{},x=S[cod];if(!v.nuvem)continue;if(!force&&x&&x.fim&&v.nuvem<=x.fim+90000)continue;try{await puxa(cod,c.u)}catch(e){}}
@@ -10097,9 +10117,10 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
    m.querySelector('#rr_x').onclick=()=>m.remove();m.onclick=e=>{if(e.target===m)m.remove()};
    const pinta=async()=>{const c=await cfg(),S=ld(),box=m.querySelector('#rr_c');if(!c||!Array.isArray(c.pgreps)){box.textContent='Nuvem não ligada.';return}
     const lista=c.pgreps.map(cod=>({cod,x:S[cod]||{}})).sort((a,b)=>(b.x.ultimo||0)-(a.x.ultimo||0));
-    box.innerHTML=lista.map(({cod,x})=>{const mud=x.mud||{},ks=Object.keys(mud),nomes=[...new Set(ks.map(nome))];
-     return `<div class="rt-b"><b>${E(tc(cod))}</b> <span class="rt-m">· última atividade: ${hh(x.ultimo)}</span><div style="margin-top:4px;font-size:13px">${ks.length?'<b>Novidades:</b> '+E(nomes.join(', ')):'<span class="rt-m">'+(x.busca?'Sem novidades.':'Ainda não sincronizou com a nuvem.')+'</span>'}</div>${ks.length?`<button class="rt-bt s rr_v" data-c="${E(cod)}" style="margin-top:6px">Marcar como visto</button>`:''}</div>`}).join('');
-    box.querySelectorAll('.rr_v').forEach(b=>b.onclick=()=>{const S2=ld(),x=S2[b.dataset.c];if(x){Object.keys(x.mud||{}).forEach(k=>{x.vis[k]=x.mud[k].ts});x.mud={};sv(S2)}pinta()})};
+    const ITM=ldx(IT);
+    box.innerHTML=lista.map(({cod,x})=>{const it=ITM[cod]||[],n=x.nNovos||0;
+     return `<div class="rt-b"><b>${E(tc(cod))}</b> <span class="rt-m">· última atividade: ${hh(x.ultimo)}</span><div style="margin-top:4px;font-size:13px">${n?'<b>'+n+' novidade(s)</b>':'<span class="rt-m">'+(x.busca?'Sem novidades.':'Ainda não sincronizou com a nuvem.')+'</span>'}</div>${it.slice(0,30).map(i=>`<div class="rt-m" style="padding:4px 0;border-top:1px solid #eef1f6"><b>${E(i.l.nome||'')}</b>${i.l.cli?' <span style="opacity:.7">cód '+E(i.l.cli)+'</span>':''} · <i>${E(nome(i.key))}</i><div>${E(i.l.txt)}</div></div>`).join('')}${n>30?'<div class="rt-m">… e mais '+(n-30)+' (marque como visto para zerar)</div>':''}${n?`<button class="rt-bt s rr_v" data-c="${E(cod)}" style="margin-top:6px">Marcar como visto</button>`:''}</div>`}).join('');
+    box.querySelectorAll('.rr_v').forEach(b=>b.onclick=async()=>{b.textContent='Marcando…';const cod=b.dataset.c;if(!(window.__rrRaw||{})[cod]){const c2=await cfg();try{await puxa(cod,c2.u)}catch(e){}}marca(cod);pinta()})};
    pinta();ciclo(true).then(pinta)}
   window.lcRegRep=tela;
   function tick(){try{if(typeof VIEW==='undefined'||VIEW!=='lnk'||document.getElementById('rr_btn'))return;const v=document.getElementById('v2out');if(!v)return;const b=document.createElement('button');b.id='rr_btn';b.className='rt-bt s';b.type='button';b.textContent='📥 Registros dos representantes';b.style.cssText='margin:8px 0 8px 8px';b.onclick=tela;const a=document.getElementById('pg_btn');if(a)a.after(b);else v.insertBefore(b,v.firstChild)}catch(e){}}
