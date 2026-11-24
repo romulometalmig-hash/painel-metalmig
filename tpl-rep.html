@@ -1963,7 +1963,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v245';
+const NX_VER = 'v246';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3650,6 +3650,9 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v246',d:'24/11/2026',t:'Correção da setinha do cabeçalho',l:[
+   ['a','Corrigido: ao recolher o cabeçalho na Ficha do Cliente a lista de clientes também sumia. Agora só somem o topo, os filtros e os alertas.'],
+  ]},
   {v:'v245',d:'24/11/2026',t:'Clientes passados a representante novo',l:[
    ['g','Corrigido: ao passar um cliente para um representante novo (tela Objetivos), ele voltava a aparecer depois de sair e entrar na tela ou recarregar o painel. Agora a passagem fica gravada e é reaplicada sozinha.'],
   ]},
@@ -10244,7 +10247,7 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
  const ini=()=>{document.body.appendChild(b);if(gs('metalmig_hdr_off')==='1')document.body.classList.add('lcup');paint()};
  if(document.body)ini();else addEventListener('DOMContentLoaded',ini);
  // ---- selo da nuvem no cabeçalho
- const abc=()=>{document.querySelectorAll('#v2out > div:not([data-lcabc])').forEach(d=>{if(/^Classe ABC:/.test((d.textContent||'').trim().slice(0,14)))d.setAttribute('data-lcabc','1')})};
+ const abc=()=>{document.querySelectorAll('.lcq_ab').forEach(x=>{const d=x.parentElement;if(d&&d.id!=='f_res'&&d.id!=='v2out'&&!d.hasAttribute('data-lcabc'))d.setAttribute('data-lcabc','1')})};
  const selo=()=>{const e=document.getElementById('lcsel');if(!e)return;if(!e.classList.contains('lcs-fx'))e.classList.add('lcs-fx');const v=b.style.top||'0px';if(e.style.top!==v)e.style.top=v};
  // ---- aviso de envio (só nas páginas dos representantes)
  let env=null,viuPend=false,tmr=0;
