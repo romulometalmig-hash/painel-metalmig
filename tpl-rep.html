@@ -1962,7 +1962,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v235';
+const NX_VER = 'v236';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3649,6 +3649,10 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v236',d:'24/11/2026',t:'Repasse na nuvem',l:[
+   ['g','Depois de repassar, o painel confirma "☁️ salvo na nuvem" (ou avisa em vermelho se a sincronização não está ligada).'],
+   ['g','Novo botão no Repasse: "📋 Quem passei para cada representante" — lista por representante, com copiar.'],
+  ]},
   {v:'v235',d:'24/11/2026',t:'Link do Ferreira Garra',l:[
    ['g','Ferreira Garra Representação já aparece em Links dos representantes (código provisório, até chegar o número da fábrica).'],
   ]},
@@ -9933,6 +9937,30 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
  }catch(e){}}
  setInterval(tick,600);
 })();
+
+// ===== v236 · Repasse na nuvem: aviso de salvo + lista "Clientes passados por representante" =====
+(function(){try{ if(window.__lcCL)return;window.__lcCL=1;
+ const L0=localStorage,gs=k=>{try{return L0.getItem(k)}catch(e){return null}};
+ const E=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+ // 1) depois de repassar/aprovar, avisa se foi para a nuvem
+ const SP=Storage.prototype,raw=SP.setItem;let tm=null;
+ SP.setItem=function(k){const r=raw.apply(this,arguments);if(this===L0&&(k==='metalmig_reat_v1'||k==='metalmig_carteira_v1')){clearTimeout(tm);tm=setTimeout(conf,9000)}return r};
+ async function conf(){try{const url=(gs('metalmig_bkp_syncurl')||'').trim();
+  if(!url&&!(D&&D.rm)){window.lcBigToast&&lcBigToast('⚠️ Repasse salvo SÓ neste aparelho. Ligue em Ferramentas › Sincronizar aparelhos','#C62828');return}
+  if(window.lcSync){const r=await lcSync(true);window.lcBigToast&&lcBigToast(r&&r.ok?'☁️ Repasse salvo na nuvem':'⚠️ Não consegui salvar na nuvem agora. Tento de novo sozinho.',r&&r.ok?'#2E7D32':'#C62828')}}catch(e){}}
+ // 2) lista por representante
+ function dados(){let R={};try{R=JSON.parse(gs('metalmig_reat_v1')||'{}').t||{}}catch(e){}const by={};const CI=new Map();D.cli.forEach((c,i)=>CI.set(String(c[0]),i));
+  Object.keys(R).forEach(code=>{(R[code]||[]).forEach(t=>{if(t.dest!=='rep'&&t.dest!=='bo')return;const ci=CI.get(code);if(ci==null)return;const k=String(t.cod);(by[k]=by[k]||[]).push({code,nome:D.cli[ci][1],ini:t.ini||'',st:t.st||''})})});
+  return by}
+ const nm=c=>{try{return lcReat.nm(+c)}catch(e){return c}};
+ function abre(){const by=dados(),ks=Object.keys(by).sort((a,b)=>by[b].length-by[a].length);const m=document.createElement('div');m.className='rt-ov';
+  const txt=k=>nm(k)+' ('+by[k].length+' clientes)\n'+by[k].sort((a,b)=>a.ini<b.ini?1:-1).map(x=>x.code+' · '+x.nome+(x.ini?' · '+x.ini.split('-').reverse().join('/'):'')).join('\n');
+  m.innerHTML='<div class="rt-sh rt-sh2"><div style="display:flex;justify-content:space-between"><b style="font-size:17px">Clientes passados por representante</b><button class="rt-bt s" id="cl_x">Fechar</button></div>'+(ks.length?ks.map(k=>`<div class="rt-b"><h3>${E(nm(k))} (${by[k].length})</h3>${by[k].sort((a,b)=>a.ini<b.ini?1:-1).map(x=>`<div class="rt-m" style="padding:3px 0;border-top:1px solid #eef1f6"><b>${E(x.nome)}</b> · cód ${E(x.code)}${x.ini?' · '+E(x.ini.split('-').reverse().join('/')):''}</div>`).join('')}<button class="rt-bt s cl_c" data-k="${E(k)}" style="margin-top:6px">Copiar lista</button></div>`).join(''):'<div class="rt-m">Nenhum repasse ainda.</div>')+'</div>';
+  document.body.appendChild(m);m.querySelector('#cl_x').onclick=()=>m.remove();m.onclick=e=>{if(e.target===m)m.remove()};
+  m.querySelectorAll('.cl_c').forEach(b=>b.onclick=()=>{const t=txt(b.dataset.k);try{navigator.clipboard.writeText(t).then(()=>{b.textContent='✔ Copiado'})}catch(e){}})}
+ function tick(){try{const c=document.getElementById('rt_c');if(!c||document.getElementById('cl_btn'))return;const b=document.createElement('button');b.id='cl_btn';b.className='rt-bt s';b.type='button';b.textContent='📋 Quem passei para cada representante';b.style.cssText='margin:6px 0';b.onclick=abre;c.parentNode.insertBefore(b,c)}catch(e){}}
+ setInterval(tick,1200);
+}catch(e){console.error('lcCL',e)}})();
 
 
 </script></body></html>
