@@ -1962,7 +1962,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v240';
+const NX_VER = 'v241';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3649,6 +3649,10 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v241',d:'24/11/2026',t:'Registros dos representantes',l:[
+   ['g','Novo botão em Links: "📥 Registros dos representantes" — mostra, por representante, o que ele registrou na página dele (visitas, retornos, contatos, pedidos…) e quando foi a última atividade. Chega pela nuvem, alguns minutos depois.'],
+   ['a','Seus registros passam a ir para a nuvem sozinhos (cópia automática), para o gestor acompanhar.'],
+  ]},
   {v:'v240',d:'24/11/2026',t:'Nuvem mais rápida',l:[
    ['g','Páginas dos representantes: envio 20 segundos depois do repasse e verificação a cada 2 minutos; a página também é refeita quando a data dos dados ou a versão do painel mudam.'],
   ]},
@@ -10066,6 +10070,41 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
   setInterval(tick,1200);window.lcPgTela=tela;
  }
 }catch(e){console.error('lcCO',e)}})();
+
+// ===== v241 · O que os representantes registram chega ao gestor (via nuvem), com tela "Registros dos representantes" =====
+(function(){try{ if(window.__lcCP||(typeof D!=='undefined'&&D.rm))return;window.__lcCP=1;
+ const L0=localStorage,gs=k=>{try{return L0.getItem(k)}catch(e){return null}},ss=(k,v)=>{try{L0.setItem(k,v)}catch(e){}};
+ const GK='',E=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+ const K='metalmig_rr_v1',ld=()=>{try{return JSON.parse(gs(K)||'{}')||{}}catch(e){return{}}},sv=o=>ss(K,JSON.stringify(o));
+ const NM={opened:'fichas abertas',rt:'retornos',visitas:'visitas',viagens:'viagens',viagem:'viagens',notas:'anotações',rev:'revisões',mpr:'prospectos',prosp:'prospectos',atrib:'clientes passados',obj:'objetivos',lembretes:'lembretes',ord:'pedidos',orc:'orçamentos',oco:'ocorrências',con:'conferências',repnovos:'representantes novos',prfl:'fichas de candidatos',grupos:'redes de lojas',ctt:'contatos registrados',hist:'histórico',cliinfo:'dados de clientes',semwa:'clientes sem whats',arqmorto:'arquivo morto',novos:'clientes novos',reat:'repasses',carteira:'carteira',pedidos:'pedidos',rascunho:'pedido em andamento',pr:'prospectos',prx:'próximos contatos',desp:'despesas',log:'registro de uso'};
+ const nome=k=>{const n=k.replace(/^metalmig_/,'').replace(/_(v\d+)(_[gr])?$/,'').replace(/^pedidos_.*_(pedidos|rascunho|seq|conferidos)$/,'$1');return NM[n]||NM[n.split('_')[0]]||n};
+ const cfg=async()=>{try{const r=await fetch(new URL('drive.json?t='+Date.now(),location.href).href,{cache:'no-store'});return await r.json()}catch(e){return null}};
+ const post=async(u,o)=>{const r=await fetch(u,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(o)});return r.json()};
+ const riDe=c=>D.reps.findIndex(r=>+r[0]===+c),tc=c=>{const i=riDe(c);return i<0?String(c):String(D.reps[i][1]).replace(/\s*-?\s*INATIVO/i,'').split(' ').slice(0,2).join(' ')};
+ const hh=t=>t?new Date(t).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
+ let busy=false;
+ async function puxa(cod,u){const k=(window.LC_RK||{})[String(cod)];if(!k)return null;const t0=Date.now();
+  const j=await post(u,{k,rep:String(cod),t:'rsync',last:t0,dados:{ls:{},ts:{}}});if(!j||!j.ok)return null;
+  const M=j.dados||{ls:{},ts:{}},S=ld(),x=S[cod]=S[cod]||{vis:{},busca:0};x.busca=Date.now();x.fim=t0;
+  const mud={};Object.keys(M.ts||{}).forEach(key=>{const ts=+M.ts[key]||0,n=M.ls&&M.ls[key]!=null?M.ls[key].length:0;if(ts>(x.vis[key]||0)){mud[key]={ts,n}}});
+  x.mud=mud;x.ultimo=Math.max(0,...Object.values(M.ts||{}).map(v=>+v||0));sv(S);return x}
+  async function ciclo(force){if(busy||document.hidden)return;const c=await cfg();if(!c||!c.u||!Array.isArray(c.pgreps))return;busy=true;
+   try{const V=(await post(c.u,{k:GK,t:'visto_lista'})).visto||{},S=ld();
+    for(const cod of c.pgreps){const v=V[cod]||{},x=S[cod];if(!v.nuvem)continue;if(!force&&x&&x.fim&&v.nuvem<=x.fim+90000)continue;try{await puxa(cod,c.u)}catch(e){}}
+   }catch(e){}finally{busy=false}}
+  setTimeout(()=>ciclo(false),40000);setInterval(()=>ciclo(false),2*60*1000);
+  async function tela(){const m=document.createElement('div');m.className='rt-ov';m.innerHTML='<div class="rt-sh rt-sh2"><div style="display:flex;justify-content:space-between"><b style="font-size:17px">📥 Registros dos representantes</b><button class="rt-bt s" id="rr_x">Fechar</button></div><div class="rt-m" style="margin:6px 0">Tudo que o representante registra na página dele sobe para a nuvem e aparece aqui, alguns minutos depois. “Novidades” = o que mudou desde a última vez que você marcou como visto.</div><div id="rr_c">Atualizando…</div></div>';document.body.appendChild(m);
+   m.querySelector('#rr_x').onclick=()=>m.remove();m.onclick=e=>{if(e.target===m)m.remove()};
+   const pinta=async()=>{const c=await cfg(),S=ld(),box=m.querySelector('#rr_c');if(!c||!Array.isArray(c.pgreps)){box.textContent='Nuvem não ligada.';return}
+    const lista=c.pgreps.map(cod=>({cod,x:S[cod]||{}})).sort((a,b)=>(b.x.ultimo||0)-(a.x.ultimo||0));
+    box.innerHTML=lista.map(({cod,x})=>{const mud=x.mud||{},ks=Object.keys(mud),nomes=[...new Set(ks.map(nome))];
+     return `<div class="rt-b"><b>${E(tc(cod))}</b> <span class="rt-m">· última atividade: ${hh(x.ultimo)}</span><div style="margin-top:4px;font-size:13px">${ks.length?'<b>Novidades:</b> '+E(nomes.join(', ')):'<span class="rt-m">'+(x.busca?'Sem novidades.':'Ainda não sincronizou com a nuvem.')+'</span>'}</div>${ks.length?`<button class="rt-bt s rr_v" data-c="${E(cod)}" style="margin-top:6px">Marcar como visto</button>`:''}</div>`}).join('');
+    box.querySelectorAll('.rr_v').forEach(b=>b.onclick=()=>{const S2=ld(),x=S2[b.dataset.c];if(x){Object.keys(x.mud||{}).forEach(k=>{x.vis[k]=x.mud[k].ts});x.mud={};sv(S2)}pinta()})};
+   pinta();ciclo(true).then(pinta)}
+  window.lcRegRep=tela;
+  function tick(){try{if(typeof VIEW==='undefined'||VIEW!=='lnk'||document.getElementById('rr_btn'))return;const v=document.getElementById('v2out');if(!v)return;const b=document.createElement('button');b.id='rr_btn';b.className='rt-bt s';b.type='button';b.textContent='📥 Registros dos representantes';b.style.cssText='margin:8px 0 8px 8px';b.onclick=tela;const a=document.getElementById('pg_btn');if(a)a.after(b);else v.insertBefore(b,v.firstChild)}catch(e){}}
+  setInterval(tick,1300);
+}catch(e){console.error('lcCP',e)}})();
 
 
 </script></body></html>
