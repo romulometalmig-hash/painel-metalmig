@@ -1962,7 +1962,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v242';
+const NX_VER = 'v243';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3649,6 +3649,9 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v243',d:'24/11/2026',t:'Cartão unificado',l:[
+   ['g','Novo cartão do cliente na Ficha, Recomprar e Reativar: Representantes (atual e já atenderam), Observações com histórico, faixa verde "Contato registrado" e bloco AÇÕES com botões redondos (Ligar, Catálogo, Registrar contato, Passar, Inativo, Arquivo morto, Ficha, Pular).'],
+  ]},
   {v:'v242',d:'24/11/2026',t:'Registros: conteúdo',l:[
    ['g','"📥 Registros dos representantes" agora mostra o conteúdo de cada registro novo (cliente, data, resultado, observação), por representante, com "Marcar como visto".'],
   ]},
@@ -10126,6 +10129,69 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
   function tick(){try{if(typeof VIEW==='undefined'||VIEW!=='lnk'||document.getElementById('rr_btn'))return;const v=document.getElementById('v2out');if(!v)return;const b=document.createElement('button');b.id='rr_btn';b.className='rt-bt s';b.type='button';b.textContent='📥 Registros dos representantes';b.style.cssText='margin:8px 0 8px 8px';b.onclick=tela;const a=document.getElementById('pg_btn');if(a)a.after(b);else v.insertBefore(b,v.firstChild)}catch(e){}}
   setInterval(tick,1300);
 }catch(e){console.error('lcCP',e)}})();
+
+// v243 · cartão unificado (gestor): Representantes, Observações, Contato registrado e AÇÕES redondas
+(function(){try{
+ if(window.__lcCQ||typeof D==='undefined'||!D.cli||D.rm)return;window.__lcCQ=1;
+ const E=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+ const J=k=>{try{return JSON.parse(localStorage.getItem(k)||'null')}catch(e){return null}};
+ const RES={nao:'Não atendeu',conv:'Conversou',int:'Interessado',ret:'Pediu retorno',cat:'Catálogo enviado',ped:'Fez pedido',sem:'Sem interesse',pedido:'Pedido feito',pensar:'Vai pensar',semint:'Sem interesse',novo:'Cliente novo',ausente:'Não estava',rel:'Visita de relacionamento',lig:'Ligação'};
+ const st=document.createElement('style');st.textContent='.cq{margin-top:8px}.cq-b{border:1px solid #d5dbe6;border-radius:10px;padding:7px 10px;margin-top:6px;background:#fff;font-size:13px}.cq-b .tt{font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:#556;font-weight:700;margin-bottom:3px}'
+ +'.cq-ch{display:inline-block;background:#eef1f6;border-radius:10px;padding:1px 8px;margin:1px 3px 1px 0;font-size:12px}.cq-ok{background:#e8f5e9;border-color:#9ccc9f;cursor:pointer}'
+ +'.cq-ob{display:flex;gap:6px;margin:4px 0}.cq-ob input{flex:1;min-width:0;border:1px solid #b9c7e2;border-radius:8px;padding:6px 8px;font-size:13px}.cq-ob button{border:0;border-radius:8px;background:#1F4E78;color:#fff;padding:6px 12px;font-weight:700}'
+ +'.cq-h div{padding:3px 0;border-top:1px solid #eef1f6}.cq-h small{color:#667}.cq-tg{cursor:pointer;color:#1F4E78;font-weight:700;float:right}'
+ +'.cq-ac{margin-top:8px;border:1px solid #b7cbe8;border-radius:10px;padding:8px;background:#dfeaf8}.cq-ac .tt{font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:#2c5282;font-weight:700;margin-bottom:6px}'
+ +'.cq-tel{display:flex;gap:8px;align-items:center;margin-bottom:8px;font-weight:700}.cq-tel button{border:1px solid #a9bfdf;background:#fff;border-radius:8px;padding:3px 9px;font-weight:700;color:#1F4E78}'
+ +'.cq-r{display:grid;grid-template-columns:repeat(8,1fr);gap:4px}@media(max-width:700px){.cq-r{grid-template-columns:repeat(4,1fr);row-gap:8px}}'
+ +'.cq-r button{border:0;background:none;padding:0;display:flex;flex-direction:column;align-items:center;gap:3px;font:600 11px Arial,sans-serif;color:#1F4E78;cursor:pointer}.cq-r i{font-style:normal;width:42px;height:42px;border-radius:50%;background:#fff;border:1px solid #a9bfdf;display:flex;align-items:center;justify-content:center;font-size:19px;box-shadow:0 1px 0 #c4d4ec}.cq-r button:disabled{opacity:.4}.cq-x{display:none!important}#f_res .fch .g{display:grid!important;grid-template-columns:repeat(3,1fr);gap:4px 10px}#f_res .fch .g>div.w:first-child{display:none}#f_res .fch .g>div{grid-column:auto!important;min-width:0}@media(max-width:600px){#f_res .fch .g{grid-template-columns:1fr 1fr}}';
+ document.head.appendChild(st);
+ const cod=ci=>String(D.cli[ci][0]);
+ const repN=i=>{const r=D.reps[i];if(!r)return '—';const ap=window.lcApel&&window.lcApel.get?window.lcApel.get(r[0]):'';return ap||String(r[1]).replace(/\s*-?\s*INATIVO/i,'')};
+ function ja(ci){try{const s=new Set(),at=D.cli[ci][8];for(let i=0;i<L.D.length;i++)if(L.C[i]===ci&&L.V[i]>0)s.add(L.R[i]);s.delete(at);return [...s].map(repN)}catch(e){return []}}
+ const fd=d=>{d=String(d||'');return /^\d{4}-\d\d-\d\d/.test(d)?d.slice(8,10)+'/'+d.slice(5,7)+' '+(d.length>10?d.slice(11,16):''):''};
+ function reg7(code){const V=(J('metalmig_visitas_v1')||[]).filter(v=>String(v.cli)===code);V.sort((a,b)=>String(b.data+b.hora).localeCompare(String(a.data+a.hora)));const v=V[0];if(!v)return null;const dt=new Date(v.data+'T12:00');if((Date.now()-dt)/864e5>7.5)return null;return v}
+ function blocks(ci){const code=cod(ci),c=D.cli[ci];const j=ja(ci),ar=window.lcArq&&lcArq.has(code);
+  const rg=reg7(code),ob=window.lcCliInfo?lcCliInfo.list(code):[];
+  let h='';
+  if(rg){const hoje=rg.data===new Date().toISOString().slice(0,10);h+='<div class="cq-b cq-ok" data-k="hist">✔ Contato registrado '+(hoje?'hoje':String(rg.data).slice(8,10)+'/'+String(rg.data).slice(5,7))+(rg.hora?', '+E(rg.hora):'')+' · Resultado: <b>'+E(RES[rg.res]||rg.res||'—')+'</b>'+(rg.obs&&rg.obs!=='Lembrete de retorno'?' · Obs.: '+E(rg.obs):'')+'</div>'}
+  h+='<div class="cq-b"><div class="tt">Representantes</div>Atual: <b>'+E(repN(c[8]))+'</b>'+(j.length?'<br>Já atenderam: '+j.map(n=>'<span class="cq-ch">'+E(n)+'</span>').join(''):'')+(ar?'<br><span class="cq-ch" style="background:#fdecea">🗄 Arquivo morto</span>':'')+'</div>';
+  h+='<div class="cq-b"><div class="tt">📝 Observações'+(ob.length>1?'<span class="cq-tg" data-k="tg">'+(window['__cqo'+code]?'▴':'▾')+' '+ob.length+'</span>':'')+'</div><div class="cq-ob"><input placeholder="Escrever observação…" maxlength="500"><button data-k="add">Salvar</button></div><div class="cq-h">'
+   +ob.slice(0,window['__cqo'+code]?99:1).map(o=>'<div><small>'+fd(o.d)+'</small> '+E(o.t)+'</div>').join('')+'</div></div>';
+  return h}
+ const BT=[['tel','📞','Ligar'],['cat','📖','Catálogo'],['reg','📝','Registrar contato'],['pas','🔁','Passar p/ outro rep.'],['ina','⛔','Deixar inativo'],['arq','🗄','Arquivo morto'],['fi','👤','Ficha'],['pu','⏭','Pular']];
+ function acoes(ci,ficha,fire){const c=D.cli[ci];const d=String(c[3]||'').replace(/\D/g,'').replace(/^0+/,'');const ok=d.length>=10;
+  return '<div class="cq-ac"><div class="tt">Ações</div><div class="cq-tel">'+(ok?'📞 '+E(d.length===11?'('+d.slice(0,2)+') '+d.slice(2,7)+'-'+d.slice(7):d.length===10?'('+d.slice(0,2)+') '+d.slice(2,6)+'-'+d.slice(6):c[3])+'<button data-k="cp">📋 Copiar</button>':'<span style="color:#667">sem telefone</span>')+'</div><div class="cq-r">'
+   +BT.filter(b=>!(ficha&&(b[0]==='fi'||b[0]==='pu'))).map(b=>'<button data-k="'+b[0]+'"'+((b[0]==='tel'&&!ok)?' disabled':'')+'><i>'+b[1]+'</i>'+b[2]+'</button>').join('')+'</div></div>'}
+ function wire(box,ci,fire){box.onclick=e=>{const t=e.target.closest('[data-k]');if(!t)return;const k=t.dataset.k,code=cod(ci);e.preventDefault();e.stopPropagation();
+   if(k==='add'){const i=box.querySelector('.cq-ob input');if(window.lcCliInfo&&lcCliInfo.add(code,i.value)){i.value='';box.dataset.sig='';refresh()}return}
+   if(k==='tg'){window['__cqo'+code]=!window['__cqo'+code];box.dataset.sig='';refresh();return}
+   if(k==='cp'){const d=String(D.cli[ci][3]||'').replace(/\D/g,'');try{navigator.clipboard.writeText(d);t.textContent='✔ Copiado';setTimeout(()=>{t.textContent='📋 Copiar'},1500)}catch(x){}return}
+   if(k==='hist'){if(window.lcCliHist)lcCliHist(ci);return}
+   fire(k,ci)}}
+ let busy=0;
+ function refresh(){if(busy)return;busy=1;try{
+  const V=typeof VIEW!=='undefined'?VIEW:'';
+  // Ficha
+  document.querySelectorAll('#f_res .fch').forEach(el=>{const ci=+el.dataset.ci;if(!D.cli[ci])return;const old=el.querySelector('.fcb');
+   const sig=cod(ci)+'|'+(window.lcCliInfo?lcCliInfo.list(cod(ci)).length:0)+'|'+(reg7(cod(ci))||{}).hora+'|'+(window.lcArq&&lcArq.has(cod(ci)))+'|'+D.cli[ci][8]+'|'+(window['__cqo'+cod(ci)]?1:0);
+   let box=el.querySelector('.cq');if(box&&box.dataset.sig===sig)return;if(!old&&!box)return;
+   if(!box){box=document.createElement('div');box.className='cq';box.onclick=null;el.appendChild(box);if(old)old.classList.add('cq-x')}
+   box.dataset.sig=sig;box.innerHTML=blocks(ci)+acoes(ci,true);
+   wire(box,ci,(k,ci)=>{const o=el.querySelector('.fcb [data-k="'+(k==='tel'?'tel':k)+'"]');if(o)o.click()})});
+  // Recomprar / Reativar
+  if(V==='rec'||V==='reat')document.querySelectorAll('#v2out .lccard.lcbx-k').forEach(card=>{const a=card.querySelector('a.rcf');if(!a)return;const ci=+a.dataset.ci;if(!D.cli[ci])return;
+   const sig=cod(ci)+'|'+(window.lcCliInfo?lcCliInfo.list(cod(ci)).length:0)+'|'+(reg7(cod(ci))||{}).hora+'|'+(window.lcArq&&lcArq.has(cod(ci)))+'|'+D.cli[ci][8]+'|'+(window['__cqo'+cod(ci)]?1:0);
+   let box=card.querySelector('.cq');if(box&&box.dataset.sig===sig)return;
+   if(!box){box=document.createElement('div');box.className='cq';card.querySelectorAll('.cio,.lcbx-i,.lcbx-b').forEach(x=>x.classList.add('cq-x'));card.appendChild(box)}
+   box.dataset.sig=sig;box.innerHTML=blocks(ci)+acoes(ci,false);
+   wire(box,ci,(k,ci)=>{const q=s=>{const x=card.querySelector(s);if(x)x.click()};
+    if(k==='tel')q('.lcbx-b [data-k=lig]');else if(k==='cat')q('.lcbx-b [data-k=ct]');else if(k==='fi')q('.lcbx-b [data-k=fi]');
+    else if(k==='reg'&&window.__agForm){window.__agForm(ci,window.__agHoje)}else if(k==='pas'&&window.lcRep)lcRep.passar(ci);else if(k==='ina'&&window.lcRep)lcRep.inativar(ci);else if(k==='arq'&&window.lcRep)lcRep.arquivar(ci);
+    else if(k==='pu'){q('.lcbx-b [data-k=jc]')}})})
+ }catch(e){console.error('lcCQ',e)}busy=0}
+ window.lcCQ={refresh};
+ setInterval(refresh,1000);
+}catch(e){console.error('lcCQ',e)}})();
 
 
 </script></body></html>
