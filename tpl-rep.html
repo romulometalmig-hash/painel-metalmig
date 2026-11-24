@@ -806,7 +806,7 @@ function renderResumo(){
 // ---------- FICHA DO CLIENTE ----------
 let FQ='',FCI=null,FCID='',FREP='';
 function renderFicha(){
- ctl(`<label>Buscar cliente <input id="f_q" type="search" autocomplete="off" placeholder="Nome, código, cidade, rua ou bairro" style="width:340px" value="${FQ.replace(/"/g,'&quot;')}"></label><label>Cidade <select id="f_c"><option value="">Todas as cidades</option>${[...new Set(D.cli.map(c=>c[2]).filter(Boolean))].sort((a,b)=>a.localeCompare(b)).map(x=>`<option value="${x.replace(/"/g,'&quot;')}"${x===FCID?' selected':''}>${x.replace(/</g,'&lt;')}</option>`).join('')}</select></label>${D.rm?'':`<label>Representante <select id="f_r"><option value="">Todos</option>${D.reps.map((r,i)=>i?[i,sqRn(i)]:null).filter(x=>x&&x[1]).sort((a,b)=>a[1].localeCompare(b[1])).map(x=>`<option value="${x[0]}"${String(x[0])===FREP?' selected':''}>${x[1].replace(/</g,'&lt;')}</option>`).join('')}</select></label>`}<span class="mute">Digite parte do nome, do código, da cidade, da rua ou do bairro (ex.: belo horizonte rua tamoios) — ou escolha a cidade na lista.</span>`);
+ ctl(`<label>Buscar cliente <input id="f_q" type="search" autocomplete="off" placeholder="Nome, código, cidade, rua ou bairro" style="width:340px" value="${FQ.replace(/"/g,'&quot;')}"></label><label>Cidade <select id="f_c"><option value="">Todas as cidades</option>${[...new Set(D.cli.map(c=>c[2]).filter(Boolean))].sort((a,b)=>a.localeCompare(b)).map(x=>`<option value="${x.replace(/"/g,'&quot;')}"${x===FCID?' selected':''}>${x.replace(/</g,'&lt;')}</option>`).join('')}</select></label>${D.rm?'':`<label>Representante <select id="f_r"><option value="">Todos</option>${((hc)=>D.reps.map((r,i)=>i?[i,sqRn(i)]:null).filter(x=>x&&x[1]&&(hc.has(x[0])||String(x[0])===FREP)).sort((a,b)=>a[1].localeCompare(b[1])).map(x=>`<option value="${x[0]}"${String(x[0])===FREP?' selected':''}>${x[1].replace(/</g,'&lt;')}</option>`).join(''))(new Set(D.cli.map(c=>c[8])))}</select></label>`}<span class="mute">Digite parte do nome, do código, da cidade, da rua ou do bairro (ex.: belo horizonte rua tamoios) — ou escolha a cidade na lista.</span>`);
  $('#v2out').innerHTML='<div id="f_res"></div><div id="f_det"></div>';
  const q=$('#f_q');q.oninput=()=>{FQ=q.value;fichaBusca()};$('#f_c').onchange=e=>{FCID=e.target.value;fichaBusca()};const fr=$('#f_r');if(fr)fr.onchange=e=>{FREP=e.target.value;fichaBusca()};fichaBusca();if(FCI!=null)fichaShow(FCI);setTimeout(()=>{q.focus()},30)}
 const fNorm=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
@@ -1963,7 +1963,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v246';
+const NX_VER = 'v247';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3650,6 +3650,9 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v247',d:'24/11/2026',t:'Filtro de representante',l:[
+   ['g','Ficha do Cliente: o filtro "Representante" agora lista só quem tem clientes na carteira (antes mostrava os 113, inclusive quem não tem cliente).'],
+  ]},
   {v:'v246',d:'24/11/2026',t:'Correção da setinha do cabeçalho',l:[
    ['a','Corrigido: ao recolher o cabeçalho na Ficha do Cliente a lista de clientes também sumia. Agora só somem o topo, os filtros e os alertas.'],
   ]},
