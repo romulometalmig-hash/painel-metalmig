@@ -1962,7 +1962,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v238';
+const NX_VER = 'v239';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3649,6 +3649,10 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v239',d:'24/11/2026',t:'Páginas na nuvem (piloto)',l:[
+   ['g','Repasse novo é enviado sozinho para a nuvem e chega à página do representante em minutos (sem eu gerar a página). Tela "☁️ Páginas na nuvem" em Links mostra quem já recebeu. Fica desligado até o endereço da nuvem de páginas ser ligado.'],
+   ['a','Quando sua carteira mudar, aparece o aviso "Sua carteira foi atualizada · Atualizar".'],
+  ]},
   {v:'v238',d:'24/11/2026',t:'Clientes do Ferreira na carteira',l:[
    ['g','Corrigido: os clientes repassados para o Ferreira Garra agora aparecem na carteira dele (o código dele estava duplicado com outro candidato).'],
   ]},
@@ -9994,6 +9998,71 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
   d.innerHTML='🗺 <b>Mesorregião:</b> '+E(m)+' <span class="mute">· '+tot+' clientes nossos</span><div style="margin-top:3px"><b>Quem atende:</b> '+(rs||'ninguém ainda')+'</div>';
   first.after(d)}catch(e){console.error('lcCM',e)}};
 }catch(e){console.error('lcCM',e)}})();
+
+// ===== v239 · Páginas na nuvem: gestor publica a página de cada representante; o representante recebe sozinho e avisa que recebeu =====
+(function(){try{ if(window.__lcCO)return;window.__lcCO=1;const REP=!!D.rm;
+ const L0=localStorage,gs=k=>{try{return L0.getItem(k)}catch(e){return null}},ss=(k,v)=>{try{L0.setItem(k,v)}catch(e){}};
+ const GK='',E=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+ let CFG=null;
+ async function cfg(){if(CFG)return CFG;try{const r=await fetch(new URL('drive.json?t='+Date.now(),location.href).href,{cache:'no-store'});CFG=await r.json()}catch(e){try{CFG=JSON.parse(gs('metalmig_bkp_drvcfg')||'null')}catch(_){}}return CFG}
+ const post=async(u,o)=>{const r=await fetch(u,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(o)});return r.json()};
+ // ---------------- armazenamento local da página nova (lido pelo carregador do arquivo do representante)
+ const idb=()=>new Promise((ok,no)=>{const q=indexedDB.open('nx_pg',1);q.onupgradeneeded=()=>q.result.createObjectStore('p');q.onsuccess=()=>ok(q.result);q.onerror=()=>no(q.error)});
+ const idbPut=async(k,v)=>{const d=await idb();return new Promise((ok,no)=>{const t=d.transaction('p','readwrite');t.objectStore('p').put(v,k);t.oncomplete=ok;t.onerror=()=>no(t.error)})};
+ const mesPad=n=>(n<10?'0':'')+n;
+ const mesPadrao=()=>{const t=new Date(D.ref*864e5),d=new Date(Date.UTC(t.getUTCFullYear(),t.getUTCMonth()+1,1));return d.getUTCFullYear()+'-'+mesPad(d.getUTCMonth()+1)};
+ // =================== REPRESENTANTE ===================
+ if(REP){
+  const bk=()=>D.bk&&D.bk.k&&D.bk.c?D.bk:(window.LC_BK_OBJ||null);
+  const cur=()=>+gs('nx_pgv')||0;
+  let busy=false,pronto=null;
+  async function banner(v){if(document.getElementById('lcpg_b'))return;const d=document.createElement('div');d.id='lcpg_b';d.style.cssText='position:fixed;left:12px;right:12px;bottom:calc(86px + env(safe-area-inset-bottom,0px));z-index:2147482000;background:#1F4E78;color:#fff;border-radius:14px;padding:14px 16px;font-size:16px;box-shadow:0 8px 26px #0007;display:flex;gap:12px;align-items:center;flex-wrap:wrap';
+   d.innerHTML='<span style="flex:1 1 220px;font-weight:700">🔄 Sua carteira foi atualizada.<small style="display:block;font-weight:400;opacity:.85;font-size:13px">Termine o que está fazendo e toque em Atualizar.</small></span><button id="lcpg_ok" style="border:0;border-radius:10px;padding:11px 18px;font-size:16px;font-weight:700;background:#fff;color:#1F4E78">Atualizar</button>';
+   document.body.appendChild(d);d.querySelector('#lcpg_ok').onclick=()=>{d.querySelector('#lcpg_ok').textContent='Atualizando…';location.reload()}}
+  async function ciclo(){if(busy||document.hidden||navigator.onLine===false)return;const c=await cfg(),b=bk();if(!c||!c.pg||!b)return;
+   if(Array.isArray(c.pgreps)&&c.pgreps.map(String).indexOf(String(b.c))<0)return;
+   busy=true;try{const j=await post(c.pg,{t:'pg_ver',rep:b.c,k:b.k,cur:cur()});
+    if(j&&j.ok&&j.v>cur()){const g=await post(c.pg,{t:'pg_get',rep:b.c,k:b.k});
+     if(g&&g.ok&&g.html){await idbPut('pagina',{v:g.v,html:g.html});await banner(g.v)}}}catch(e){}finally{busy=false}}
+  setTimeout(ciclo,9000);setInterval(ciclo,5*60*1000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(ciclo,800)});
+  window.lcPgCiclo=ciclo;
+ }
+ // =================== GESTOR ===================
+ else{
+  const SIG='metalmig_pg_sig_v1',ldS=()=>{try{return JSON.parse(gs(SIG)||'{}')||{}}catch(e){return{}}};
+  const riDe=cod=>D.reps.findIndex(r=>+r[0]===+cod);
+  const assin=ri=>{const l=[];D.cli.forEach(c=>{if(c[8]===ri)l.push(c[0])});l.sort();let h=5381;const s=l.join(',');for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return l.length+':'+h};
+  async function publica(cod,prog){const c=await cfg();if(!c||!c.pg)throw new Error('sem endereço da nuvem de páginas');
+   const ri=riDe(cod);if(ri<0)throw new Error('representante não encontrado');const rk=(window.LC_RK||{})[String(cod)];if(!rk)throw new Error('representante sem chave');
+   prog&&prog('Montando a página de '+tcN(ri)+'…');await new Promise(r=>setTimeout(r,30));
+   const ms=mesPadrao();let h=apEnv(ri,ms);h=await apLock(h,D.reps[ri][1],'2026',ms);
+   prog&&prog('Enviando '+tcN(ri)+' ('+Math.round(h.length/1048576*10)/10+' MB)…');
+   const j=await post(c.pg,{t:'pg_set',k:GK,rep:String(cod),rk,v:Date.now(),html:h});if(!j||!j.ok)throw new Error((j&&j.erro)||'falha');
+   const S=ldS();S[cod]=assin(ri);ss(SIG,JSON.stringify(S));return j.v}
+  const tcN=ri=>String((D.reps[ri]||[0,''])[1]||'').replace(/\s*-?\s*INATIVO/i,'').split(' ').slice(0,2).join(' ');
+  async function lista(){const c=await cfg();if(!c||!c.pg)return null;const j=await post(c.pg,{t:'pg_lista',k:GK});return j&&j.ok?j:null}
+  window.lcPgPublica=publica;
+  // publica sozinho quem teve a carteira alterada (só representantes liberados em drive.json › pgreps)
+  let tm=null,rodando=false;
+  async function auto(){if(rodando)return;const c=await cfg();if(!c||!c.pg||!Array.isArray(c.pgreps))return;rodando=true;
+   try{const S=ldS();for(const cod of c.pgreps){const ri=riDe(cod);if(ri<0)continue;if(S[cod]===assin(ri))continue;try{await publica(cod);window.lcBigToast&&lcBigToast('☁️ Página de '+tcN(ri)+' enviada para a nuvem','#2E7D32')}catch(e){console.warn('pg',cod,e.message)}}}finally{rodando=false}}
+  const SP=Storage.prototype,raw=SP.setItem;SP.setItem=function(k){const r=raw.apply(this,arguments);if(this===L0&&(k==='metalmig_reat_v1'||k==='metalmig_carteira_v1')){clearTimeout(tm);tm=setTimeout(auto,45000)}return r};
+  setTimeout(auto,30000);setInterval(()=>{if(!document.hidden)auto()},10*60*1000);
+  // tela do gestor
+  const hh=t=>t?new Date(t).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
+  async function tela(){const m=document.createElement('div');m.className='rt-ov';m.innerHTML='<div class="rt-sh rt-sh2"><div style="display:flex;justify-content:space-between"><b style="font-size:17px">☁️ Páginas dos representantes na nuvem</b><button class="rt-bt s" id="pg_x">Fechar</button></div><div class="rt-m" id="pg_c" style="margin-top:8px">Consultando…</div></div>';document.body.appendChild(m);
+   m.querySelector('#pg_x').onclick=()=>m.remove();m.onclick=e=>{if(e.target===m)m.remove()};
+   async function pinta(){const c=await cfg(),box=m.querySelector('#pg_c');if(!c||!c.pg){box.innerHTML='Ainda não ligado: falta o endereço da nuvem de páginas (drive.json).';return}
+    const L=await lista();if(!L){box.textContent='Não consegui consultar a nuvem agora.';return}
+    const reps=(c.pgreps||[]).map(String);
+    box.innerHTML=(reps.length?'':'Nenhum representante liberado ainda.')+reps.map(cod=>{const ri=riDe(cod),x=L.lista[cod]||{},nm=ri>=0?tcN(ri):cod,ok=x.v&&x.ack>=x.v,pend=ri>=0&&ldS()[cod]!==assin(ri);
+     return `<div class="rt-b"><b>${E(nm)}</b> <span class="rt-m">· cód ${E(cod)}</span><div class="rt-m">Publicada: ${hh(x.ts)} · Representante recebeu: ${x.ackts?hh(x.ackts):'ainda não abriu'}</div><div style="margin-top:4px;font-weight:700;color:${!x.v?'#8a94a6':pend?'#C55A11':ok?'#2E7D32':'#C55A11'}">${!x.v?'Nada publicado':pend?'⚠ Tem repasse novo para enviar':ok?'✔ Em dia':'⏳ Publicada, o representante ainda não carregou'}</div><button class="rt-bt s pg_p" data-c="${E(cod)}" style="margin-top:6px">Publicar agora</button></div>`}).join('');
+    box.querySelectorAll('.pg_p').forEach(b=>b.onclick=async()=>{b.disabled=true;try{await publica(b.dataset.c,t=>{b.textContent=t});}catch(e){b.textContent='Erro: '+e.message;return}pinta()})}
+   pinta()}
+  function tick(){try{const f=document.querySelector('#lnk_c,#lk_c,.lnk,[data-lnk]');if(document.getElementById('pg_btn'))return;const v=document.getElementById('v2out')||document.getElementById('main');if(typeof VIEW==='undefined'||VIEW!=='lnk'||!v)return;const b=document.createElement('button');b.id='pg_btn';b.className='rt-bt s';b.type='button';b.textContent='☁️ Páginas na nuvem (quem recebeu)';b.style.cssText='margin:8px 0';b.onclick=tela;v.insertBefore(b,v.firstChild)}catch(e){}}
+  setInterval(tick,1200);window.lcPgTela=tela;
+ }
+}catch(e){console.error('lcCO',e)}})();
 
 
 </script></body></html>
