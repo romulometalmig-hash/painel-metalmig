@@ -1962,7 +1962,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v229';
+const NX_VER = 'v230';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3649,6 +3649,10 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v230',d:'24/11/2026',t:'Novos representantes no Repasse',l:[
+   ['a','Hora de recomprar e Reativar: a Cidade agora é uma caixinha onde dá para marcar uma ou mais cidades (com busca), como no Repasse.'],
+   ['g','Repasse: representantes recém-aprovados (sem clientes ainda) agora aparecem em "Para quem passar?" (os da região do cliente primeiro) e na caixa "Passar para…" da Lista.'],
+  ]},
   {v:'v229',d:'24/11/2026',t:'Controle do mostruário em quadros',l:[
    ['g','Controle do mostruário: cada candidato agora aparece num quadro (nome, cidade, mesorregião e situação em etiqueta colorida), em vez de uma lista corrida. As informações são as mesmas.'],
   ]},
@@ -5061,13 +5065,18 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const rdQ=render;render=function(){if(VIEW==='rec'||VIEW==='reat')return;return rdQ.apply(this,arguments)};
  const svQ=setView;setView=function(v){if(v==='rec'||v==='reat'){svQ(v);try{v==='rec'?renderRec():renderReat()}catch(e){console.error(e)}return}return svQ(v)};
  // ===== (1) Hora de recomprar =====
- const RQ={k:'all',uf:'',mes:'',cid:''};
+ const RQ={k:'all',uf:'',mes:'',cs:new Set()};
+ const cbHtml=(id,list,sel)=>`<div style="position:relative;flex:1 1 170px;font-size:12px;color:#5b6b82">Cidade (uma ou mais)<button type="button" id="${id}_b" style="width:100%;padding:7px;border:1px solid #c5d0e3;border-radius:9px;font-size:14px;background:#fff;text-align:left;cursor:pointer;display:block;color:#10233f">${sel.size?(sel.size===1?E([...sel][0]):sel.size+' cidades'):'Todas'} ▾</button><div id="${id}_d" hidden style="position:absolute;z-index:50;left:0;min-width:250px;background:#fff;border:1px solid #c5d0e3;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.25);padding:8px"><input id="${id}_s" placeholder="🔎 buscar cidade" style="width:100%;box-sizing:border-box;padding:6px;margin-bottom:6px"><div style="max-height:240px;overflow:auto">${list.map(u=>`<label data-n="${E(u.toLowerCase())}" style="display:flex;gap:6px;padding:3px 0;color:#10233f;font-size:13.5px"><input type="checkbox" value="${E(u)}"${sel.has(u)?' checked':''}> ${E(u)}</label>`).join('')}</div><div style="display:flex;gap:6px;margin-top:6px"><button type="button" id="${id}_c" style="flex:1;padding:6px">Limpar</button><button type="button" id="${id}_a" style="flex:1;padding:6px;background:#1F4E78;color:#fff;border:0;border-radius:6px">Aplicar</button></div></div></div>`;
+ const cbBind=(id,sel,again)=>{const g=x=>document.getElementById(id+'_'+x),d=g('d');if(!d)return;g('b').onclick=e=>{e.stopPropagation();d.hidden=!d.hidden};d.onclick=e=>e.stopPropagation();
+  g('s').oninput=e=>{const q=e.target.value.toLowerCase();d.querySelectorAll('label').forEach(l=>l.style.display=!q||l.dataset.n.includes(q)?'':'none')};
+  g('c').onclick=()=>{sel.clear();again()};g('a').onclick=()=>{sel.clear();d.querySelectorAll('input[type=checkbox]:checked').forEach(k=>sel.add(k.value));again()}};
+
  function renderRec(){const r=nxRep();ctl(nxRepSel('rec_rep',r));nxRepBind('rec_rep',renderRec);
   const all0=recList(nx2Ids());all0.forEach(o=>o.g=rgeo(o.ci));
   const rufs=[...new Set(all0.map(o=>o.g.uf).filter(Boolean))].sort();if(RQ.uf&&!rufs.includes(RQ.uf))RQ.uf='';
   const r1=all0.filter(o=>!RQ.uf||o.g.uf===RQ.uf),rmes=[...new Set(r1.map(o=>o.g.mes).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt'));if(RQ.mes&&!rmes.includes(RQ.mes))RQ.mes='';
-  const r2=r1.filter(o=>!RQ.mes||o.g.mes===RQ.mes),rcid=[...new Set(r2.map(o=>o.g.cid).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt'));if(RQ.cid&&!rcid.includes(RQ.cid))RQ.cid='';
-  const all=r2.filter(o=>!RQ.cid||o.g.cid===RQ.cid),sm=k=>{const l=all.filter(o=>o.s.k===k);return{n:l.length,v:l.reduce((a,o)=>a+o.x.typ,0)}};
+  const r2=r1.filter(o=>!RQ.mes||o.g.mes===RQ.mes),rcid=[...new Set(r2.map(o=>o.g.cid).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt'));[...RQ.cs].forEach(c=>{if(!rcid.includes(c))RQ.cs.delete(c)});
+  const all=r2.filter(o=>!RQ.cs.size||RQ.cs.has(o.g.cid)),sm=k=>{const l=all.filter(o=>o.s.k===k);return{n:l.length,v:l.reduce((a,o)=>a+o.x.typ,0)}};
   const H=sm('hora'),A=sm('atr'),B=sm('breve'),rk={hora:0,atr:1,breve:2};
   let l=all.filter(o=>RQ.k==='all'||o.s.k===RQ.k).sort((a,b)=>rk[a.s.k]-rk[b.s.k]||b.x.typ-a.x.typ);const tot=l.length;l=l.slice(0,80);
   const rowH=o=>{const c=D.cli[o.ci],x=o.x,s=o.s,ab=abcOf(o.ci);
@@ -5077,11 +5086,11 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
    <div style="font-size:13.5px;margin:4px 0">Compra a cada <b>~${Math.round(x.cyc)} dias</b> · última há <b>${s.since} dias</b> (${dstr(x.last)}) · pedido típico <b>${R0(x.typ)}</b></div><div>${n3Btn(n3Wa(c[3],msg),'💬 WhatsApp')}</div></div>`};
   $('#v2out').innerHTML=`<div class="vmh"><h2>🔁 Hora de recomprar</h2><p>Cada cliente tem o seu ritmo: calculei o intervalo normal entre os pedidos dele (mediana dos últimos pedidos). Aqui estão os que <b>estão na hora</b>, <b>passaram um pouco do ritmo</b> ou <b>chegam nas próximas 3 semanas</b>. Quem esfriou de vez está em <b>Reativar clientes</b>. Só entram clientes com 3 pedidos ou mais. Dados até ${dstr(D.ref)}.</p></div>
   <button id="k_xl" style="display:none"></button>
-  <div class="lcgf" style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0"><label style="flex:1 1 120px;font-size:12px;color:#5b6b82">Estado<select id="rq_uf" style="width:100%;padding:7px;border:1px solid #c5d0e3;border-radius:9px;font-size:14px"><option value="">Todos</option>${rufs.map(u=>`<option${u===RQ.uf?' selected':''}>${E(u)}</option>`).join('')}</select></label><label style="flex:1 1 170px;font-size:12px;color:#5b6b82">Mesorregião<select id="rq_mes" style="width:100%;padding:7px;border:1px solid #c5d0e3;border-radius:9px;font-size:14px"><option value="">Todas</option>${rmes.map(u=>`<option${u===RQ.mes?' selected':''}>${E(u)}</option>`).join('')}</select></label><label style="flex:1 1 170px;font-size:12px;color:#5b6b82">Cidade<select id="rq_cid" style="width:100%;padding:7px;border:1px solid #c5d0e3;border-radius:9px;font-size:14px"><option value="">Todas</option>${rcid.map(u=>`<option${u===RQ.cid?' selected':''}>${E(u)}</option>`).join('')}</select></label></div>
+  <div class="lcgf" style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0"><label style="flex:1 1 120px;font-size:12px;color:#5b6b82">Estado<select id="rq_uf" style="width:100%;padding:7px;border:1px solid #c5d0e3;border-radius:9px;font-size:14px"><option value="">Todos</option>${rufs.map(u=>`<option${u===RQ.uf?' selected':''}>${E(u)}</option>`).join('')}</select></label><label style="flex:1 1 170px;font-size:12px;color:#5b6b82">Mesorregião<select id="rq_mes" style="width:100%;padding:7px;border:1px solid #c5d0e3;border-radius:9px;font-size:14px"><option value="">Todas</option>${rmes.map(u=>`<option${u===RQ.mes?' selected':''}>${E(u)}</option>`).join('')}</select></label>${cbHtml("rq",rcid,RQ.cs)}</div>
   <div class="lcqk"><div><b>${H.n}</b><small>na hora · ${R0(H.v)}</small></div><div><b>${A.n}</b><small>passaram do ritmo · ${R0(A.v)}</small></div><div><b>${B.n}</b><small>nas próximas 3 semanas · ${R0(B.v)}</small></div></div>
   <div class="lcqf">${[['all','Todos ('+all.length+')'],['hora','Na hora ('+H.n+')'],['atr','Passou do ritmo ('+A.n+')'],['breve','Em breve ('+B.n+')']].map(([k,t])=>`<button class="rqk${RQ.k===k?' on':''}" data-k="${k}">${t}</button>`).join('')}</div>
   ${l.length?l.map(rowH).join('')+(tot>80?`<div class="mute">Mostrando os 80 de maior valor de ${tot}. Use o Excel para a lista completa.</div>`:''):'<div class="act">Nenhum cliente nesta situação agora.</div>'}`;
-  [['rq_uf','uf'],['rq_mes','mes'],['rq_cid','cid']].forEach(([id,k])=>{const e=document.getElementById(id);if(e)e.onchange=()=>{RQ[k]=e.value;if(k==='uf'){RQ.mes='';RQ.cid=''}if(k==='mes')RQ.cid='';renderRec()}});
+  [['rq_uf','uf'],['rq_mes','mes']].forEach(([id,k])=>{const e=document.getElementById(id);if(e)e.onchange=()=>{RQ[k]=e.value;if(k==='uf'){RQ.mes='';RQ.cs.clear()}if(k==='mes')RQ.cs.clear();renderRec()}});cbBind('rq',RQ.cs,renderRec);
   document.querySelectorAll('.rqk').forEach(b=>b.onclick=()=>{RQ.k=b.dataset.k;renderRec()});
   document.querySelectorAll('.rcf').forEach(a=>a.onclick=e=>{e.preventDefault();nxFicha(+a.dataset.ci)});
   const xb=document.getElementById('k_xl');if(xb)xb.onclick=()=>{if(window.lcXls)lcXls('Hora de recomprar',all.filter(o=>RQ.k==='all'||o.s.k===RQ.k).map(o=>o.ci))}}
@@ -5093,7 +5102,7 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
   const an=document.getElementById('lcextra')||document.getElementById('lcdia');if(an)an.insertAdjacentHTML('afterend',h);else out.insertAdjacentHTML('afterbegin',h);
   const b=document.getElementById('lcrec_b');if(b)b.onclick=()=>setView('rec')}catch(e){console.error('lcQ hoje',e)}};
  // ===== (2) Reativar clientes =====
- const RE={k:'all',h:false,uf:'',mes:'',cid:''};let BYC=null;
+ const RE={k:'all',h:false,uf:'',mes:'',cs:new Set()};let BYC=null;
  const byC=()=>{if(BYC)return BYC;BYC=new Map();for(let i=0;i<N;i++){let a=BYC.get(L.C[i]);if(!a)BYC.set(L.C[i],a=[]);a.push(i)}return BYC};
  const hidK=()=>'mm_reat_v1_'+(D.rm?'r':'g');
  const hidGet=()=>{try{return JSON.parse(localStorage.getItem(hidK())||'{}')||{}}catch(e){return{}}};
@@ -5110,8 +5119,8 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
   cand.forEach(o=>{o.g=rgeo(o.ci)});
   const ufs=[...new Set(cand.map(o=>o.g.uf).filter(Boolean))].sort();if(RE.uf&&!ufs.includes(RE.uf))RE.uf='';
   const c1=cand.filter(o=>!RE.uf||o.g.uf===RE.uf);const mess=[...new Set(c1.map(o=>o.g.mes).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt'));if(RE.mes&&!mess.includes(RE.mes))RE.mes='';
-  const c2=c1.filter(o=>!RE.mes||o.g.mes===RE.mes);const cids=[...new Set(c2.map(o=>o.g.cid).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt'));if(RE.cid&&!cids.includes(RE.cid))RE.cid='';
-  const candG=c2.filter(o=>!RE.cid||o.g.cid===RE.cid),totAll=cand.filter(o=>RE.h||!o.h).length;
+  const c2=c1.filter(o=>!RE.mes||o.g.mes===RE.mes);const cids=[...new Set(c2.map(o=>o.g.cid).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt'));[...RE.cs].forEach(c=>{if(!cids.includes(c))RE.cs.delete(c)});
+  const candG=c2.filter(o=>!RE.cs.size||RE.cs.has(o.g.cid)),totAll=cand.filter(o=>RE.h||!o.h).length;
   const vis=candG.filter(o=>RE.h||!o.h),nH=candG.filter(o=>o.h).length;
   const cs=k=>{const l=vis.filter(o=>o.ch===k);return{n:l.length,v:l.reduce((a,o)=>a+o.x.typ,0)}};const cA=cs('A'),cM=cs('M'),cB=cs('B'),rk={A:0,M:1,B:2};
   let l=vis.filter(o=>RE.k==='all'||o.ch===RE.k).sort((a,b)=>rk[a.ch]-rk[b.ch]||b.x.tot-a.x.tot);const tot=l.length;l=l.slice(0,60);
@@ -5126,13 +5135,13 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
   <button id="k_xl" style="display:none"></button>
   <div class="lcgf" style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0"><label style="flex:1 1 120px;font-size:12px;color:#5b6b82">Estado<select id="re_uf" style="width:100%;padding:7px;border:1px solid #c5d0e3;border-radius:9px;font-size:14px"><option value="">Todos</option>${ufs.map(u=>`<option${u===RE.uf?' selected':''}>${u}</option>`).join('')}</select></label>
   <label style="flex:1 1 170px;font-size:12px;color:#5b6b82">Mesorregião<select id="re_mes" style="width:100%;padding:7px;border:1px solid #c5d0e3;border-radius:9px;font-size:14px"><option value="">Todas</option>${mess.map(u=>`<option${u===RE.mes?' selected':''}>${E(u)}</option>`).join('')}</select></label>
-  <label style="flex:1 1 170px;font-size:12px;color:#5b6b82">Cidade<select id="re_cid" style="width:100%;padding:7px;border:1px solid #c5d0e3;border-radius:9px;font-size:14px"><option value="">Todas</option>${cids.map(u=>`<option${u===RE.cid?' selected':''}>${E(u)}</option>`).join('')}</select></label></div>
+  ${cbHtml("re",cids,RE.cs)}</div>
   <div class="lcqk"><div><b>${cA.n}</b><small>boa chance · ${R0(cA.v)}</small></div><div><b>${cM.n}</b><small>chance média · ${R0(cM.v)}</small></div><div><b>${cB.n}</b><small>chance baixa · ${R0(cB.v)}</small></div></div>
   <div class="mute" style="font-size:12px">Os valores são o pedido típico de cada cliente, somado: o que entra se eles voltarem ao padrão de antes.</div>
   <div class="lcqf">${[['all','Todos ('+vis.length+')'],['A','Boa chance ('+cA.n+')'],['M','Média ('+cM.n+')'],['B','Baixa ('+cB.n+')']].map(([k,t])=>`<button class="rek${RE.k===k?' on':''}" data-k="${k}">${t}</button>`).join('')}${nH?`<button id="re_h" class="${RE.h?'on':''}">${RE.h?'Esconder':'Mostrar'} já chamados (${nH})</button>`:''}</div>
-  <div id="re_cnt" class="mute" title="Quantos clientes aparecem na lista agora, em relação a todos os clientes parados do representante escolhido." style="text-align:right;font-size:13px;margin:6px 0"><b style="color:#1F4E78">${tot}</b> de ${totAll} clientes parados${RE.uf?' · '+RE.uf:''}${RE.mes?' · '+E(RE.mes):''}${RE.cid?' · '+E(RE.cid):''}${RE.k!=='all'?' · '+({A:'boa chance',M:'chance média',B:'chance baixa'}[RE.k]):''}${RE.h&&nH?' · com já chamados':''}</div>
+  <div id="re_cnt" class="mute" title="Quantos clientes aparecem na lista agora, em relação a todos os clientes parados do representante escolhido." style="text-align:right;font-size:13px;margin:6px 0"><b style="color:#1F4E78">${tot}</b> de ${totAll} clientes parados${RE.uf?' · '+RE.uf:''}${RE.mes?' · '+E(RE.mes):''}${RE.cs.size?' · '+E([...RE.cs].join(', ')):''}${RE.k!=='all'?' · '+({A:'boa chance',M:'chance média',B:'chance baixa'}[RE.k]):''}${RE.h&&nH?' · com já chamados':''}</div>
   ${l.length?l.map(rowH).join('')+(tot>60?`<div class="mute">Mostrando os 60 de maior valor de ${tot}. Use o Excel para a lista completa.</div>`:''):'<div class="act">Nenhum cliente nesta situação.</div>'}`;
-  [['re_uf','uf'],['re_mes','mes'],['re_cid','cid']].forEach(([id,k])=>{const e=document.getElementById(id);if(e)e.onchange=()=>{RE[k]=e.value;if(k==='uf'){RE.mes='';RE.cid=''}if(k==='mes')RE.cid='';renderReat()}});
+  [['re_uf','uf'],['re_mes','mes']].forEach(([id,k])=>{const e=document.getElementById(id);if(e)e.onchange=()=>{RE[k]=e.value;if(k==='uf'){RE.mes='';RE.cs.clear()}if(k==='mes')RE.cs.clear();renderReat()}});cbBind('re',RE.cs,renderReat);
   document.querySelectorAll('.rek').forEach(b=>b.onclick=()=>{RE.k=b.dataset.k;renderReat()});const hb=document.getElementById('re_h');if(hb)hb.onclick=()=>{RE.h=!RE.h;renderReat()};
   document.querySelectorAll('.rcf').forEach(a=>a.onclick=e=>{e.preventDefault();nxFicha(+a.dataset.ci)});
   document.querySelectorAll('.rhid').forEach(b=>b.onclick=()=>{const o=hidGet(),k=b.dataset.c;if(o[k]&&o[k]>Date.now()-14*864e5)delete o[k];else o[k]=Date.now();hidSet(o);renderReat()});
@@ -6961,6 +6970,9 @@ body.rt-fs{overflow:hidden!important}body.rt-fs:not(.rt-nv) #lcnav{display:none!
  const tg=(t,c)=>`<span class="rt-tg" style="background:${c}22;color:${c}">${t}</span>`;
  const R0_=v=>'R$ '+Math.round(v).toLocaleString('pt-BR');
  function resumo(){const c={aguard:0,acomp:0,vendeu:0,dec:0,conf:0};Object.keys(R.t).forEach(code=>{R.t[code].forEach(t=>{if(t.st==='conf')c.conf++});const t=ult(code);if(!t||!emCurso(t)||t.dest==='ina')return;const e=est(t);if(e==='aguard')c.aguard++;else if(e==='acomp')c.acomp++;else if(e==='vendeu')c.vendeu++;else c.dec++});return c}
+ function novosRep(ci){try{const nv=D.reps.filter(r=>+r[0]<0&&r[2]);if(!nv.length)return '';const me=mesoOf(D.cli[ci]),nz=t=>String(t||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');const np=D.np||[];
+  const L=nv.map(r=>{const x=np.find(z=>+z.c===+r[0])||{};const reg=(x.reg||[]).filter(Boolean).join(', ');const ok=me&&reg&&nz(reg).includes(nz(me));return{c:+r[0],n:first2(tc(String(r[1]))),reg,cid:x.cid||'',ok}}).sort((a,b)=>b.ok-a.ok||a.n.localeCompare(b.n));
+  return '<div class="rt-m" style="margin-top:8px;font-weight:700;color:#1F4E78">Novos representantes (aprovados, ainda sem clientes)</div>'+L.map(x=>`<div class="rt-li"><span><b>${E(x.n)}</b>${x.ok?' <span class="rt-in" style="background:#2E7D32">da região</span>':''}<div class="rt-m">${E(x.cid)}${x.reg?' · região: '+E(x.reg):''}</div></span><button class="rt-bt p rt-pp" data-p="${x.c}">Passar</button></div>`).join('')}catch(e){return ''}}
  function jaTir(ci,grande){const a=atend2(ci);if(!a.length)return `<div class="rt-jt" title="Representantes que já tiraram pedido com este cliente">🛒 Ninguém tirou pedido com ele ainda</div>`;return `<div class="rt-jt" title="Representantes que já tiraram pedido com este cliente (e o mês do último pedido de cada um)">🛒 Já tiraram pedido: ${a.map(x=>'<b>'+E(first2(tc(rN(x.r))))+'</b> <span>('+mAno(x.b)+')</span>').join(' · ')}</div>`}
  function atend2(ci){const m=new Map();cliLines(ci).forEach(i=>{const r=L.R[i];if(!r)return;const d=L.D[i];let x=m.get(r);if(!x)m.set(r,x={r,a:d,b:d});if(d<x.a)x.a=d;if(d>x.b)x.b=d});return [...m.values()].sort((x,y)=>y.b-x.b)}
  function prodsCli(ci){const m=new Map();cliLines(ci).forEach(i=>{const k=L.P[i];let x=m.get(k);if(!x)m.set(k,x={q:0,v:0,o:new Set()});x.q+=(L.Q[i]||0);x.v+=L.V[i];x.o.add(L.D[i])});return [...m.entries()].sort((a,b)=>b[1].v-a[1].v)}
@@ -7002,7 +7014,8 @@ body.rt-fs{overflow:hidden!important}body.rt-fs:not(.rt-nv) #lcnav{display:none!
  document.addEventListener('input',e=>{const t=e.target;if(t.classList&&t.classList.contains('ar_q')){AF.q=t.value;const p=t.selectionStart;draw();const n=document.querySelector('.ar_q');if(n){n.focus();try{n.setSelectionRange(p,p)}catch(x){}}}});
  // esconde o cliente arquivado nas listas de trabalho (mantém no arquivo e na ficha)
  setInterval(()=>{try{if(D.rm||!window.lcRowsOf||!Object.keys(AQ).length)return;if(typeof VIEW!=='undefined'&&(VIEW==='ficha'||VIEW==='repas'||VIEW==='cobert'))return;const o=document.getElementById('v2out');if(!o)return;lcRowsOf(o).forEach(r=>{if(r.ci!=null&&D.cli[r.ci]&&arqHas(D.cli[r.ci][0])&&r.el.style.display!=='none'){r.el.style.display='none';r.el.dataset.arq='1'}})}catch(e){}},700);
- function draw(){const o=document.getElementById('v2out');if(!o)return;try{document.getElementById('v2bar').innerHTML=''}catch(e){}badge();const P=parados(),c=resumo();
+ function refreshReps(){try{if(window.lcSincRep)window.lcSincRep();D.reps.forEach((r,i)=>{if(i)IDXC.set(+r[0],i)});const st=new Set(ATIVOS);D.reps.forEach(r=>{if(+r[0]<0&&r[2])st.add(+r[0])});REPS.splice(0,REPS.length,...[...st].filter(c=>!INT.includes(c)).sort((x,y)=>nmCod(x).localeCompare(nmCod(y))))}catch(e){}}
+ function draw(){const o=document.getElementById('v2out');if(!o)return;refreshReps();try{document.getElementById('v2bar').innerHTML=''}catch(e){}badge();const P=parados(),c=resumo();
   if(ST.tab==='par'&&ST.modo==='mapa'){o.innerHTML='';let f=document.getElementById('rt_fs');if(!f){f=document.createElement('div');f.id='rt_fs';document.body.appendChild(f)}document.body.classList.add('rt-fs');
    ST.asp=(innerWidth-(ST.dr?330:0))/Math.max(300,innerHeight-70-110);
    f.innerHTML=listaPar(P);f.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{ST.tab=b.dataset.t;draw()});f.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{ST.modo=b.dataset.m;ST.tab='par';draw()});bind2(f,P);return}
@@ -7095,7 +7108,7 @@ body.rt-fs{overflow:hidden!important}body.rt-fs:not(.rt-nv) #lcnav{display:none!
   <div class="rt-sts" style="margin-top:10px">${st('Total comprado',R0_(tot),n+' pedido'+(n===1?'':'s'))}${st('Média por pedido',R0_(n?tot/n:0))}${st('Por ano',R0_(n?tot/anos:0))}${st('Primeira compra',first?mAno(first.d):'—')}${st('Última compra',last?mAno(last.d):'—',last?'há '+(D.ref-last.d)+' dias':'')}</div></div>
   ${ritmoBox(ci)}
   <div class="rt-b"><div class="rt-f" style="border-bottom:2px solid #dde4f0;margin-bottom:8px">${abas.map(a=>`<button class="rt-ut${tb===a[0]?' on':''}" data-ut="${a[0]}">${a[1]}</button>`).join('')}</div>${cont}</div></div>
-  <div class="rt-um2"><div class="rt-b" style="border:2px solid #1F4E78"><h3 style="color:#1F4E78;letter-spacing:.5px">PARA QUEM PASSAR?</h3>${jaTir(ci)}${quem}
+  <div class="rt-um2"><div class="rt-b" style="border:2px solid #1F4E78"><h3 style="color:#1F4E78;letter-spacing:.5px">PARA QUEM PASSAR?</h3>${jaTir(ci)}${quem}${novosRep(ci)}
    <div class="rt-li"><span><b>Back Office</b></span><span></span></div>${INT.map(cc=>`<div class="rt-li"><span><b>${E(nmCod(cc))}</b> · Back Office<div class="rt-m">${cargaBO(cc)} em andamento</div></span><button class="rt-bt p rt-pp" data-p="bo${cc}">Passar</button></div>`).join('')}
    <div class="rt-f" style="margin-top:10px"><button class="rt-bt s" id="um_pu" style="flex:1">Pular</button><button class="rt-bt s" id="um_in" style="flex:1">Deixar inativo</button></div>
    <div class="rt-f" style="margin-top:8px"><button class="rt-bt s" id="um_ar" style="flex:1" title="Cliente que acabou de vez: fica guardado, mas sai das listas de trabalho">🗄 Arquivo morto</button></div>
@@ -7800,6 +7813,7 @@ body.rt-fs{overflow:hidden!important}body.rt-fs:not(.rt-nv) #lcnav{display:none!
    D.reps.push([code,String(c.nome||'').trim().toUpperCase(),1,1]);np.push({c:code,n:String(c.nome||'').trim().toUpperCase(),cid:c.cid||'',tel:c.tel||'',desde:S.td||vHoje(),reg:[c.reg||''],cod:S.cod||''})});
   prAll().forEach(c=>{if(prSt(c)==='f')return;const code=mp[c.id];if(code==null)return;const rp=D.reps.find(r=>r[0]===code);if(rp)rp[2]=0;const ni=np.findIndex(z=>z.c===code);if(ni>=0)np.splice(ni,1)});
   if(mud)sj(KN,mp)}
+ window.lcSincRep=()=>{try{sincRep()}catch(e){}};
  setTimeout(()=>{try{sincRep()}catch(e){console.error('lcAR sinc',e)}},1500);
  // ---- badge, som e aviso
  let ctx=null,pend=false;
