@@ -1962,7 +1962,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v221';
+const NX_VER = 'v222';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3649,6 +3649,10 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v222',d:'24/11/2026',t:'Histórico do cliente',l:[
+   ['g','Ficha do cliente: bloco 📝 Histórico do cliente. Você escreve observações (cada uma com data) e elas aparecem numa linha do tempo junto com pedidos, repasses, arquivo morto, lembretes, visitas e “Já chamei”. Só você vê.'],
+   ['g','Nos cartões de cliente (Reativar, Recomprar etc.) aparece a última observação; tocando nela dá para escrever mais ou abrir a Ficha.'],
+   ['g','Novo botão 🔎 Pesquisar observações: procura uma palavra em tudo o que você escreveu sobre os clientes.']]},
   {v:'v221',d:'24/11/2026',t:'Reativar: Fechou, Arquivo morto e informação do cliente',l:[
    ['g','Reativar: o bloco Ações ganhou 🚫 Fechou (manda para o Arquivo morto com o motivo “Fechou o negócio”) e 🗄 Arquivo morto. O cliente arquivado sai da lista.'],
    ['g','Novo campo 📝 Informação sobre este cliente no cartão do Reativar. A anotação aparece também na Ficha e é só sua.']]},
@@ -9302,7 +9306,7 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
    const d=dig(c[3]),ok=d.length>=10;
    const inf=document.createElement('div');inf.className='lcbx-i';const uv=ultV(ci);inf.innerHTML='👤 Carteira: <b>'+E(rep(c))+'</b>'+(uv?' · 🧾 Última venda: <b>'+E(uv)+'</b>':'')+' · 📞 '+(ok?'<span class="tel">'+E(fmt(d))+'</span>':'<span class="mute">sem telefone</span>');
    const bl=document.createElement('div');bl.className='lcbx-b';
-   bl.innerHTML='<div class="tt">Ações</div><div class="lcbx-g"><button data-k="fi">👤 Ficha</button><button data-k="ct">📖 Catálogo</button><button data-k="wa" class="wa">✉ Copiar mensagem</button><button data-k="lig">📞 Ligar</button><button data-k="cp"'+(ok?'':' disabled')+'>📋 Copiar tel.</button><button data-k="ag">📅 Agendar</button>'+(reat?'<button data-k="ps">↪ Passar para…</button><button data-k="jc">✔ Já chamei</button>'+(window.lcRep&&lcRep.arquivar?'<button data-k="fc" title="A empresa fechou: vai para o Arquivo morto com o motivo Fechou o negócio">🚫 Fechou</button><button data-k="am" title="Cliente que não compra mais: fica guardado e sai das listas de trabalho">🗄 Arquivo morto</button>':''):'')+'</div>'+(reat&&!D.rm?'<div class="lcbx-n"><input class="lcbx-ni" type="text" maxlength="300" placeholder="📝 Informação sobre este cliente (só você vê)" title="Anotação sua sobre o cliente. Aparece também na Ficha." value="'+E(window.lcCliInfo?lcCliInfo.get(c[0]):'')+'"></div>':'');
+   bl.innerHTML='<div class="tt">Ações</div><div class="lcbx-g"><button data-k="fi">👤 Ficha</button><button data-k="ct">📖 Catálogo</button><button data-k="wa" class="wa">✉ Copiar mensagem</button><button data-k="lig">📞 Ligar</button><button data-k="cp"'+(ok?'':' disabled')+'>📋 Copiar tel.</button><button data-k="ag">📅 Agendar</button>'+(reat?'<button data-k="ps">↪ Passar para…</button><button data-k="jc">✔ Já chamei</button>'+(window.lcRep&&lcRep.arquivar?'<button data-k="fc" title="A empresa fechou: vai para o Arquivo morto com o motivo Fechou o negócio">🚫 Fechou</button><button data-k="am" title="Cliente que não compra mais: fica guardado e sai das listas de trabalho">🗄 Arquivo morto</button>':''):'')+'</div>';
    const on=(k,f)=>{const x=bl.querySelector('[data-k="'+k+'"]');if(x)x.onclick=ev=>{ev.preventDefault();ev.stopPropagation();f(x)}};
    on('fi',()=>{const f=q(card,'.rowb a.fi')||a;f.click()});
    on('ct',()=>{const x=q(card,'button.lctb');if(x)x.click()});
@@ -9313,7 +9317,6 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
    on('ps',()=>{if(window.lcRep&&window.lcRep.passar)window.lcRep.passar(ci)});
    on('jc',()=>{const x=q(card,'.rhid');if(x)x.click()});
    on('fc',()=>{if(window.lcRep&&lcRep.arquivar)lcRep.arquivar(ci,'Fechou o negócio')});on('am',()=>{if(window.lcRep&&lcRep.arquivar)lcRep.arquivar(ci)});
-   {const ni=bl.querySelector('.lcbx-ni');if(ni){ni.onclick=ev=>ev.stopPropagation();ni.onchange=()=>{if(window.lcCliInfo)lcCliInfo.set(c[0],ni.value)}}}
    const city=card.querySelector('.mute');(city||card).insertAdjacentElement(city?'afterend':'beforeend',inf);
    const last=[...card.children].filter(x=>!x.classList.contains('lcbx-h')&&x!==inf).pop();(last&&last!==inf?last:inf).insertAdjacentElement('afterend',bl);
    sync(card,ci)})}
@@ -9703,17 +9706,74 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
  if(typeof apBuild==='function'&&!apBuild.__cg){const ab=apBuild;apBuild=function(){return fix(ab.apply(this,arguments))};apBuild.__cg=1}
 }catch(e){console.error('lcCG',e)}})();
 
-// ===== v221 · Informação sobre o cliente (só gestor): campo no cartão do Reativar e na Ficha =====
+// ===== v222 · Histórico do cliente (só gestor): observações com data + linha do tempo na Ficha, última observação nos cartões e busca =====
 (function(){try{ if(window.__lcCH||(typeof D!=='undefined'&&D.rm))return;window.__lcCH=1;
- const K='metalmig_cliinfo_v1',L0=window.localStorage;
+ const K2='metalmig_cliinfo_v2',K1='metalmig_cliinfo_v1',L0=window.localStorage;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
- const ld=()=>{try{return JSON.parse(L0.getItem(K)||'{}')||{}}catch(e){return{}}};
- window.lcCliInfo={get:code=>{const o=ld()[String(code)];return o?o.t:''},set:(code,t)=>{const m=ld(),k=String(code);t=String(t||'').trim().slice(0,300);if(t)m[k]={t:t,d:new Date().toISOString().slice(0,10)};else delete m[k];try{L0.setItem(K,JSON.stringify(m))}catch(e){}}};
- const st=document.createElement('style');st.textContent='.lcbx-n{margin-top:8px}.lcbx-ni,.lcci_i{width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid #c5d0e3;border-radius:9px;font:inherit;font-size:13px;background:#fff}';document.head.appendChild(st);
- const inj=ci=>{try{const det=document.getElementById('f_det');if(!det||det.querySelector('#lcci'))return;const code=D.cli[ci][0];
-  det.insertAdjacentHTML('afterbegin','<div id="lcci" class="lccard" style="margin:0 0 10px"><b>📝 Informação sobre o cliente</b> <span style="color:#5b6b82;font-size:12px">(só você vê)</span><input class="lcci_i" type="text" maxlength="300" placeholder="Escreva o que quiser sobre este cliente" value="'+E(lcCliInfo.get(code))+'"></div>');
-  const i=det.querySelector('.lcci_i');if(i)i.onchange=()=>lcCliInfo.set(code,i.value)}catch(e){}};
+ const J=k=>{try{return JSON.parse(L0.getItem(k)||'null')}catch(e){return null}};
+ const nowIso=()=>{const n=new Date(),p=x=>String(x).padStart(2,'0');return n.getFullYear()+'-'+p(n.getMonth()+1)+'-'+p(n.getDate())+'T'+p(n.getHours())+':'+p(n.getMinutes())};
+ let M=J(K2);if(!M){M={};const o=J(K1)||{};Object.keys(o).forEach(c=>{if(o[c]&&o[c].t)M[c]=[{id:'m'+c,t:o[c].t,d:(o[c].d||nowIso().slice(0,10))+'T12:00'}]});try{L0.setItem(K2,JSON.stringify(M))}catch(e){}}
+ const sv=()=>{try{L0.setItem(K2,JSON.stringify(M))}catch(e){}};
+ const lst=code=>(M[String(code)]||[]).slice().sort((a,b)=>String(b.d).localeCompare(String(a.d)));
+ const API=window.lcCliInfo={list:lst,last:code=>{const a=lst(code);return a.length?a[0]:null},get:code=>{const a=lst(code);return a.length?a[0].t:''},
+  add:(code,t)=>{t=String(t||'').trim().slice(0,500);if(!t)return false;const k=String(code);(M[k]=M[k]||[]).push({id:'m'+Date.now().toString(36)+Math.random().toString(36).slice(2,4),t:t,d:nowIso()});sv();return true},
+  del:(code,id)=>{const k=String(code);M[k]=(M[k]||[]).filter(x=>x.id!==id);if(!M[k].length)delete M[k];sv()},
+  all:()=>M};
+ const brd=d=>{d=String(d||'');return /^\d{4}-\d\d-\d\d/.test(d)?d.slice(8,10)+'/'+d.slice(5,7)+'/'+d.slice(0,4):''};
+ const nd=n=>{const t=new Date(n*864e5);return t.getUTCFullYear()+'-'+String(t.getUTCMonth()+1).padStart(2,'0')+'-'+String(t.getUTCDate()).padStart(2,'0')};
+ const R0=v=>'R$ '+Math.round(+v||0).toLocaleString('pt-BR');
+ const ciOf=code=>D.cli.findIndex(c=>String(c[0])===String(code));
+ const st=document.createElement('style');st.textContent=`.cio{margin:5px 0;padding:5px 9px;border-radius:8px;background:#fff8dc;border:1px solid #efdca0;font-size:12.5px;color:#5a4a10;cursor:pointer}.cio small{color:#8a7a3a}.cio.vz{background:transparent;border:1px dashed #cdd6e4;color:#7b8aa0}
+ #lcci{margin:0 0 10px}#lcci .lcci_f{display:flex;gap:6px;margin:6px 0}#lcci .lcci_i,.lcci_q{flex:1;box-sizing:border-box;padding:8px 10px;border:1px solid #c5d0e3;border-radius:9px;font:inherit;font-size:13px;background:#fff;min-width:0}
+ .lcci_b{padding:8px 12px;border:0;border-radius:9px;background:#1F4E78;color:#fff;font-weight:700;cursor:pointer}
+ .lcci_ev{display:flex;gap:8px;font-size:13px;padding:5px 0;border-bottom:1px dashed #e3e8f0}.lcci_ev .dt{color:#667;min-width:78px;flex:none}.lcci_ev .tx{flex:1;min-width:0;word-break:break-word}.lcci_ev.ob .tx{background:#fff8dc;border-radius:6px;padding:2px 6px}.lcci_x{border:0;background:none;color:#a33;cursor:pointer;font-size:13px}
+ #f_det #lcci~#lcln_b{display:none}
+ .lcci_ov{position:fixed;inset:0;background:rgba(15,30,55,.45);z-index:99990;display:flex;align-items:center;justify-content:center;padding:14px}.lcci_md{background:#fff;border-radius:14px;padding:16px;max-width:520px;width:100%;max-height:86vh;overflow:auto;box-shadow:0 10px 40px rgba(0,0,0,.3)}
+ .lcci_r{padding:8px 0;border-bottom:1px solid #e8edf5;cursor:pointer}.lcci_r mark{background:#ffe58a}`;document.head.appendChild(st);
+ // ---- eventos do cliente
+ function eventos(ci){const c=D.cli[ci],code=String(c[0]),ev=[];
+  lst(code).forEach(o=>ev.push({d:o.d,k:'ob',id:o.id,t:o.t}));
+  try{(nxOrd(ci)||[]).slice(-15).forEach(o=>ev.push({d:nd(o.d),t:'🧾 Pedido · '+R0(o.v)}))}catch(e){}
+  try{const R=J('metalmig_reat_v1');((R&&R.t&&R.t[code])||[]).forEach(t=>{const lab=t.dest==='ina'?'Deixado inativo':('Passado para '+(t.nome||(t.dest==='bo'?'Back Office':'representante')));const r={recusou:'recusou',vendeu:'vendeu',conf:'vendeu',sem:'não vendeu',enc:'não vendeu',aguard:'aguardando',acomp:'acompanhando'}[t.st];ev.push({d:t.ini,t:'↪ '+lab+(r?' ('+r+')':'')})})}catch(e){}
+  try{const a=J('metalmig_arqmorto_v1')||{};if(a[code])ev.push({d:a[code].d,t:'🗄 Arquivo morto · '+(a[code].mot||'')+(a[code].obs?' — '+a[code].obs:'')})}catch(e){}
+  try{(J('metalmig_visitas_v1')||[]).filter(v=>String(v.cli)===code).forEach(v=>{if(v.prox&&v.res==='rel'&&String(v.obs||'')==='Lembrete de retorno')ev.push({d:v.data,t:'🔁 Lembrete para '+brd(v.prox.d)+' · '+(v.prox.m||'')+(v.prox.feito?' (feito)':'')});else ev.push({d:v.data,t:'📍 '+(v.tipo==='lig'?'Ligação':'Visita')+(v.res?' · '+v.res:'')+(v.obs?' — '+String(v.obs).replace(/\s+/g,' ').slice(0,120):'')})})}catch(e){}
+  try{const h=J('mm_reat_v1_g')||{};if(h[c[0]]){const t=new Date(+h[c[0]]);if(!isNaN(t))ev.push({d:t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0'),t:'✔ Já chamei (reativação)'})}}catch(e){}
+  return ev.sort((a,b)=>String(b.d).localeCompare(String(a.d)))}
+ // ---- bloco na Ficha
+ function bloco(ci){const det=document.getElementById('f_det');if(!det)return;const o=det.querySelector('#lcci');if(o)o.remove();const c=D.cli[ci],code=c[0],ev=eventos(ci);
+  const d=document.createElement('div');d.id='lcci';d.className='lccard';
+  d.innerHTML='<b>📝 Histórico do cliente</b> <span style="color:#5b6b82;font-size:12px">(só você vê)</span><div class="lcci_f"><input class="lcci_i" type="text" maxlength="500" placeholder="Escreva uma observação sobre este cliente"><button class="lcci_b" type="button">Adicionar</button></div><div class="lcci_l">'+(ev.length?ev.map(e=>'<div class="lcci_ev'+(e.k==='ob'?' ob':'')+'"><span class="dt">'+E(brd(e.d))+'</span><span class="tx">'+(e.k==='ob'?'📝 ':'')+E(e.t)+'</span>'+(e.k==='ob'?'<button class="lcci_x" data-id="'+E(e.id)+'" title="Apagar esta observação">✕</button>':'')+'</div>').join(''):'<div class="mute" style="font-size:12.5px">Nada registrado ainda sobre este cliente.</div>')+'</div>';
+  det.insertAdjacentElement('afterbegin',d);
+  const i=d.querySelector('.lcci_i'),add=()=>{if(API.add(code,i.value)){bloco(ci);refreshLinhas()}};d.querySelector('.lcci_b').onclick=add;i.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();add()}};
+  d.querySelectorAll('.lcci_x').forEach(b=>b.onclick=()=>{if(b.dataset.c!=='1'){b.dataset.c='1';b.textContent='Apagar?';setTimeout(()=>{b.dataset.c='';b.textContent='✕'},2500);return}API.del(code,b.dataset.id);bloco(ci);refreshLinhas()})}
+ const inj=ci=>{try{const det=document.getElementById('f_det');if(!det||det.querySelector('#lcci'))return;bloco(ci)}catch(e){}};
  if(typeof fichaShow==='function'){const f0=fichaShow;fichaShow=function(ci){const r=f0.apply(this,arguments);[0,250,900].forEach(t=>setTimeout(()=>inj(ci),t));return r}}
+ // ---- janelinha rápida (nos cartões)
+ function rapido(ci){document.querySelectorAll('.lcci_ov').forEach(x=>x.remove());const c=D.cli[ci],code=c[0];const o=document.createElement('div');o.className='lcci_ov';
+  const draw=()=>{const L=lst(code);o.innerHTML='<div class="lcci_md"><b style="font-size:16px;color:#1F4E78">📝 '+E(c[1])+'</b><div class="mute" style="font-size:12.5px">'+E(c[2]||'')+' · só você vê</div><div class="lcci_f" style="display:flex;gap:6px;margin:10px 0"><input class="lcci_q" type="text" maxlength="500" placeholder="Escreva uma observação sobre este cliente"><button class="lcci_b" type="button">Salvar</button></div>'+(L.length?L.slice(0,8).map(x=>'<div class="lcci_ev ob"><span class="dt">'+E(brd(x.d))+'</span><span class="tx">'+E(x.t)+'</span></div>').join(''):'<div class="mute">Sem observações ainda.</div>')+'<div style="display:flex;gap:8px;margin-top:12px"><button class="lcci_b" data-a="f" type="button" style="background:#e5e9f0;color:#1F4E78;flex:1">📋 Abrir a Ficha (histórico completo)</button><button class="lcci_b" data-a="x" type="button" style="background:#e5e9f0;color:#1F4E78">Fechar</button></div></div>';
+   const q=o.querySelector('.lcci_q'),sal=()=>{if(API.add(code,q.value)){draw();refreshLinhas()}};o.querySelector('.lcci_b').onclick=sal;q.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();sal()}};setTimeout(()=>q.focus(),30);
+   o.querySelector('[data-a=x]').onclick=()=>o.remove();o.querySelector('[data-a=f]').onclick=()=>{o.remove();try{nxFicha(ci)}catch(e){}}};
+  o.addEventListener('mousedown',e=>{if(e.target===o)o.remove()});draw();document.body.appendChild(o)}
+ // ---- linha da última observação nos cartões de cliente
+ function linhaTxt(code){const l=API.last(code);return l?'<div class="cio" title="Toque para ver e escrever observações">📝 '+E(l.t.length>140?l.t.slice(0,140)+'…':l.t)+' <small>· '+E(brd(l.d))+'</small></div>':'<div class="cio vz" title="Toque para escrever uma observação sobre o cliente">📝 Escrever observação</div>'}
+ function linhas(){try{document.querySelectorAll('#v2out .lccard').forEach(card=>{const a=card.querySelector('a.rcf[data-ci]');if(!a)return;const ci=+a.dataset.ci,c=D.cli[ci];if(!c)return;let o=card.querySelector(':scope>.cio');const code=String(c[0]);const txt=linhaTxt(code);
+   if(o){if(o.dataset.k!==txt){o.insertAdjacentHTML('beforebegin',txt);const n=o.previousElementSibling;n.dataset.k=txt;n.dataset.ci=ci;o.remove()}return}
+   const city=card.querySelector('.mute');const h=document.createElement('div');h.innerHTML=txt;const n=h.firstChild;n.dataset.k=txt;n.dataset.ci=ci;(city||card.firstElementChild).insertAdjacentElement('afterend',n)})}catch(e){}}
+ function refreshLinhas(){document.querySelectorAll('#v2out .lccard>.cio').forEach(x=>x.remove());linhas()}
+ document.addEventListener('click',e=>{const x=e.target.closest&&e.target.closest('.cio');if(x&&x.dataset.ci!=null){e.preventDefault();e.stopPropagation();rapido(+x.dataset.ci)}},true);
+ setInterval(linhas,1000);
+ // ---- busca nas observações
+ const nz=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+ function busca(){document.querySelectorAll('.lcci_ov').forEach(x=>x.remove());const o=document.createElement('div');o.className='lcci_ov';
+  o.innerHTML='<div class="lcci_md"><b style="font-size:16px;color:#1F4E78">🔎 Pesquisar nas observações dos clientes</b><div class="lcci_f" style="display:flex;gap:6px;margin:10px 0"><input class="lcci_q" type="text" placeholder="Digite uma palavra (ex.: dezembro, viajou, pagamento)"><button class="lcci_b" data-a="x" type="button" style="background:#e5e9f0;color:#1F4E78">Fechar</button></div><div class="lcci_res"></div></div>';
+  const q=o.querySelector('.lcci_q'),res=o.querySelector('.lcci_res');
+  const go=()=>{const t=nz(q.value).trim();const all=[];Object.keys(M).forEach(code=>{const ci=ciOf(code);if(ci<0)return;M[code].forEach(x=>{if(!t||nz(x.t).includes(t)||nz(D.cli[ci][1]).includes(t))all.push({ci,x})})});all.sort((a,b)=>String(b.x.d).localeCompare(String(a.x.d)));
+   res.innerHTML=(all.length?'<div class="mute" style="font-size:12px;margin-bottom:4px">'+all.length+' observaç'+(all.length===1?'ão':'ões')+(t?'':' (mais recentes primeiro)')+'</div>':'<div class="mute">Nenhuma observação encontrada.</div>')+all.slice(0,60).map(r=>{let tx=E(r.x.t);if(t){const i=nz(r.x.t).indexOf(t);if(i>=0){const raw=r.x.t;tx=E(raw.slice(0,i))+'<mark>'+E(raw.slice(i,i+t.length))+'</mark>'+E(raw.slice(i+t.length))}}return '<div class="lcci_r" data-ci="'+r.ci+'"><b>'+E(D.cli[r.ci][1])+'</b> <span class="mute" style="font-size:12px">'+E(D.cli[r.ci][2]||'')+' · '+E(brd(r.x.d))+'</span><div style="font-size:13px">'+tx+'</div></div>'}).join('');
+   res.querySelectorAll('.lcci_r').forEach(r=>r.onclick=()=>{o.remove();try{nxFicha(+r.dataset.ci)}catch(e){}})};
+  q.oninput=go;o.querySelector('[data-a=x]').onclick=()=>o.remove();o.addEventListener('mousedown',e=>{if(e.target===o)o.remove()});document.body.appendChild(o);go();setTimeout(()=>q.focus(),30)}
+ window.lcBuscaObs=busca;
+ const ini=()=>{if(window.lcAcao)window.lcAcao('lcobsb','🔎 Pesquisar observações','Procura uma palavra no que você escreveu sobre os clientes',busca,false)};
+ if(document.readyState==='loading')addEventListener('DOMContentLoaded',()=>setTimeout(ini,700));else setTimeout(ini,700);
 }catch(e){console.error('lcCH',e)}})();
 
 
