@@ -1962,7 +1962,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v220';
+const NX_VER = 'v221';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3649,6 +3649,9 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v221',d:'24/11/2026',t:'Reativar: Fechou, Arquivo morto e informação do cliente',l:[
+   ['g','Reativar: o bloco Ações ganhou 🚫 Fechou (manda para o Arquivo morto com o motivo “Fechou o negócio”) e 🗄 Arquivo morto. O cliente arquivado sai da lista.'],
+   ['g','Novo campo 📝 Informação sobre este cliente no cartão do Reativar. A anotação aparece também na Ficha e é só sua.']]},
   {v:'v220',d:'24/11/2026',t:'Telefone para copiar no lugar do WhatsApp',l:[
    ['a','Em todo o sistema, onde havia o botão de WhatsApp agora aparece o número do telefone com o botão 📋 Copiar. Se o cliente tem mais de um número, aparecem todos. Onde havia mensagem pronta, aparece também ✉ Copiar mensagem. Nos pedidos, o mapa de clientes por perto também mostra o número com Copiar.']]},
   {v:'v219',d:'24/11/2026',t:'Mesorregiões da Bahia',l:[
@@ -5065,7 +5068,7 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const rgeo=ci=>{const k=String(D.cli[ci][2]||''),m=k.match(/^(.*)\/([A-Za-z]{2})\s*$/);let me='';try{const o=window.lcMeso&&lcMeso.ofCid(k);me=o?o.m:''}catch(e){}return{uf:m?m[2].toUpperCase():'',cid:m?m[1].trim():k,mes:me}};
  function renderReat(){const r=nxRep();ctl(nxRepSel('rea_rep',r));nxRepBind('rea_rep',renderReat);
   const M=ritmo(),hid=hidGet(),now=Date.now(),cand=[];
-  nx2Ids().forEach(ci=>{const x=M.get(ci);if(!x||x.n<2)return;const since=D.ref-x.last,ratio=x.cyc?since/x.cyc:null;const frio=x.cyc?ratio>=3:since>180;if(!frio||since>1095)return;
+  nx2Ids().forEach(ci=>{if(window.lcArq&&lcArq.has(D.cli[ci][0]))return;const x=M.get(ci);if(!x||x.n<2)return;const since=D.ref-x.last,ratio=x.cyc?since/x.cyc:null;const frio=x.cyc?ratio>=3:since>180;if(!frio||since>1095)return;
    let ch=x.cyc?(ratio<=4?'A':ratio<=8?'M':'B'):(since<=270?'M':'B');if(since>730&&ch==='A')ch='M';
    cand.push({ci,x,since,ch,h:(hid[D.cli[ci][0]]||0)>now-14*864e5})});
   cand.forEach(o=>{o.g=rgeo(o.ci)});
@@ -6795,7 +6798,7 @@ window.lcRelPos=function(w,S){
  const aqLd=()=>{try{return JSON.parse(L0.getItem(AQK)||'{}')||{}}catch(e){return{}}};let AQ=aqLd();const aqSv=()=>{try{L0.setItem(AQK,JSON.stringify(AQ))}catch(e){}};
  const arqHas=code=>!!AQ[String(code)];
  window.lcArq={has:arqHas,all:()=>AQ,reload:()=>{AQ=aqLd()}};
- window.lcRep={passar:function(ci){passar([ci],null,true)},arquivar:function(ci){arquivar([ci])},inativar:function(ci){passar([ci],'ina')}};
+ window.lcRep={passar:function(ci){passar([ci],null,true)},arquivar:function(ci,mot){arquivar([ci],mot)},inativar:function(ci){passar([ci],'ina')}};
  const AQM=['Fechou o negócio','Compra para uso próprio','Mudou de ramo','Não quer comprar','Outro motivo'];
  function parados(){const out=[];D.cli.forEach((c,ci)=>{const o=ordens(ci);if(!o.length)return;const last=o[o.length-1].d,since=D.ref-last;if(since<180)return;
   const code=String(c[0]),a=R.t[code]||[],cur=a.length?a[a.length-1]:null;if(arqHas(code))return;if(cur&&(emCurso(cur)||cur.st==='conf'))return;if(cur&&cur.st==='ina'&&!ST.ina)return;if(!(cur&&cur.st==='ina')&&ST.ina)return;
@@ -6948,14 +6951,14 @@ body.rt-fs{overflow:hidden!important}body.rt-fs:not(.rt-nv) #lcnav{display:none!
   return `<div class="rt-b arq-w"><h3>🗄 Arquivo morto · ${tot} cliente${tot===1?'':'s'}</h3><div class="rt-m" style="margin-bottom:8px">Clientes que acabaram de vez (fecharam, compram para uso próprio, mudaram de ramo…). As informações ficam guardadas, mas eles saem do Repasse e das listas de trabalho. Só você vê esta tela. Para voltar a trabalhar um cliente, use Restaurar.</div>
   <div class="rt-f" style="margin-bottom:8px"><select class="ar_mt"><option value="">Motivo: todos</option>${AQM.map(m=>`<option${AF.mot===m?' selected':''}>${m}</option>`).join('')}</select><input class="ar_q" type="text" placeholder="🔎 nome, cidade ou código" value="${E(AF.q)}" style="min-width:220px"><span class="rt-m">${L.length} de ${tot}</span></div>
   <div class="rt-t" style="overflow:auto"><table><tr><th>Cliente</th><th>Cidade</th><th>Motivo</th><th>Arquivado em</th><th style="text-align:right">Total comprado</th><th>Última compra</th><th></th></tr>${L.length?L.map(x=>`<tr><td><b>${E(x.nome)}</b><div class="rt-m">Cód. ${E(x.code)}</div></td><td>${E(x.cid||'')}</td><td>${E(x.mot||'')}${x.obs?'<div class="rt-m">'+E(x.obs)+'</div>':''}</td><td>${E(ISO2(x.d))}</td><td style="text-align:right">${R0_(x.tot)}</td><td>${x.ult?mAno(x.ult):'—'}</td><td><button class="rt-bt s ar_rs" data-code="${E(x.code)}">Restaurar</button></td></tr>`).join(''):'<tr><td colspan="7" class="rt-m">Nenhum cliente no arquivo morto.</td></tr>'}</table></div></div>`}
- function arquivar(cis){if(!cis.length)return;const m=document.createElement('div');m.className='rt-ov';document.body.appendChild(m);
+ function arquivar(cis,mot0){if(!cis.length)return;const m=document.createElement('div');m.className='rt-ov';document.body.appendChild(m);
   const nomes=cis.map(ci=>tc(D.cli[ci][1]));
   m.innerHTML=`<div class="rt-sh" style="width:min(520px,100%)"><div style="display:flex;justify-content:space-between;align-items:center"><div><b style="font-size:17px">🗄 Mandar para o arquivo morto</b><div class="rt-m">${E(nomes.slice(0,3).join(' · '))}${cis.length>3?' …':''}</div></div><button class="rt-bt s" id="aq_x">Cancelar</button></div>
-  <div class="rt-b" style="margin-top:10px"><h3>Motivo</h3><select id="aq_m" style="width:100%;padding:9px;border:1px solid #b9c7e2;border-radius:9px;font-size:14px">${AQM.map(x=>`<option>${x}</option>`).join('')}</select><input id="aq_o" type="text" placeholder="Observação (opcional)" style="width:100%;margin-top:8px;padding:9px;border:1px solid #b9c7e2;border-radius:9px;font-size:14px;box-sizing:border-box"></div>
+  <div class="rt-b" style="margin-top:10px"><h3>Motivo</h3><select id="aq_m" style="width:100%;padding:9px;border:1px solid #b9c7e2;border-radius:9px;font-size:14px">${AQM.map(x=>`<option${x===mot0?' selected':''}>${x}</option>`).join('')}</select><input id="aq_o" type="text" placeholder="Observação (opcional)" style="width:100%;margin-top:8px;padding:9px;border:1px solid #b9c7e2;border-radius:9px;font-size:14px;box-sizing:border-box"></div>
   <div class="rt-b"><div class="rt-m">Nada é apagado: histórico de compras e atendimentos continuam guardados. O cliente sai do Repasse e das listas de trabalho, e você pode restaurar quando quiser na aba <b>Arquivo morto</b>. Isso não muda o representante dele.</div></div>
   <div class="rt-f"><button class="rt-bt" id="aq_c" style="flex:1">Cancelar</button><button class="rt-bt p" id="aq_ok" style="flex:2">Confirmar arquivo morto</button></div></div>`;
   const f=()=>m.remove();m.querySelector('#aq_x').onclick=f;m.querySelector('#aq_c').onclick=f;m.onclick=e=>{if(e.target===m)f()};
-  m.querySelector('#aq_ok').onclick=()=>{const mot=m.querySelector('#aq_m').value,obs=m.querySelector('#aq_o').value.trim();cis.forEach(ci=>{AQ[String(D.cli[ci][0])]={d:hoje(),mot,obs}});aqSv();f();ST.sel.clear&&cis.forEach(ci=>ST.sel.delete(ci));sv();draw();try{bigMsg('🗄 '+cis.length+' cliente(s) no arquivo morto','#455A64')}catch(e){}}}
+  m.querySelector('#aq_ok').onclick=()=>{const mot=m.querySelector('#aq_m').value,obs=m.querySelector('#aq_o').value.trim();cis.forEach(ci=>{AQ[String(D.cli[ci][0])]={d:hoje(),mot,obs}});aqSv();f();ST.sel.clear&&cis.forEach(ci=>ST.sel.delete(ci));sv();draw();try{if(typeof VIEW!=='undefined'&&(VIEW==='reat'||VIEW==='rec'))setView(VIEW)}catch(e){}try{bigMsg('🗄 '+cis.length+' cliente(s) no arquivo morto','#455A64')}catch(e){}}}
  window.lcArquivar=cis=>arquivar(cis);
  document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('.ar_rs');if(!b)return;const code=b.dataset.code;if(!confirm('Restaurar este cliente? Ele volta para as listas de trabalho e para o Repasse.'))return;delete AQ[code];aqSv();draw()});
  document.addEventListener('change',e=>{const t=e.target;if(t.classList&&t.classList.contains('ar_mt')){AF.mot=t.value;draw()}});
@@ -9299,7 +9302,7 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
    const d=dig(c[3]),ok=d.length>=10;
    const inf=document.createElement('div');inf.className='lcbx-i';const uv=ultV(ci);inf.innerHTML='👤 Carteira: <b>'+E(rep(c))+'</b>'+(uv?' · 🧾 Última venda: <b>'+E(uv)+'</b>':'')+' · 📞 '+(ok?'<span class="tel">'+E(fmt(d))+'</span>':'<span class="mute">sem telefone</span>');
    const bl=document.createElement('div');bl.className='lcbx-b';
-   bl.innerHTML='<div class="tt">Ações</div><div class="lcbx-g"><button data-k="fi">👤 Ficha</button><button data-k="ct">📖 Catálogo</button><button data-k="wa" class="wa">✉ Copiar mensagem</button><button data-k="lig">📞 Ligar</button><button data-k="cp"'+(ok?'':' disabled')+'>📋 Copiar tel.</button><button data-k="ag">📅 Agendar</button>'+(reat?'<button data-k="ps">↪ Passar para…</button><button data-k="jc">✔ Já chamei</button>':'')+'</div>';
+   bl.innerHTML='<div class="tt">Ações</div><div class="lcbx-g"><button data-k="fi">👤 Ficha</button><button data-k="ct">📖 Catálogo</button><button data-k="wa" class="wa">✉ Copiar mensagem</button><button data-k="lig">📞 Ligar</button><button data-k="cp"'+(ok?'':' disabled')+'>📋 Copiar tel.</button><button data-k="ag">📅 Agendar</button>'+(reat?'<button data-k="ps">↪ Passar para…</button><button data-k="jc">✔ Já chamei</button>'+(window.lcRep&&lcRep.arquivar?'<button data-k="fc" title="A empresa fechou: vai para o Arquivo morto com o motivo Fechou o negócio">🚫 Fechou</button><button data-k="am" title="Cliente que não compra mais: fica guardado e sai das listas de trabalho">🗄 Arquivo morto</button>':''):'')+'</div>'+(reat&&!D.rm?'<div class="lcbx-n"><input class="lcbx-ni" type="text" maxlength="300" placeholder="📝 Informação sobre este cliente (só você vê)" title="Anotação sua sobre o cliente. Aparece também na Ficha." value="'+E(window.lcCliInfo?lcCliInfo.get(c[0]):'')+'"></div>':'');
    const on=(k,f)=>{const x=bl.querySelector('[data-k="'+k+'"]');if(x)x.onclick=ev=>{ev.preventDefault();ev.stopPropagation();f(x)}};
    on('fi',()=>{const f=q(card,'.rowb a.fi')||a;f.click()});
    on('ct',()=>{const x=q(card,'button.lctb');if(x)x.click()});
@@ -9309,6 +9312,8 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
    on('ag',()=>{if(window.lcLembrar)window.lcLembrar(ci)});
    on('ps',()=>{if(window.lcRep&&window.lcRep.passar)window.lcRep.passar(ci)});
    on('jc',()=>{const x=q(card,'.rhid');if(x)x.click()});
+   on('fc',()=>{if(window.lcRep&&lcRep.arquivar)lcRep.arquivar(ci,'Fechou o negócio')});on('am',()=>{if(window.lcRep&&lcRep.arquivar)lcRep.arquivar(ci)});
+   {const ni=bl.querySelector('.lcbx-ni');if(ni){ni.onclick=ev=>ev.stopPropagation();ni.onchange=()=>{if(window.lcCliInfo)lcCliInfo.set(c[0],ni.value)}}}
    const city=card.querySelector('.mute');(city||card).insertAdjacentElement(city?'afterend':'beforeend',inf);
    const last=[...card.children].filter(x=>!x.classList.contains('lcbx-h')&&x!==inf).pop();(last&&last!==inf?last:inf).insertAdjacentElement('afterend',bl);
    sync(card,ci)})}
@@ -9697,6 +9702,19 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
  const fix=h=>{h=String(h);if(h.indexOf('wa.me/')<0)return h;R.forEach(([a,b])=>{h=h.split(a).join(b)});return h};
  if(typeof apBuild==='function'&&!apBuild.__cg){const ab=apBuild;apBuild=function(){return fix(ab.apply(this,arguments))};apBuild.__cg=1}
 }catch(e){console.error('lcCG',e)}})();
+
+// ===== v221 · Informação sobre o cliente (só gestor): campo no cartão do Reativar e na Ficha =====
+(function(){try{ if(window.__lcCH||(typeof D!=='undefined'&&D.rm))return;window.__lcCH=1;
+ const K='metalmig_cliinfo_v1',L0=window.localStorage;
+ const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+ const ld=()=>{try{return JSON.parse(L0.getItem(K)||'{}')||{}}catch(e){return{}}};
+ window.lcCliInfo={get:code=>{const o=ld()[String(code)];return o?o.t:''},set:(code,t)=>{const m=ld(),k=String(code);t=String(t||'').trim().slice(0,300);if(t)m[k]={t:t,d:new Date().toISOString().slice(0,10)};else delete m[k];try{L0.setItem(K,JSON.stringify(m))}catch(e){}}};
+ const st=document.createElement('style');st.textContent='.lcbx-n{margin-top:8px}.lcbx-ni,.lcci_i{width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid #c5d0e3;border-radius:9px;font:inherit;font-size:13px;background:#fff}';document.head.appendChild(st);
+ const inj=ci=>{try{const det=document.getElementById('f_det');if(!det||det.querySelector('#lcci'))return;const code=D.cli[ci][0];
+  det.insertAdjacentHTML('afterbegin','<div id="lcci" class="lccard" style="margin:0 0 10px"><b>📝 Informação sobre o cliente</b> <span style="color:#5b6b82;font-size:12px">(só você vê)</span><input class="lcci_i" type="text" maxlength="300" placeholder="Escreva o que quiser sobre este cliente" value="'+E(lcCliInfo.get(code))+'"></div>');
+  const i=det.querySelector('.lcci_i');if(i)i.onchange=()=>lcCliInfo.set(code,i.value)}catch(e){}};
+ if(typeof fichaShow==='function'){const f0=fichaShow;fichaShow=function(ci){const r=f0.apply(this,arguments);[0,250,900].forEach(t=>setTimeout(()=>inj(ci),t));return r}}
+}catch(e){console.error('lcCH',e)}})();
 
 
 </script></body></html>
