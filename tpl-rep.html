@@ -1962,7 +1962,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v233';
+const NX_VER = 'v234';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3649,6 +3649,9 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v234',d:'24/11/2026',t:'Repasse: filtro de representante só com quem tem cliente parado',l:[
+   ['g','Repasse: o filtro Representante atual agora lista só os representantes que têm cliente parado no estado e na mesorregião escolhidos (antes aparecia quem só tinha vendido na região).'],
+  ]},
   {v:'v233',d:'24/11/2026',t:'Hora de recomprar: filtros reorganizados',l:[
    ['g','Hora de recomprar: saíram os dois filtros do topo (Mostrar e Representante); o filtro de Representante agora fica depois de Cidade, junto dos outros.'],
   ]},
@@ -7136,7 +7139,8 @@ body.rt-fs{overflow:hidden!important}body.rt-fs:not(.rt-nv) #lcnav{display:none!
  function ufStat(P){const av=new Map(),tot=new Map();P.forEach(x=>{const u=UFof(x.c);if(u.length===2)av.set(u,(av.get(u)||0)+1)});D.cli.forEach((c,ci)=>{const u=UFof(c);if(u.length!==2)return;const o=ordens(ci);if(!o.length)return;if(D.ref-o[o.length-1].d<180)return;tot.set(u,(tot.get(u)||0)+1)});return{av,tot}}
  function listaPar(P){const US=ufStat(P),ufs=[...new Set([...US.av.keys(),...US.tot.keys()])].sort();
   const reps=[...new Map(P.map(x=>[x.c[8],rN(x.c[8])])).entries()].filter(x=>x[0]).sort((a,b)=>String(a[1]).localeCompare(String(b[1])));
-  const repsV=ST.meso?reps.filter(r=>String(r[0])===ST.rep||msReps(ST.meso).has(+r[0])):reps;
+  const repsAq=(()=>{const sr=ST.rep;ST.rep='';try{return new Set(filtra(P,false).map(x=>String(x.c[8])))}finally{ST.rep=sr}})();
+  const repsV=reps.filter(r=>String(r[0])===ST.rep||repsAq.has(String(r[0])));
   const base=filtra(P,true),cm=new Map();base.forEach(x=>{const k=CK(x.c);cm.set(k,(cm.get(k)||0)+1)});const cids=[...cm.entries()].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0]));
   const L=filtra(P,false);const mm=new Map();L.forEach(x=>mm.set(x.ci,medio(x.ci)));L.sort((a,b)=>ST.ord==='valor'?(mm.get(b.ci)-mm.get(a.ci)):(a.since-b.since));ST.ids=L.map(x=>x.ci);ST.Lc=L;
   {const ix0=L.findIndex(x=>x.ci===ST.cur);if(ix0>=0)ST.lastIx=ix0;else ST.cur=L.length?L[Math.min(ST.lastIx||0,L.length-1)].ci:null}
