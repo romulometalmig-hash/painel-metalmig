@@ -1962,7 +1962,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v219';
+const NX_VER = 'v220';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3649,6 +3649,8 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v220',d:'24/11/2026',t:'Telefone para copiar no lugar do WhatsApp',l:[
+   ['a','Em todo o sistema, onde havia o botão de WhatsApp agora aparece o número do telefone com o botão 📋 Copiar. Se o cliente tem mais de um número, aparecem todos. Onde havia mensagem pronta, aparece também ✉ Copiar mensagem. Nos pedidos, o mapa de clientes por perto também mostra o número com Copiar.']]},
   {v:'v219',d:'24/11/2026',t:'Mesorregiões da Bahia',l:[
    ['g','Bahia (7 mesorregiões: Extremo Oeste, Vale São-Franciscano, Centro-Norte, Nordeste, Metropolitana de Salvador, Centro-Sul e Sul Baiano) agora tem a divisão por mesorregião no Repasse, na Cobertura de mercado, no Recrutamento e nos filtros, com os 417 municípios.']]},
   {v:'v218',d:'24/11/2026',t:'Mesorregiões do Sul e do Pará',l:[
@@ -5198,12 +5200,12 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
   if(CT.ci==null){body=`<div class="lccard"><b>Escolha o cliente</b><input id="ct_q" type="search" autocomplete="off" placeholder="Nome, código ou cidade" style="width:100%;box-sizing:border-box;margin:8px 0;padding:10px;font-size:15px;border:2px solid #cfd6e3;border-radius:10px" value="${E(CT.q)}"><div id="ct_pl">${pickList()}</div></div>`}
   else if(CT.mode==='home'){body=`${sel}<div style="font-weight:700;margin-top:6px">Como enviar?</div><div class="ctm"><div class="${CT.p?'on':''}" data-pp="1">💲 Com preço</div><div class="${CT.p?'':'on'}" data-pp="0">🚫 Sem preço</div></div>
    <div class="mute" style="margin-bottom:8px">O link leva os dados do cliente e as sugestões do que ele costuma comprar. ${CT.p?'O cliente vê a tabela e o pedido mínimo é conferido ao fechar.':'O cliente só escolhe os produtos, sem ver valores e sem mínimo.'}</div>
-   <a class="ctb g" id="ct_env" href="#">📲 Enviar catálogo pelo WhatsApp</a><div class="ctb l" id="ct_cp">🔗 Copiar link</div><div class="ctb" id="ct_ped" style="background:#1F4E78">🧾 Montar pedido para o cliente</div>`}
+   <a class="ctb g" id="ct_env" href="#">✉ Copiar mensagem do catálogo</a><div class="ctb l" id="ct_cp">🔗 Copiar link</div><div class="ctb" id="ct_ped" style="background:#1F4E78">🧾 Montar pedido para o cliente</div>`}
   else{const S=sumPed();body=`${sel}<div style="font-weight:700;margin:4px 0">🧾 Pedido para o cliente</div><input id="ct_pq" type="search" autocomplete="off" placeholder="Buscar produto (nome ou código)" style="width:100%;box-sizing:border-box;margin:4px 0;padding:10px;font-size:15px;border:2px solid #cfd6e3;border-radius:10px" value="${E(CT.pq)}"><div id="ct_pr">${prodRows()}</div>
    <div class="lccard" style="margin-top:10px"><b>No pedido: ${S.it.length} ${S.it.length===1?'item':'itens'}${S.it.length?' · '+br(S.t)+' (tabela + IPI)':''}</b></div>
    <div style="font-weight:700;margin-top:6px">📝 Observação para o cliente</div><textarea id="ct_ob" rows="3" style="width:100%;box-sizing:border-box;margin:4px 0;padding:10px;font-size:15px;border:2px solid #cfd6e3;border-radius:10px" placeholder="Ex.: Reposição do mês. Conferi o estoque da loja…">${E(CT.obs)}</textarea>
    <div class="ctm"><div class="${CT.p?'on':''}" data-pp="1">💲 Com preço</div><div class="${CT.p?'':'on'}" data-pp="0">🚫 Sem preço</div></div>
-   <a class="ctb g" id="ct_env2" href="#">📲 Enviar ao cliente pelo WhatsApp</a><div class="ctb l" id="ct_cp2">🔗 Copiar link</div><div class="ctb l" id="ct_back">‹ Voltar</div>`}
+   <a class="ctb g" id="ct_env2" href="#">✉ Copiar mensagem do catálogo</a><div class="ctb l" id="ct_cp2">🔗 Copiar link</div><div class="ctb l" id="ct_back">‹ Voltar</div>`}
   const lg=getLog().slice(0,12),ofr=(window.lcRecList?lcRecList(nx2Ids()):[]).filter(o=>o.s.k!=='breve').sort((a,b)=>(a.s.k==='hora'?0:1)-(b.s.k==='hora'?0:1)||b.x.typ-a.x.typ).slice(0,6);
   const extra=CT.ci==null||CT.mode==='home'?`${lg.length?`<div style="font-weight:700;margin:14px 0 4px">📤 Enviados</div>${lg.map((g,i)=>{const c=D.cli[g.ci];return`<div class="ctr"><div><b>${E(c?c[1]:'?')}</b><small>${dt(g.ts)} · ${g.k==='ped'?'pedido montado':'catálogo'} · ${g.p?'com preço':'sem preço'}</small></div><span data-ok="${i}" style="cursor:pointer;font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;${g.ok?'background:#e7f6ec;color:#17803f':'background:#fff3e8;color:#b4451f'}">${g.ok?'✔ respondeu':'aguardando'}</span></div>`}).join('')}<div class="mute">Toque em “aguardando” para marcar que o cliente respondeu.</div>`:''}
    ${CT.ci==null&&ofr.length?`<div style="font-weight:700;margin:14px 0 4px">🎯 Clientes para oferecer</div>${ofr.map(o=>{const c=D.cli[o.ci];return`<div class="ctr" data-pick="${o.ci}" style="cursor:pointer"><div><b>${E(c[1])}</b><small>${o.s.k==='hora'?'🟢 Na hora de recomprar':'🟠 Passou do ritmo'} · última compra há ${o.s.since} dias</small></div><span>›</span></div>`}).join('')}`:''}`:'';
@@ -5467,7 +5469,7 @@ ${g&&d.rv?`<h3>Representantes</h3><div class="k"><div class="c tap" data-l="rvl"
  // --- cartões de cliente: Ficha | Catálogo | WhatsApp numa fileira
  function rows(){document.querySelectorAll('.lccard').forEach(c=>{if(c.querySelector('.rowb'))return;const wa=c.querySelector('a[href^="https://wa.me"]'),cat=c.querySelector('.lctb'),nm=c.querySelector('a.rcf');if(!wa||!nm)return;
   const r=document.createElement('div');r.className='rowb';const f=document.createElement('a');f.className='fi';f.href='#';f.textContent='👤 Ficha';f.onclick=e=>{e.preventDefault();nm.click()};r.appendChild(f);
-  if(cat){cat.classList.add('cat');r.appendChild(cat)}wa.classList.add('w');const par=wa.parentElement;r.appendChild(wa);if(par&&par!==c&&!par.children.length&&!par.textContent.trim())par.remove();c.appendChild(r)})}
+  if(cat){cat.classList.add('cat');r.appendChild(cat)}wa.classList.add('w');const par=wa.parentElement;const ch=wa.previousElementSibling&&wa.previousElementSibling.classList&&wa.previousElementSibling.classList.contains('wch')?wa.previousElementSibling:null;if(ch)r.appendChild(ch);r.appendChild(wa);if(par&&par!==c&&!par.children.length&&!par.textContent.trim())par.remove();c.appendChild(r)})}
  // --- aniversariantes dos representantes (só gestor)
  const BD=[['Wander Bruce Teixeira','08/08','31975626626'],['Edson Barbosa Lagares','04/03','37999651975'],['Allan Roberth Vieira Alves','06/11','98991397600'],['Gladson Fabiani de Oliveira','19/02','35999845323'],['Roberto Alves Pedroso','20/02','62998111011'],['Marcos José Almeida Borsoi','20/08','27998333121'],['Anderson Alves dos Santos','28/05','38999719913'],['Anderson da Silva Lima','26/09','86999741858'],['Claudek Mendes Pereira','01/06','61994465975'],['Clayton Mendes','29/05','34996302003'],['Leonardo Henrique Cardoso','05/04','31991136663']];
  const pad=n=>String(n).padStart(2,'0'),wa=t=>{t=String(t||'').replace(/\D/g,'').replace(/^0+/,'');return t.length<=11?'55'+t:t};
@@ -9297,11 +9299,11 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
    const d=dig(c[3]),ok=d.length>=10;
    const inf=document.createElement('div');inf.className='lcbx-i';const uv=ultV(ci);inf.innerHTML='👤 Carteira: <b>'+E(rep(c))+'</b>'+(uv?' · 🧾 Última venda: <b>'+E(uv)+'</b>':'')+' · 📞 '+(ok?'<span class="tel">'+E(fmt(d))+'</span>':'<span class="mute">sem telefone</span>');
    const bl=document.createElement('div');bl.className='lcbx-b';
-   bl.innerHTML='<div class="tt">Ações</div><div class="lcbx-g"><button data-k="fi">👤 Ficha</button><button data-k="ct">📖 Catálogo</button><button data-k="wa" class="wa">💬 WhatsApp</button><button data-k="lig">📞 Ligar</button><button data-k="cp"'+(ok?'':' disabled')+'>📋 Copiar tel.</button><button data-k="ag">📅 Agendar</button>'+(reat?'<button data-k="ps">↪ Passar para…</button><button data-k="jc">✔ Já chamei</button>':'')+'</div>';
+   bl.innerHTML='<div class="tt">Ações</div><div class="lcbx-g"><button data-k="fi">👤 Ficha</button><button data-k="ct">📖 Catálogo</button><button data-k="wa" class="wa">✉ Copiar mensagem</button><button data-k="lig">📞 Ligar</button><button data-k="cp"'+(ok?'':' disabled')+'>📋 Copiar tel.</button><button data-k="ag">📅 Agendar</button>'+(reat?'<button data-k="ps">↪ Passar para…</button><button data-k="jc">✔ Já chamei</button>':'')+'</div>';
    const on=(k,f)=>{const x=bl.querySelector('[data-k="'+k+'"]');if(x)x.onclick=ev=>{ev.preventDefault();ev.stopPropagation();f(x)}};
    on('fi',()=>{const f=q(card,'.rowb a.fi')||a;f.click()});
    on('ct',()=>{const x=q(card,'button.lctb');if(x)x.click()});
-   on('wa',()=>{const x=q(card,'.rowb a.w');if(x)x.click()});
+   on('wa',()=>{const x=q(card,'.rowb a.w');if(!x)return;const m=((x.getAttribute('href')||'').match(/[?&]text=([^&#]*)/)||[])[1];if(m&&window.lcCopy){let t=m;try{t=decodeURIComponent(m)}catch(e){}window.lcCopy(t,card.querySelector('.lcbx-g [data-k=wa]'))}else x.click()});
    on('lig',()=>{const x=q(card,'.rowb a.lig');if(x)x.click()});
    on('cp',x=>{const done=()=>{x.textContent='✔ Copiado';setTimeout(()=>{x.textContent='📋 Copiar tel.'},1500)};try{navigator.clipboard.writeText(d).then(done,()=>{const r=document.createRange();r.selectNodeContents(inf.querySelector('.tel'));const g=getSelection();g.removeAllRanges();g.addRange(r)})}catch(e){}});
    on('ag',()=>{if(window.lcLembrar)window.lcLembrar(ci)});
@@ -9320,7 +9322,7 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
    const inf=document.createElement('div');inf.className='lcbx-i';inf.style.borderTop='0';
    inf.innerHTML='👤 Carteira: <b>'+E(rep(c))+'</b>'+(uv?' · 🧾 Última venda: <b>'+E(uv)+'</b>':'')+' · 📞 '+(ok?'<span class="tel">'+E(fmt(d))+'</span>':'<span class="mute">sem telefone</span>');
    const bl=document.createElement('div');bl.className='lcbx-b';
-   bl.innerHTML='<div class="tt">Ações</div><div class="lcbx-g"><button data-k="fe" class="ok">✔ Feito</button><button data-k="nr">🔁 Novo retorno</button><button data-k="fi">👤 Ficha</button><button data-k="ct">📖 Catálogo</button><button data-k="wa" class="wa"'+(d.length>=10?'':' disabled')+'>💬 WhatsApp</button><button data-k="lig"'+(ok?'':' disabled')+'>📞 Ligar</button><button data-k="cp"'+(ok?'':' disabled')+'>📋 Copiar tel.</button><button data-k="ps">↪ Passar para…</button></div>';
+   bl.innerHTML='<div class="tt">Ações</div><div class="lcbx-g"><button data-k="fe" class="ok">✔ Feito</button><button data-k="nr">🔁 Novo retorno</button><button data-k="fi">👤 Ficha</button><button data-k="ct">📖 Catálogo</button><button data-k="wa" class="wa"'+(d.length>=10?'':' disabled')+'>✉ Copiar mensagem</button><button data-k="lig"'+(ok?'':' disabled')+'>📞 Ligar</button><button data-k="cp"'+(ok?'':' disabled')+'>📋 Copiar tel.</button><button data-k="ps">↪ Passar para…</button></div>';
    const on=(k,f)=>{const x=bl.querySelector('[data-k="'+k+'"]');if(x)x.onclick=ev=>{ev.preventDefault();ev.stopPropagation();f(x)}};
    const clk=sel=>{const x=it.querySelector(sel);if(x)x.click()};
    on('fe',()=>clk('.lc_rf'));on('nr',()=>clk('.lc_rn'));on('fi',()=>clk('.lc_ff'));
@@ -9533,7 +9535,7 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
  // ---------- textos do roteiro (passo a passo de cada tipo de cliente)
  const ROT={
   mpr:['📋 Como trabalhar um prospectado',['Toque em <b>Copiar telefone</b> e cole no WhatsApp (ou toque em <b>Ligar</b>).','Apresente a Metalmig e ofereça o catálogo (<b>Enviar catálogo</b>).','Toque em <b>Registrar contato</b> e marque como foi a conversa.','<b>Você escolhe a data do próximo retorno</b>: toque em “Em 2, 7, 15 ou 30 dias” ou digite outra data.','Se fizer pedido ou disser que não quer, a loja sai da lista de pendentes.']],
-  reat:['📋 Como trabalhar um cliente inativo',['Filtre por <b>Estado, Mesorregião ou Cidade</b> e comece pelos de <b>Boa chance</b>.','Toque em <b>WhatsApp</b>: a mensagem já vai pronta.','Depois de chamar, toque em <b>Já chamei</b>. Ele sai da lista por 14 dias.','Se vendeu, o cliente volta sozinho para os ativos. Se não é o seu cliente, use <b>Repasse de clientes</b>.']],
+  reat:['📋 Como trabalhar um cliente inativo',['Filtre por <b>Estado, Mesorregião ou Cidade</b> e comece pelos de <b>Boa chance</b>.','Toque em <b>Copiar tel.</b> (ou em <b>Copiar mensagem</b>, que já vem pronta) e cole na conversa.','Depois de chamar, toque em <b>Já chamei</b>. Ele sai da lista por 14 dias.','Se vendeu, o cliente volta sozinho para os ativos. Se não é o seu cliente, use <b>Repasse de clientes</b>.']],
   rec:['📋 Como trabalhar um cliente ativo',['Comece pelos <b>Na hora</b>: é o dia em que ele costuma comprar.','Depois chame os que <b>Passaram do ritmo</b>. Cliente atrasado é o mais fácil de salvar.','Toque em <b>WhatsApp</b>: a mensagem já vai pronta, e o pedido típico dele aparece no cartão.','Os de <b>Em breve</b> podem esperar: chame quando a hora chegar.']]
  };
  function box(k){const r=ROT[k];if(!r)return'';const open=ST[k]!==0;
@@ -9654,6 +9656,47 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
  function tick(){try{document.querySelectorAll('.prc:not([data-v9])').forEach(c=>{if(!c.dataset.v9t)c.dataset.v9t=String(Date.now());const age=Date.now()-(+c.dataset.v9t);if(age<1500||(age<5000&&!(c.dataset.mz&&c.dataset.ct&&c.dataset.cl&&c.dataset.lj)))return;xf(c)})}catch(e){}}
  setInterval(tick,500);
 }catch(e){console.error('cf219',e)}})();
+
+// ===== v220 · WhatsApp trocado por "número + copiar" em todo o sistema =====
+(function(){try{ if(window.__lcCG)return;window.__lcCG=1;
+ const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+ const TM=window.__telMap=window.__telMap||{};
+ const norm=d=>{d=String(d||'').replace(/\D/g,'');if(d.startsWith('0'))d=d.slice(1);if((d.length===12||d.length===13)&&d.startsWith('55'))d=d.slice(2);return d};
+ const fmt=d=>{d=norm(d);if(d.length===11)return '('+d.slice(0,2)+') '+d.slice(2,7)+'-'+d.slice(7);if(d.length===10)return '('+d.slice(0,2)+') '+d.slice(2,6)+'-'+d.slice(6);return d};
+ function phones(t){const s=String(t==null?'':t);const out=[];s.split(/\s*(?:[\/;,]|\se\s|\sou\s)\s*/i).forEach(p=>{let d=norm(p);if(d.length<8)return;while(d.length>=20){const n=d[2]==='9'?11:10;out.push(d.slice(0,n));d=d.slice(n)}if(d.length>=8)out.push(d)});return out}
+ window.lcPhones=phones;
+ // telefones separados por / ; , e/ou: a função de número passa a devolver o 1º e guarda a lista completa
+ if(typeof waNum==='function'&&!waNum.__cg){const w0=waNum;waNum=function(t){const l=phones(t);if(l.length>1){TM[l[0]]=l;return l[0]}return w0(t)};waNum.__cg=1}
+ const st=document.createElement('style');st.textContent=`.wch{display:inline-flex;flex-wrap:wrap;gap:4px 6px;align-items:center;vertical-align:middle;font-size:12.5px;margin:1px 3px}
+ .wcn{display:inline-flex;align-items:center;gap:6px;background:#eef4fb;border:1px solid #b9d0ea;border-radius:9px;padding:2px 3px 2px 8px;color:#1F4E78;white-space:nowrap}
+ .wcl{font-size:11.5px;color:#64748b;font-weight:700}
+ .wcc{border:1px solid #b9d0ea;background:#fff;color:#1F4E78;border-radius:7px;padding:3px 8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+ .wcc.ok{background:#2e7d32;color:#fff;border-color:#2e7d32}
+ .wc_ov{position:fixed;inset:0;background:rgba(15,30,55,.45);z-index:100000;display:flex;align-items:center;justify-content:center;padding:16px}
+ .wc_md{background:#fff;border-radius:14px;padding:16px;max-width:420px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,.3)}
+ .wc_md h3{margin:0 0 8px;color:#1F4E78;font-size:16px}.wc_md .wch{display:flex;margin:6px 0}
+ .wc_md .wc_m{background:#f6f8fb;border:1px solid #e3e8f0;border-radius:9px;padding:8px;font-size:13px;white-space:pre-wrap;max-height:140px;overflow:auto;margin:6px 0}
+ .rowb .wch{flex:1 1 auto}`;document.head.appendChild(st);
+ function parse(h){h=String(h||'');const m=h.match(/(?:wa\.me\/|[?&]phone=)\+?(\d*)/);const d=m?norm(m[1]):'';const t=h.match(/[?&]text=([^&#]*)/);let msg='';if(t){try{msg=decodeURIComponent(t[1].replace(/\+/g,' '))}catch(e){msg=t[1]}}return {d:d,msg:msg}}
+ function chipHtml(d,msg,label){const lst=d?(TM[d]||[d]):[];let h=(label?'<span class="wcl">'+E(label)+'</span>':'')+lst.map(n=>'<span class="wcn"><b>📞 '+E(fmt(n))+'</b><button type="button" class="wcc" data-c="'+E(n)+'" title="Copiar o número '+E(fmt(n))+'">📋 Copiar</button></span>').join('');if(msg)h+='<button type="button" class="wcc wcm" data-m="'+E(msg)+'" title="Copiar a mensagem pronta para colar na conversa">✉ Copiar mensagem</button>';return h}
+ function conv(a){if(a.dataset.wch)return;const href=a.getAttribute('href')||'';if(!/wa\.me|whatsapp\.com/.test(href))return;if(a.closest('.wc_ov'))return;const p=parse(href);if(!p.d&&!p.msg)return;a.dataset.wch='1';
+  let lab=(a.textContent||'').replace(/whats\s*app|💬|📲|📞|\bwhats\b/ig,'').replace(/\s+/g,' ').trim();if(lab.length>40||lab.length<2)lab='';
+  const s=document.createElement('span');s.className='wch';s.innerHTML=chipHtml(p.d,p.msg,lab);a.style.display='none';a.parentNode.insertBefore(s,a)}
+ let tm=0;function varre(){tm=0;try{document.querySelectorAll('a[href*="wa.me"],a[href*="whatsapp.com"]').forEach(conv)}catch(e){}}
+ new MutationObserver(()=>{if(!tm)tm=setTimeout(varre,150)}).observe(document.documentElement,{childList:true,subtree:true});varre();
+ function copia(txt,btn,ok){const fim=()=>{if(btn){const t0=btn.dataset.t0||btn.textContent;btn.dataset.t0=t0;btn.textContent='✓ Copiado';btn.classList.add('ok');setTimeout(()=>{btn.textContent=t0;btn.classList.remove('ok')},1600)}};
+  const fb=()=>{try{const x=document.createElement('textarea');x.value=txt;x.style.cssText='position:fixed;opacity:0';document.body.appendChild(x);x.select();document.execCommand('copy');x.remove();fim()}catch(e){}};
+  try{navigator.clipboard.writeText(txt).then(fim,fb)}catch(e){fb()}}
+ window.lcCopy=copia;
+ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('.wcc');if(b){e.preventDefault();e.stopPropagation();copia(b.dataset.m!=null?b.dataset.m:b.dataset.c,b);return}
+  const a=e.target.closest&&e.target.closest('a[href*="wa.me"],a[href*="whatsapp.com"]');if(a&&!a.closest('.wc_ov')){const p=parse(a.getAttribute('href'));e.preventDefault();e.stopPropagation();modal(p.d,p.msg)}},true);
+ function modal(d,msg){document.querySelectorAll('.wc_ov').forEach(x=>x.remove());const o=document.createElement('div');o.className='wc_ov';o.innerHTML='<div class="wc_md"><h3>📞 Telefone para ligar ou chamar</h3><div class="wch">'+chipHtml(d,'')+'</div>'+(d?'':'<div class="wcl">Sem número neste contato.</div>')+(msg?'<div class="wcl">Mensagem pronta</div><div class="wc_m">'+E(msg)+'</div><button type="button" class="wcc wcm" data-m="'+E(msg)+'">✉ Copiar mensagem</button>':'')+'<div style="text-align:right;margin-top:10px"><button type="button" class="wcc wc_x">Fechar</button></div></div>';o.addEventListener('mousedown',ev=>{if(ev.target===o)o.remove()});o.querySelector('.wc_x').onclick=()=>o.remove();document.body.appendChild(o)}
+ const wo=window.open;window.open=function(u){if(/wa\.me|whatsapp\.com/.test(String(u||''))){const p=parse(u);modal(p.d,p.msg);return null}return wo.apply(this,arguments)};
+ // pedidos (mapa "clientes perto"): copiar o número em vez do WhatsApp
+ const R=[["(ph&&ph.wa?'<a class=\\\"wa\\\" href=\\\"https://wa.me/'+ph.wa+'?text='+encodeURIComponent('Olá! Aqui é da Metalmig.')+'\\\" target=\\\"_blank\\\" rel=\\\"noopener\\\">💬 WhatsApp<\\/a>':'')", "(ph&&ph.wa?'<span class=\\\"wa\\\" style=\\\"background:#eef4fb;color:#1F4E78;border:1px solid #b9d0ea;display:inline-flex;gap:6px;align-items:center\\\">📞 '+(ph.disp||ph.wa)+' <a href=\\\"#\\\" data-n=\\\"'+ph.wa+'\\\" data-t=\\\"✓ Copiado\\\" onclick=\\\"navigator.clipboard&&navigator.clipboard.writeText(this.dataset.n);this.textContent=this.dataset.t;return false\\\" style=\\\"color:#1F4E78;font-weight:700\\\">📋 Copiar<\\/a><\\/span>':'')"], ["(x.ph.wa?' · <a href=\\\"https://wa.me/'+x.ph.wa+'\\\" target=\\\"_blank\\\" rel=\\\"noopener\\\">WhatsApp<\\/a>':'')", "(x.ph.wa?' · <a href=\\\"#\\\" data-n=\\\"'+x.ph.wa+'\\\" data-t=\\\"✓ Copiado\\\" onclick=\\\"navigator.clipboard&&navigator.clipboard.writeText(this.dataset.n);this.textContent=this.dataset.t;return false\\\">📋 Copiar<\\/a>':'')"]];
+ const fix=h=>{h=String(h);if(h.indexOf('wa.me/')<0)return h;R.forEach(([a,b])=>{h=h.split(a).join(b)});return h};
+ if(typeof apBuild==='function'&&!apBuild.__cg){const ab=apBuild;apBuild=function(){return fix(ab.apply(this,arguments))};apBuild.__cg=1}
+}catch(e){console.error('lcCG',e)}})();
 
 
 </script></body></html>
