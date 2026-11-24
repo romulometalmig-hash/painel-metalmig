@@ -1962,7 +1962,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v239';
+const NX_VER = 'v240';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3649,6 +3649,9 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v240',d:'24/11/2026',t:'Nuvem mais rápida',l:[
+   ['g','Páginas dos representantes: envio 20 segundos depois do repasse e verificação a cada 2 minutos; a página também é refeita quando a data dos dados ou a versão do painel mudam.'],
+  ]},
   {v:'v239',d:'24/11/2026',t:'Páginas na nuvem (piloto)',l:[
    ['g','Repasse novo é enviado sozinho para a nuvem e chega à página do representante em minutos (sem eu gerar a página). Tela "☁️ Páginas na nuvem" em Links mostra quem já recebeu. Fica desligado até o endereço da nuvem de páginas ser ligado.'],
    ['a','Quando sua carteira mudar, aparece o aviso "Sua carteira foi atualizada · Atualizar".'],
@@ -10024,14 +10027,14 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
    busy=true;try{const j=await post(c.pg,{t:'pg_ver',rep:b.c,k:b.k,cur:cur()});
     if(j&&j.ok&&j.v>cur()){const g=await post(c.pg,{t:'pg_get',rep:b.c,k:b.k});
      if(g&&g.ok&&g.html){await idbPut('pagina',{v:g.v,html:g.html});await banner(g.v)}}}catch(e){}finally{busy=false}}
-  setTimeout(ciclo,9000);setInterval(ciclo,5*60*1000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(ciclo,800)});
+  setTimeout(ciclo,9000);setInterval(ciclo,2*60*1000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(ciclo,800)});
   window.lcPgCiclo=ciclo;
  }
  // =================== GESTOR ===================
  else{
   const SIG='metalmig_pg_sig_v1',ldS=()=>{try{return JSON.parse(gs(SIG)||'{}')||{}}catch(e){return{}}};
   const riDe=cod=>D.reps.findIndex(r=>+r[0]===+cod);
-  const assin=ri=>{const l=[];D.cli.forEach(c=>{if(c[8]===ri)l.push(c[0])});l.sort();let h=5381;const s=l.join(',');for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return l.length+':'+h};
+  const assin=ri=>{const l=[];D.cli.forEach(c=>{if(c[8]===ri)l.push(c[0])});l.sort();let h=5381;const s=l.join(',');for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return l.length+':'+h+':'+(typeof NX_VER!=='undefined'?NX_VER:'')+':'+D.ref};
   async function publica(cod,prog){const c=await cfg();if(!c||!c.pg)throw new Error('sem endereço da nuvem de páginas');
    const ri=riDe(cod);if(ri<0)throw new Error('representante não encontrado');const rk=(window.LC_RK||{})[String(cod)];if(!rk)throw new Error('representante sem chave');
    prog&&prog('Montando a página de '+tcN(ri)+'…');await new Promise(r=>setTimeout(r,30));
@@ -10046,7 +10049,7 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
   let tm=null,rodando=false;
   async function auto(){if(rodando)return;const c=await cfg();if(!c||!c.pg||!Array.isArray(c.pgreps))return;rodando=true;
    try{const S=ldS();for(const cod of c.pgreps){const ri=riDe(cod);if(ri<0)continue;if(S[cod]===assin(ri))continue;try{await publica(cod);window.lcBigToast&&lcBigToast('☁️ Página de '+tcN(ri)+' enviada para a nuvem','#2E7D32')}catch(e){console.warn('pg',cod,e.message)}}}finally{rodando=false}}
-  const SP=Storage.prototype,raw=SP.setItem;SP.setItem=function(k){const r=raw.apply(this,arguments);if(this===L0&&(k==='metalmig_reat_v1'||k==='metalmig_carteira_v1')){clearTimeout(tm);tm=setTimeout(auto,45000)}return r};
+  const SP=Storage.prototype,raw=SP.setItem;SP.setItem=function(k){const r=raw.apply(this,arguments);if(this===L0&&(k==='metalmig_reat_v1'||k==='metalmig_carteira_v1')){clearTimeout(tm);tm=setTimeout(auto,20000)}return r};
   setTimeout(auto,30000);setInterval(()=>{if(!document.hidden)auto()},10*60*1000);
   // tela do gestor
   const hh=t=>t?new Date(t).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
