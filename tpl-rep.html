@@ -1962,7 +1962,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v223';
+const NX_VER = 'v224';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3649,6 +3649,11 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v224',d:'24/11/2026',t:'Cidades da mesorregião no Repasse',l:[
+   ['g','Repasse "Um por vez": nova seta ▲ acima do cartão esconde avisos, totais, abas e filtros para o cartão do cliente ocupar a tela; ▼ mostra de novo (lembra sua escolha).'],
+   ['g','Cadastro da Sertaneja (cód. 1393): acrescentado o telefone (31) 98869-3365.'],
+   ['g','No Repasse de clientes, ao escolher a mesorregião aparecem logo abaixo dos filtros as cidades dela (com o nº de parados). Toque numa ou mais para filtrar; ✕ todas limpa.'],
+  ]},
   {v:'v223',d:'24/11/2026',t:'Observação no Repasse e no Hoje; Arquivo morto no Recomprar',l:[
    ['g','A linha 📝 de observação do cliente agora aparece também no Repasse de clientes (cartão do cliente e Lista) e na tela Hoje.'],
    ['g','Recomprar: o bloco Ações ganhou 🚫 Fechou e 🗄 Arquivo morto, iguais aos do Reativar.']]},
@@ -7091,6 +7096,7 @@ body.rt-fs{overflow:hidden!important}body.rt-fs:not(.rt-nv) #lcnav{display:none!
   <div class="rt-sl"><small title="Com uma mesorregião escolhida, aparecem só os representantes que já venderam nela.">Representante atual${ST.meso?' (já vendeu aqui)':''}</small><select id="rt_rp"><option value="">Todos</option>${repsV.map(r=>`<option value="${r[0]}"${ST.rep===String(r[0])?' selected':''}>${E(first2(tc(r[1])))}</option>`).join('')}</select></div>
   <div class="rt-sl" style="flex:2"><small>Parado há</small><div class="rt-f" style="gap:5px">${FAIXAS.map((f,i)=>`<button class="rt-chip${ST.fx[i]?' on':''}" data-fx="${i}">${f}</button>`).join('')}</div></div>
   <div class="rt-sl"><small>Buscar</small><input type="text" id="rt_q" placeholder="🔎 nome, cidade ou código" value="${E(ST.q)}"></div></div>
+  ${ST.meso&&cids.length?`<div class="rt-f" style="margin:6px 0 2px;gap:5px;align-items:center"><span class="rt-m" style="font-weight:700">Cidades de ${E(ST.meso)}:</span>${cids.map(([k,n])=>`<button class="rt-chip${ST.cid.has(k)?' on':''}" data-cc="${E(k)}" title="Mostrar só ${E(k.split('/')[0])}">${E(k.split('/')[0])} <b>${n}</b></button>`).join('')}${ST.cid.size?`<button class="rt-chip" id="rt_cc2">✕ todas</button>`:''}</div>`:''}
   <div class="rt-f" style="margin:4px 0 10px"><label class="rt-m"><input type="checkbox" id="rt_te"${ST.tent?' checked':''}> só os que já passaram por alguém</label><label class="rt-m"><input type="checkbox" id="rt_in"${ST.ina?' checked':''}> ver os que deixei inativos</label><span style="flex:1"></span><span class="rt-m"><b>${L.length}</b> de ${P.length} parados</span></div>`;
   if(ST.modo==='um')return filtros.replace('<div class="rt-fb">',modoSw()+'<div class="rt-fb">')+umHtml(L);
   if(ST.modo==='lista'){const tot=L.length,LL=L.slice(0,ST.max);
@@ -7104,6 +7110,7 @@ body.rt-fs{overflow:hidden!important}body.rt-fs:not(.rt-nv) #lcnav{display:none!
   w('rt_uf','onchange',e=>{ST.uf=e.target.value;ST.meso='';ST.cid.clear();ST.cidD=new Set();draw()});w('rt_ms','onchange',e=>{ST.meso=e.target.value;ST.cid.clear();ST.cidD=new Set();ST.max=60;draw()});w('rt_rp','onchange',e=>{ST.rep=e.target.value;draw()});
   o.querySelectorAll('[data-fx]').forEach(b=>b.onclick=()=>{const i=+b.dataset.fx;ST.fx[i]=!ST.fx[i];if(!ST.fx.some(Boolean))ST.fx[i]=true;draw()});
   w('rt_vm','onclick',()=>{ST.modo='mapa';draw()});
+  o.querySelectorAll('[data-cc]').forEach(e=>e.onclick=()=>{const k=e.dataset.cc;if(ST.cid.has(k))ST.cid.delete(k);else ST.cid.add(k);ST.cidD=new Set(ST.cid);ST.max=60;draw()});w('rt_cc2','onclick',()=>{ST.cid=new Set();ST.cidD=new Set();draw()});
   const cd=o.querySelector('#rt_cd');w('rt_cb','onclick',e=>{e.stopPropagation();ST.cidD=new Set(ST.cid);cd.querySelectorAll('[data-ck2]').forEach(k=>k.checked=ST.cidD.has(k.dataset.ck2));cd.hidden=!cd.hidden});
   if(cd){cd.onclick=e=>e.stopPropagation();cd.querySelectorAll('[data-ck2]').forEach(k=>k.onchange=()=>{if(k.checked)ST.cidD.add(k.dataset.ck2);else ST.cidD.delete(k.dataset.ck2)});
    w('rt_cs','oninput',e=>{const q=fNorm(e.target.value);cd.querySelectorAll('label').forEach(l=>l.style.display=!q||l.dataset.cn.includes(q)?'':'none')});
@@ -9791,6 +9798,35 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
  const ini=()=>{if(window.lcAcao)window.lcAcao('lcobsb','🔎 Pesquisar observações','Procura uma palavra no que você escreveu sobre os clientes',busca,false)};
  if(document.readyState==='loading')addEventListener('DOMContentLoaded',()=>setTimeout(ini,700));else setTimeout(ini,700);
 }catch(e){console.error('lcCH',e)}})();
+
+/* v224: telefones acrescentados ao cadastro por correção do gestor (cód → telefone extra) */
+(function(){
+ const EXTRA={1393:'(31) 98869-3365'};
+ let n=0;const iv=setInterval(()=>{try{
+  if(typeof D==='undefined'||!D.cli||!D.cli.length){if(++n>120)clearInterval(iv);return}
+  Object.keys(EXTRA).forEach(cod=>{const c=D.cli.find(x=>String(x[0])===cod);if(!c)return;const dg=s=>String(s||'').replace(/\D/g,'');
+   const ex=EXTRA[cod];if(dg(c[3]).includes(dg(ex)))return;c[3]=(c[3]?String(c[3]).trim()+' / ':'')+ex});
+  clearInterval(iv)}catch(e){if(++n>120)clearInterval(iv)}},500);
+})();
+
+/* v224: Repasse "Um por vez" — seta para recolher tudo que fica acima do cartão (avisos, totais, abas, filtros) */
+(function(){
+ const K='metalmig_rt_recolhe';let rec=false;try{rec=localStorage.getItem(K)==='1'}catch(e){}
+ const st=document.createElement('style');st.textContent=`.rtH{display:none!important}.rtTg{display:flex;align-items:center;gap:8px;margin:4px 0 6px;padding:7px 12px;border:1px solid #b8c4d8;background:#fff;border-radius:10px;font-weight:700;font-size:13px;color:#1F4E78;cursor:pointer;width:100%;text-align:left}.rtTg small{font-weight:400;color:#667;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.rtTg:hover{background:#eef3fb}`;document.head.appendChild(st);
+ function resumo(){const v=id=>{const e=document.getElementById(id);return e?e.value:''},t=id=>{const e=document.getElementById(id);return e&&e.selectedIndex>=0?e.options[e.selectedIndex].text.replace(/\s*[·(].*$/,'').trim():''};
+  const a=[];const uf=v('rt_uf');if(uf)a.push(uf);if(v('rt_ms'))a.push(t('rt_ms'));const cb=document.getElementById('rt_cb');if(cb&&!/^Todas/.test(cb.textContent.trim()))a.push(cb.textContent.replace('▾','').trim());if(v('rt_rp'))a.push(t('rt_rp'));return a.length?a.join(' · '):'sem filtro'}
+ function tick(){try{
+  const c=document.getElementById('rt_c');if(!c||!c.querySelector('.rt-um')){document.querySelectorAll('.rtH').forEach(e=>e.classList.remove('rtH'));return}
+  const kids=[...c.children],ix=kids.findIndex(e=>e.classList.contains('rt-um'));if(ix<1)return;
+  const nav=kids[ix-1];let b=c.querySelector('.rtTg');
+  if(!b){b=document.createElement('button');b.className='rtTg';b.onclick=()=>{rec=!rec;try{localStorage.setItem(K,rec?'1':'0')}catch(e){}tick()};nav.insertAdjacentElement('beforebegin',b)}
+  const topo=[...c.parentElement.children].filter(e=>e!==c&&c.parentElement.children.length&&(e.compareDocumentPosition(c)&Node.DOCUMENT_POSITION_FOLLOWING));
+  const esc=[...topo,...kids.slice(0,ix).filter(e=>e!==nav&&e!==b)];
+  esc.forEach(e=>e.classList.toggle('rtH',rec));
+  b.innerHTML=(rec?'▼ Mostrar filtros e totais':'▲ Esconder filtros e totais')+'<small>'+(rec?'Filtro atual: '+resumo():'')+'</small>';
+ }catch(e){}}
+ setInterval(tick,400);
+})();
 
 
 </script></body></html>
