@@ -1962,7 +1962,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v226';
+const NX_VER = 'v227';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3649,6 +3649,9 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v227',d:'24/11/2026',t:'Bola de clientes na mesorregião (Recrutamento)',l:[
+   ['g','Cartão do candidato: nova bola com a quantidade de clientes nossos na mesorregião dele.'],
+  ]},
   {v:'v226',d:'24/11/2026',t:'Nomes dos representantes na conferência de aprovação',l:[
    ['g','Recrutamento › Conferir antes de aprovar: além de "comporta N, tem N", aparecem os nomes dos representantes que já atendem a região.'],
   ]},
@@ -9665,6 +9668,7 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
   if(cli)circ.push(['~'+cli,'clientes ativos']);
   if(cand&&cand.tempo){const n=num(cand.tempo),meses=/mes/i.test(cand.tempo);circ.push([n?String(n):E(String(cand.tempo).slice(0,8)),n?(meses?'meses como rep.':'anos como rep.'):'tempo como rep.'])}
   if(mk){const t=tx(mk),a=t.match(/([\d.]+)\s*lojas/),b=t.match(/([\d.]+)\s*clientes?/);if(a)circ.push([a[1],'lojas CNAE 4744 na cidade']);if(b)circ.push([b[1],'clientes nossos na cidade'])}
+  try{const M=window.lcMeso;if(cand&&M){const o=M.ofCid(M.cidDe(cand));if(o){const e=M.stats()[o.k];if(e)circ.push([String(e.cli),'clientes nossos na mesorregião'])}}}catch(e){}
   let ce=null;if(circ.length){ce=document.createElement('div');ce.className='v9_circ';ce.innerHTML=circ.map(x=>'<div class="v9_c"><i>'+x[0]+'</i><span>'+x[1]+'</span></div>').join('')}
   // atende + anel
   const aEls=[];if(atende)aEls.push(atende);
