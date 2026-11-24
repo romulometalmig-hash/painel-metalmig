@@ -1962,7 +1962,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v236';
+const NX_VER = 'v237';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3649,6 +3649,9 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v237',d:'24/11/2026',t:'Mesorregião na Ficha',l:[
+   ['g','Ficha do cliente: filtro de Mesorregião (só as do estado escolhido) e, na ficha, a linha "Mesorregião · quem atende" com os representantes e quantos clientes cada um tem lá.'],
+  ]},
   {v:'v236',d:'24/11/2026',t:'Repasse na nuvem',l:[
    ['g','Depois de repassar, o painel confirma "☁️ salvo na nuvem" (ou avisa em vermelho se a sincronização não está ligada).'],
    ['g','Novo botão no Repasse: "📋 Quem passei para cada representante" — lista por representante, com copiar.'],
@@ -4240,8 +4243,8 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  fichaBusca=function(){const box=$('#f_res');if(!box)return;const t=fNorm(FQ).trim();
   const bar=`<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:2px 0 6px"><span class="mute" style="font-size:12.5px">Classe ABC:</span>${['','A','B','C'].map(k=>`<button class="lcq_ab${FABC===k?' on':''}" data-k="${k}">${k||'Todas'}</button>`).join('')}</div>`;
   const bind=()=>box.querySelectorAll('.lcq_ab').forEach(b=>b.onclick=()=>{FABC=b.dataset.k;fichaBusca()});
-  if(t.length<2&&!FCID&&!FREP&&!FABC&&!window.lcUF&&!window.lcSIT){box.innerHTML=bar+'<div class="mute" style="padding:8px 2px">Digite pelo menos 2 letras do nome, parte do código ou da cidade (ou escolha a cidade ou a classe).</div>';bind();return}
-  const ps=t?t.split(/\s+/):[];let hits=[];const okU=c=>!window.lcUF||String(c[2]||'').split('/').pop().trim().toUpperCase()===window.lcUF;const okS=i=>!(window.lcSITS&&window.lcSITS.length)||window.lcSITS.indexOf(((lcSituacao(i)||{}).t||''))>=0;const okR=i=>!FREP||nxRepsCli(i).indexOf(sqRn(+FREP))>=0;
+  if(t.length<2&&!FCID&&!FREP&&!FABC&&!window.lcUF&&!window.lcMZ&&!window.lcSIT){box.innerHTML=bar+'<div class="mute" style="padding:8px 2px">Digite pelo menos 2 letras do nome, parte do código ou da cidade (ou escolha a cidade ou a classe).</div>';bind();return}
+  const ps=t?t.split(/\s+/):[];let hits=[];const okU=c=>(!window.lcUF||String(c[2]||'').split('/').pop().trim().toUpperCase()===window.lcUF)&&(!window.lcMZ||(window.lcMZm&&window.lcMZm(c)===window.lcMZ));const okS=i=>!(window.lcSITS&&window.lcSITS.length)||window.lcSITS.indexOf(((lcSituacao(i)||{}).t||''))>=0;const okR=i=>!FREP||nxRepsCli(i).indexOf(sqRn(+FREP))>=0;
   for(let i=0;i<D.cli.length;i++){const c=D.cli[i],h=fNorm(c[1]+' '+c[0]+' '+c[2]+' '+(c[9]||''));if((!FCID||c[2]===FCID)&&okU(c)&&okS(i)&&okR(i)&&ps.every(p=>h.includes(p)))hits.push(i)}
   if(hits.length<5&&window.lcFz&&ps.some(p=>p.length>=4)){for(let i=0;i<D.cli.length;i++){if(hits.indexOf(i)>=0)continue;const c=D.cli[i],h=fNorm(c[1]+' '+c[2]);if((!FCID||c[2]===FCID)&&okU(c)&&okS(i)&&okR(i)&&ps.every(p=>h.includes(p)||lcFz(h,p)))hits.push(i)}}
   if(FABC)hits=hits.filter(i=>abcMap().get(i)===FABC);
@@ -9961,6 +9964,33 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
  function tick(){try{const c=document.getElementById('rt_c');if(!c||document.getElementById('cl_btn'))return;const b=document.createElement('button');b.id='cl_btn';b.className='rt-bt s';b.type='button';b.textContent='📋 Quem passei para cada representante';b.style.cssText='margin:6px 0';b.onclick=abre;c.parentNode.insertBefore(b,c)}catch(e){}}
  setInterval(tick,1200);
 }catch(e){console.error('lcCL',e)}})();
+
+// ===== v237 · Ficha: filtro de Mesorregião (só as do estado escolhido) + linha "Mesorregião · quem atende" na ficha do cliente =====
+(function(){try{ if(window.__lcCM)return;window.__lcCM=1;
+ const E=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+ const M=new Map(),mz=c=>{const k=String(c[2]||'');let v=M.get(k);if(v===undefined){try{const o=window.lcMeso&&lcMeso.ofCid(k);v=o?o.m:''}catch(e){v=''}M.set(k,v)}return v};
+ const uf=c=>String(c[2]||'').split('/').pop().trim().toUpperCase();
+ window.lcMZm=mz;if(window.lcMZ==null)window.lcMZ='';
+ const first2=n=>String(n||'').trim().split(/\s+/).slice(0,2).join(' ');
+ function opts(){const set=new Map();D.cli.forEach(c=>{if(window.lcUF&&uf(c)!==window.lcUF)return;const m=mz(c);if(m)set.set(m,(set.get(m)||0)+1)});return [...set.entries()].sort((a,b)=>a[0].localeCompare(b[0],'pt'))}
+ function monta(){const s=document.getElementById('f_mz');if(!s)return;const o=opts();if(window.lcMZ&&!o.some(x=>x[0]===window.lcMZ))window.lcMZ='';
+  s.innerHTML='<option value="">'+(window.lcUF?'Todas as mesorregiões de '+window.lcUF:'Escolha o estado primeiro')+'</option>'+(window.lcUF?o.map(x=>`<option value="${E(x[0])}"${x[0]===window.lcMZ?' selected':''}>${E(x[0])} (${x[1]})</option>`).join(''):'');s.disabled=!window.lcUF}
+ function tick(){try{const u=document.getElementById('f_uf');if(!u||document.getElementById('f_mz'))return;
+  const l=document.createElement('label');l.innerHTML='Mesorregião <select id="f_mz"></select>';u.closest('label').after(l);monta();
+  l.querySelector('select').onchange=e=>{window.lcMZ=e.target.value;try{fichaBusca()}catch(_){}};
+  u.addEventListener('change',()=>{window.lcMZ='';monta();try{fichaBusca()}catch(_){}})}catch(e){}}
+ setInterval(tick,800);
+ // linha na ficha do cliente
+ const fs=fichaShow;
+ fichaShow=function(ci){fs.apply(this,arguments);try{
+  const fx=document.getElementById('lcfx');if(!fx||fx.querySelector('#lcfz'))return;const first=fx.querySelector('.lccard');if(!first)return;
+  const c=D.cli[ci],m=mz(c);if(!m)return;const U=uf(c),cnt=new Map();let tot=0;
+  D.cli.forEach(x=>{if(uf(x)!==U||mz(x)!==m)return;tot++;const r=x[8];if(r&&D.reps[r]){const n=first2(String(D.reps[r][1]||'').replace(/\s*-?\s*INATIVO/i,''));cnt.set(n,(cnt.get(n)||0)+1)}});
+  const rs=[...cnt.entries()].sort((a,b)=>b[1]-a[1]).map(x=>E(x[0])+' ('+x[1]+')').join(' · ');
+  const d=document.createElement('div');d.id='lcfz';d.style.cssText='margin:6px 0;padding:7px 10px;border-top:1px solid #dbe3ef;font-size:13px;color:#33465f';
+  d.innerHTML='🗺 <b>Mesorregião:</b> '+E(m)+' <span class="mute">· '+tot+' clientes nossos</span><div style="margin-top:3px"><b>Quem atende:</b> '+(rs||'ninguém ainda')+'</div>';
+  first.after(d)}catch(e){console.error('lcCM',e)}};
+}catch(e){console.error('lcCM',e)}})();
 
 
 </script></body></html>
