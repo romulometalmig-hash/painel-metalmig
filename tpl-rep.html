@@ -1962,7 +1962,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v227';
+const NX_VER = 'v228';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3649,6 +3649,9 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v228',d:'24/11/2026',t:'Correção: aprovar candidato',l:[
+   ['g','Corrigido: ao aprovar um candidato, depois de "Conferir antes de aprovar" a tela voltava em vez de aprovar. Agora a conferência vale como confirmação e o candidato passa direto para Representante ativo.'],
+  ]},
   {v:'v227',d:'24/11/2026',t:'Bola de clientes na mesorregião (Recrutamento)',l:[
    ['g','Cartão do candidato: nova bola com a quantidade de clientes nossos na mesorregião dele.'],
   ]},
@@ -7742,7 +7745,7 @@ body.rt-fs{overflow:hidden!important}body.rt-fs:not(.rt-nv) #lcnav{display:none!
   const m=document.createElement('div');m.style.cssText='position:fixed;inset:0;background:rgba(16,35,63,.45);z-index:100000;display:flex;align-items:center;justify-content:center;padding:16px';
   m.innerHTML=`<div style="background:#fff;border-radius:14px;max-width:420px;width:100%;padding:18px 20px;box-shadow:0 10px 40px rgba(0,0,0,.3);font:15px system-ui,Segoe UI,Arial;color:#10233f"><div style="font-weight:800;font-size:16px;margin-bottom:8px">Mudar a situação?</div><div style="line-height:1.5"><b>${E(c.nome||'Candidato')}</b><br>de <b>${SN[from]||from}</b> para <b>${SN[to]||to}</b></div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px"><button class="cf_n" style="padding:8px 14px;border:1px solid #9aa7bd;border-radius:9px;background:#fff;font-size:14px;cursor:pointer">Cancelar</button><button class="cf_s" style="padding:8px 14px;border:0;border-radius:9px;background:#1F4E78;color:#fff;font-weight:700;font-size:14px;cursor:pointer">Sim, mudar</button></div></div>`;
   document.body.appendChild(m);const fim=()=>m.remove();m.querySelector('.cf_n').onclick=()=>{fim();if(cancel)cancel()};m.querySelector('.cf_s').onclick=()=>{fim();go()};m.addEventListener('click',ev=>{if(ev.target===m){fim();if(cancel)cancel()}});m.querySelector('.cf_s').focus()}
- document.addEventListener('click',e=>{if(CF_OK)return;const t=e.target;if(!t.closest)return;const b=t.closest('.aq_nv,.pr_mv,.pr_ap,.pr_rp,.aq_rsb,.aq_bk');if(!b||!b.dataset.id)return;
+ document.addEventListener('click',e=>{if(CF_OK||window.__mzOk)return;const t=e.target;if(!t.closest)return;const b=t.closest('.aq_nv,.pr_mv,.pr_ap,.pr_rp,.aq_rsb,.aq_bk');if(!b||!b.dataset.id)return;
   const to=b.classList.contains('aq_nv')||b.classList.contains('pr_mv')?b.dataset.to:b.classList.contains('pr_ap')?'f':b.classList.contains('pr_rp')?'r':b.classList.contains('aq_rsb')?'v':'a';
   e.stopImmediatePropagation();e.preventDefault();cfAsk(b.dataset.id,to,()=>{CF_OK=true;try{b.click()}finally{CF_OK=false}})},true);
  document.addEventListener('change',e=>{if(CF_OK)return;const t=e.target;if(!t.classList||!(t.classList.contains('aq_mvs')||t.classList.contains('aq_tsit')))return;const id=t.dataset.id,to=t.value;if(!to)return;
@@ -8938,8 +8941,8 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
    +'<div class="mz_ck"><input type="checkbox" class="mz_c1"><div>Conferi as marcas'+(mk?' ('+E(mk)+')':'')+' e nenhuma é concorrente direta</div></div>'
    +'<div class="mz_ck"><input type="checkbox" class="mz_c2"><div>Já conversei e alinhei as condições com o candidato</div></div>'
    +'<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap"><button class="mz_bt mz_cx">Cancelar</button><button class="mz_bt g mz_ok">✅ Aprovar</button></div></div>');
-  o.querySelector('.mz_cx').onclick=fechar;o.querySelector('.mz_ok').onclick=()=>{fechar();window.__mzOk=1;btn.click()}}
- window.addEventListener('click',e=>{const b=e.target&&e.target.closest&&e.target.closest('.prc .pr_ap');if(!b)return;if(window.__mzOk){window.__mzOk=0;return}const a=cand(b.dataset.id);if(!a)return;e.preventDefault();e.stopImmediatePropagation();conf(a,b)},true);
+  o.querySelector('.mz_cx').onclick=fechar;o.querySelector('.mz_ok').onclick=()=>{fechar();window.__mzOk=1;const oc=window.confirm;window.confirm=()=>true;try{btn.click()}finally{window.confirm=oc;window.__mzOk=0}}}
+ window.addEventListener('click',e=>{const b=e.target&&e.target.closest&&e.target.closest('.prc .pr_ap');if(!b)return;if(window.__mzOk)return;const a=cand(b.dataset.id);if(!a)return;e.preventDefault();e.stopImmediatePropagation();conf(a,b)},true);
 
  // ===== 7) candidato de volta / mesmo telefone =====
  const VT=()=>J('mz_volta',{});
