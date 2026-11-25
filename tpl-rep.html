@@ -1963,7 +1963,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v252';
+const NX_VER = 'v253';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3650,6 +3650,9 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v253',d:'24/11/2026',t:'Testar ida e volta',l:[
+   ['g','Sistema → Saúde do sistema: botão "Testar ida e volta agora". Confere em 4 etapas se o que você muda chega à nuvem e à página do representante e se o que o representante grava volta para você. Se falhar, explica o que pode ser e o que fazer.'],
+  ]},
   {v:'v252',d:'24/11/2026',t:'Ficha no celular',l:[
    ['a','Ficha: com o cabeçalho recolhido, a caixa de busca não some mais enquanto nenhum cliente estiver aberto (a tela ficava vazia).'],
   ]},
@@ -10095,7 +10098,7 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
    const S=ldS();S[cod]=assin(ri);ss(SIG,JSON.stringify(S));return j.v}
   const tcN=ri=>String((D.reps[ri]||[0,''])[1]||'').replace(/\s*-?\s*INATIVO/i,'').split(' ').slice(0,2).join(' ');
   async function lista(){const c=await cfg();if(!c||!c.pg)return null;const j=await post(c.pg,{t:'pg_lista',k:GK});return j&&j.ok?j:null}
-  window.lcPgPublica=publica;
+  window.lcPgPublica=publica;window.lcPgPendF=async()=>{const c=await cfg();return((c&&c.pgreps)||[]).filter(cod=>{const ri=riDe(cod);return ri>=0&&ldS()[cod]!==assin(ri)})};
   // publica sozinho quem teve a carteira alterada (só representantes liberados em drive.json › pgreps)
   let tm=null,rodando=false;
   async function auto(){if(rodando)return;const c=await cfg();if(!c||!c.pg||!Array.isArray(c.pgreps))return;rodando=true;
@@ -10368,6 +10371,106 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
   })}
  setInterval(()=>{try{passa()}catch(e){console.error('lcCT',e)}},1200);
 }catch(e){console.error('lcCT',e)}})();
+
+// ===== v253 · Testar ida e volta (gestor): confere se o que o gestor muda chega ao representante e o que o representante faz chega ao gestor =====
+(function(){try{
+ if(window.__lcCU||typeof D==='undefined'||D.rm)return;window.__lcCU=1;
+ const L0=localStorage,gs=k=>{try{return L0.getItem(k)}catch(e){return null}};
+ const GK='',E=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+ const PROBE='metalmig_sync_teste_iv';   // começa com metalmig_sync → nunca é copiado para os aparelhos
+ const TMO=25000;
+ // ---------- explicações em português para cada tipo de erro
+ const EX={
+  net:{o:'Sem internet neste aparelho (ou o sinal está muito fraco).',f:'Conecte no Wi‑Fi ou nos dados do celular e toque em Testar de novo.'},
+  nuvem:{o:'A nuvem (Google) não respondeu a tempo. Pode ser instabilidade do Google ou da sua internet.',f:'Espere 1 minuto e teste de novo. Se repetir várias vezes, o endereço da nuvem pode ter mudado: avise o suporte.'},
+  chave:{o:'A nuvem recusou a chave. A chave do gestor ou a do representante de teste não confere.',f:'Atualize o painel para a última versão. Se continuar, a chave foi trocada na nuvem: avise o suporte.'},
+  semcfg:{o:'O painel não achou o endereço da nuvem (arquivo drive.json).',f:'Abra o painel pelo link oficial (com internet) e teste de novo.'},
+  naoguardou:{o:'A nuvem respondeu, mas não guardou o dado de teste.',f:'Teste de novo. Se repetir, o script da nuvem pode estar desatualizado: avise o suporte.'},
+  desat:{o:'A página de um ou mais representantes está numa versão antiga (falta publicar).',f:'Toque em “Publicar páginas agora”. Se der erro, veja Sistema → Páginas na nuvem.'},
+  sempag:{o:'Esta nuvem ainda não tem endereço de páginas dos representantes.',f:'Avise o suporte para ligar a nuvem de páginas.'},
+  parado:{o:'Há representantes que não enviam nada há vários dias. O aparelho deles pode estar sem internet ou sem abrir a página.',f:'Fale com eles e peça para abrir a página com internet.'},
+  outro:{o:'Erro que o painel ainda não conhece.',f:'Tire um print desta tela e mande para o suporte.'}
+ };
+ const classifica=e=>{const m=String(e&&e.message||e||'');
+  if(navigator.onLine===false)return['net',m];
+  if(e&&e.cod)return[e.cod,m];
+  if(/timeout|tempo/i.test(m))return['nuvem',m];
+  if(/Failed to fetch|NetworkError|Load failed|fetch/i.test(m))return['nuvem',m];
+  if(/chave/i.test(m))return['chave',m];
+  return['outro',m]};
+ const er=(cod,msg)=>{const x=new Error(msg||cod);x.cod=cod;return x};
+ // ---------- ligação com a nuvem (pode ser trocada nos testes automáticos)
+ const mkPost=()=>async(u,o)=>{const ct=new AbortController(),t=setTimeout(()=>ct.abort(),TMO);
+  try{const r=await fetch(u,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(o),signal:ct.signal});
+   if(!r.ok)throw er('nuvem','HTTP '+r.status);
+   let j;try{j=await r.json()}catch(x){throw er('nuvem','resposta inválida')}
+   if(j&&j.ok===false&&j.erro==='chave')throw er('chave','chave recusada');
+   return j}catch(x){if(x&&x.name==='AbortError')throw er('nuvem','timeout');throw x}finally{clearTimeout(t)}};
+ const cfgR=async()=>{try{const r=await fetch(new URL('drive.json?t='+Date.now(),location.href).href,{cache:'no-store'});return await r.json()}catch(e){try{return JSON.parse(gs('metalmig_bkp_drvcfg')||'null')}catch(_){return null}}};
+ const riDe=c=>D.reps.findIndex(r=>+r[0]===+c);
+ const nomeRep=c=>{const i=riDe(c);return i<0?String(c):String(D.reps[i][1]).replace(/\s*-?\s*INATIVO/i,'').split(' ').slice(0,2).join(' ')};
+ // ---------- o teste (4 etapas). Cada etapa devolve {ok, aviso?, det?}
+ async function roda(op,prog){op=op||{};const post=op.post||mkPost(),c=await(op.cfg?op.cfg():cfgR());
+  const R=[{n:'Gestor → nuvem'},{n:'Nuvem → página do representante'},{n:'Representante → nuvem'},{n:'Nuvem → gestor'}];
+  const RK=op.RK||window.LC_RK||{};const t0=Date.now();
+  const pCod=String((op.probeRep||[2001].concat((c&&c.pgreps)||[]).find(x=>RK[String(x)])));const pKey=RK[pCod];
+  const nonce1='g'+Date.now()+Math.random().toString(36).slice(2,7),nonce2='r'+Date.now()+Math.random().toString(36).slice(2,7);
+  const passo=async(i,fn)=>{const t=Date.now();prog&&prog(i,'run');try{const r=await fn()||{};R[i].ok=true;R[i].aviso=r.aviso;R[i].det=r.det;R[i].ms=Date.now()-t;prog&&prog(i,r.aviso?'warn':'ok',R[i])}catch(e){const[cod,m]=classifica(e);R[i].ms=Date.now()-t;R[i].lista=e&&e.lista;if(cod==='desat'){R[i].ok=true;R[i].aviso='desat';prog&&prog(i,'warn',R[i]);return true}R[i].ok=false;R[i].cod=cod;R[i].tec=m;prog&&prog(i,'err',R[i]);return false}return true};
+  const limpa=async()=>{const ts=Date.now()+5;try{await post(c.u,{k:GK,t:'gsync',last:0,dados:{ls:{},ts:{[PROBE]:ts}}})}catch(e){}try{if(pKey)await post(c.u,{k:pKey,rep:pCod,t:'rsync',last:0,dados:{ls:{},ts:{[PROBE]:ts}}})}catch(e){}};
+  if(!c||!c.u){R[0].ok=false;R[0].cod='semcfg';R[0].tec='drive.json';prog&&prog(0,'err',R[0]);return{R,t:Date.now()-t0,ok:false}}
+  // 1) o gestor grava na nuvem e a nuvem devolve o que gravou
+  let ok=await passo(0,async()=>{const ts=Date.now();const j=await post(c.u,{k:GK,t:'gsync',last:ts-1,dados:{ls:{[PROBE]:nonce1},ts:{[PROBE]:ts}}});
+   if(!j||!j.ok)throw er('outro','gsync: '+JSON.stringify(j||{}).slice(0,120));
+   if(!j.dados||!j.dados.ls||j.dados.ls[PROBE]!==nonce1)throw er('naoguardou','gsync não devolveu o dado de teste');});
+  // 2) página do representante: nuvem de páginas no ar, páginas em dia
+  if(ok||true)await passo(1,async()=>{if(!c.pg)throw er('sempag','sem pg');
+   const L=await post(c.pg,{t:'pg_lista',k:GK});if(!L||!L.ok)throw er('outro','pg_lista: '+JSON.stringify(L||{}).slice(0,120));
+   const pgr=(c.pgreps||[]).map(String),lista=L.lista||{},av=[];
+   const pend=op.pend||(window.lcPgPendF?await window.lcPgPendF():[]);
+   pend.forEach(x=>av.push(nomeRep(x)+' (falta publicar)'));
+   pgr.forEach(cod=>{const x=lista[cod];if(!x||!x.v)av.push(nomeRep(cod)+' (nada publicado)');else if(x.ack<x.v&&Date.now()-x.ts>6*3600e3)av.push(nomeRep(cod)+' (ainda não carregou a página nova)')});
+   if(pKey){const v=await post(c.pg,{t:'pg_ver',rep:pCod,k:pKey,cur:null});if(!v||!v.ok)throw er(v&&v.erro==='chave'?'chave':'outro','pg_ver')}
+   if(av.length){const e=er('desat','');e.lista=av;throw e}});
+  // 3) o representante (chave de teste) grava na nuvem
+  ok=await passo(2,async()=>{if(!pKey)throw er('chave','sem chave de teste');const ts=Date.now();
+   const j=await post(c.u,{k:pKey,rep:pCod,t:'rsync',last:ts-1,dados:{ls:{[PROBE]:nonce2},ts:{[PROBE]:ts}}});
+   if(!j||!j.ok)throw er('outro','rsync: '+JSON.stringify(j||{}).slice(0,120));
+   if(!j.dados||!j.dados.ls||j.dados.ls[PROBE]!==nonce2)throw er('naoguardou','rsync não devolveu o dado de teste');});
+  // 4) o gestor lê, pelo mesmo caminho que usa de verdade, o que o representante gravou + vê quem está parado
+  await passo(3,async()=>{if(!R[2].ok)throw er('outro','etapa 3 falhou, não há o que ler');
+   const j=await post(c.u,{k:pKey,rep:pCod,t:'rsync',last:Date.now(),dados:{ls:{},ts:{}}});
+   if(!j||!j.ok||!j.dados||!j.dados.ls||j.dados.ls[PROBE]!==nonce2)throw er('naoguardou','a leitura não trouxe o dado de teste');
+   const V=await post(c.u,{k:GK,t:'visto_lista'});const lim=Date.now()-(op.diasParado||7)*864e5,par=[];
+   if(V&&V.visto)((c.pgreps||[]).map(String)).forEach(cod=>{const v=V.visto[cod];if(v&&v.nuvem&&v.nuvem<lim)par.push(nomeRep(cod)+' ('+Math.floor((Date.now()-v.nuvem)/864e5)+' dias)')});
+   if(par.length){R[3].lista=par;return{aviso:'parado'}}});
+  await limpa();
+  const fail=R.some(r=>r.ok===false),warn=R.some(r=>r.aviso);
+  return{R,t:Date.now()-t0,ok:!fail,warn,pCod};
+ }
+ window.lcTesteIV={roda,EX,classifica,nomeRep};
+ // ---------- tela
+ const CSS='.iv-c{border:1px solid #cfd8e8;border-radius:12px;background:#fff;padding:12px 14px;margin:8px 0 12px;font-family:inherit}.iv-b{border:0;border-radius:10px;background:#1F4E78;color:#fff;font:700 14px Arial;padding:10px 16px;cursor:pointer}.iv-b:disabled{opacity:.6}.iv-s{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-top:1px solid #eef1f6;font-size:13.5px}.iv-s i{font-style:normal;width:22px;flex:none;text-align:center}.iv-m{color:#6b7a90;font-size:12px}.iv-x{background:#fff4e5;border-left:4px solid #C55A11;border-radius:6px;padding:8px 10px;margin:4px 0 2px;font-size:13px}.iv-ok{background:#e8f5e9;border-left:4px solid #2E7D32;border-radius:6px;padding:8px 10px;margin:8px 0 0;font-weight:700;font-size:14px}.iv-er{background:#fdecea;border-left:4px solid #C62828;border-radius:6px;padding:8px 10px;margin:8px 0 0;font-weight:700;font-size:14px}.iv-t{font:11px monospace;color:#8a94a6;word-break:break-all;margin-top:4px}';
+ const st=document.createElement('style');st.textContent=CSS;document.head.appendChild(st);
+ function pintaS(r,i,estado){const ic=estado==='run'?'⏳':estado==='ok'?'✅':estado==='warn'?'⚠️':estado==='err'?'⛔':'▫️';
+  let x='';
+  if(estado==='warn'||estado==='err'){const k=estado==='err'?r.cod:(r.aviso==='desat'?'desat':'parado');const e=EX[k]||EX.outro;
+   let lst='';const L=(r.lista||[]);
+   x='<div class="iv-x"><b>O que pode ser:</b> '+E(e.o)+(L.length?'<div class="iv-m">'+L.slice(0,8).map(E).join(' · ')+(L.length>8?' … e mais '+(L.length-8):'')+'</div>':'')+'<br><b>O que fazer:</b> '+E(e.f)+(k==='desat'?'<br><button class="iv-b" id="iv_pub" style="margin-top:6px;padding:7px 12px">Publicar páginas agora</button>':'')+(k==='outro'||k==='naoguardou'?'<div class="iv-t">Detalhe técnico: '+E(r.tec||'')+'</div>':'')+'</div>'}
+  return '<div class="iv-s"><i>'+ic+'</i><div style="flex:1"><b>'+(i+1)+'. '+E(r.n)+'</b>'+(r.ms&&estado!=='run'?' <span class="iv-m">· '+(r.ms/1000).toFixed(1)+'s</span>':'')+x+'</div></div>'}
+ function monta(box){box.innerHTML='<b style="font-size:15px">🔄 Testar ida e volta</b><div class="iv-m" style="margin:3px 0 8px">Confere se o que você muda chega aos representantes e se o que eles fazem chega até você. Usa um dado de teste que é apagado no fim; não mexe em clientes nem pedidos.</div><button class="iv-b" id="iv_go" style="margin-bottom:6px">🔄 Testar ida e volta agora</button><div id="iv_r"></div>';
+  const go=box.querySelector('#iv_go'),out=box.querySelector('#iv_r');
+  go.onclick=async()=>{go.disabled=true;go.textContent='Testando…';const NM=['Gestor → nuvem','Nuvem → página do representante','Representante → nuvem','Nuvem → gestor'];const S=NM.map(n=>({n}));const est=[];
+   const pinta=()=>{out.innerHTML=S.map((r,i)=>pintaS(r,i,est[i])).join('')};pinta();
+   let res;try{res=await roda({},(i,e,r)=>{est[i]=e;if(r)S[i]=r;pinta()})}catch(e){const[k,m]=classifica(e);res={ok:false,R:[{n:NM[0],ok:false,cod:k,tec:m}]};S[0]=res.R[0];est[0]='err';pinta()}
+   go.disabled=false;go.textContent='🔄 Testar de novo';
+   const bad=(res.R||[]).filter(r=>r.ok===false);
+   out.insertAdjacentHTML('beforeend',bad.length?'<div class="iv-er">⛔ Algo não chegou. Veja acima o que fazer.</div>':res.warn?'<div class="iv-ok" style="background:#fff4e5;border-color:#C55A11">⚠️ Chegou nos dois sentidos, mas há um aviso acima ('+(res.t/1000).toFixed(0)+'s).</div>':'<div class="iv-ok">✅ Tudo chegou nos dois sentidos em '+(res.t/1000).toFixed(0)+' segundos.</div>');
+   try{L0.setItem('metalmig_iv_ult',JSON.stringify({t:Date.now(),ok:!bad.length}))}catch(e){}
+   const pb=out.querySelector('#iv_pub');if(pb)pb.onclick=async()=>{pb.disabled=true;pb.textContent='Publicando…';try{const c=await cfgR();for(const cod of(c.pgreps||[])){const ri=riDe(cod);if(ri<0)continue;if(window.lcPgPublica)await window.lcPgPublica(cod,t=>{pb.textContent=t})}pb.textContent='Pronto. Teste de novo.'}catch(e){pb.textContent='Erro: '+e.message}}
+  }}
+ function tick(){try{if(typeof VIEW==='undefined'||VIEW!=='saude'||document.getElementById('iv_card'))return;const v=document.getElementById('v2out');if(!v||v.children.length<2)return;const d=document.createElement('div');d.id='iv_card';d.className='iv-c';monta(d);const f=[...v.children].find(c=>c.id!=='nx3t');if(!f)return;f.after(d)}catch(e){}}
+ setInterval(tick,1200);
+}catch(e){console.error('lcCU',e)}})();
 
 
 </script></body></html>
