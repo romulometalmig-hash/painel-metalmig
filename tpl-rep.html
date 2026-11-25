@@ -1963,7 +1963,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v257';
+const NX_VER = 'v258';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3270,11 +3270,11 @@ if(H.sec==='agenda'){setView('agenda')}else if(H.sec==='cal'){setView('cal')}els
 (function(){try{
  if(window.__lc)return;window.__lc=1;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
- const LG=[['hoje','☀️','Hoje',['dash','hoje','venda','agenda','dashrep']],['cli','👥','Clientes',['oque','ficha','cart','catx','rec','reat','repas','relsem','mapa','perto','abc','queda','novos','rev','orc','pspc','mpr']],['vm','📈','Vendas',['painel','resumo','meta','proj','vendas','cal','hist']],['ter','🗺️','Territórios',['cobert','cidn','lnv','cfe','camp','cobreg','orfaos','confl']],['via','🧳','Viagens',['desp','vis']],['mat','📚','Materiais',['rel','conq','bib','precos','trein']],['sasi','🤖','Sasi',['sasi']],['sis','⚙️','Sistema',['pedidos','prec','lnk','imp','dup','saude','pcp','nov']],['ger','🧭','Gestão',['repterm','repn','recr','most','prosp','and']]];
+ const LG=[['hoje','☀️','Hoje',['dash','hoje','venda','agenda','dashrep']],['cli','👥','Clientes',['oque','ficha','cart','catx','rec','reat','repas','relsem','mapa','perto','abc','queda','novos','cnov','cnovg','rev','orc','pspc','mpr']],['vm','📈','Vendas',['painel','resumo','meta','proj','vendas','cal','hist']],['ter','🗺️','Territórios',['cobert','cidn','lnv','cfe','camp','cobreg','orfaos','confl']],['via','🧳','Viagens',['desp','vis']],['mat','📚','Materiais',['rel','conq','bib','precos','trein']],['sasi','🤖','Sasi',['sasi']],['sis','⚙️','Sistema',['pedidos','prec','lnk','imp','dup','saude','pcp','nov']],['ger','🧭','Gestão',['repterm','repn','recr','most','prosp','and']]];
  const HID=new Set(['seg','oco','conc','cartao']);window.LCHID=HID;
  const GI={};LG.forEach(g=>GI[g[0]]=[g[1],g[2]]);
  const GC={hoje:'#F9A825',cli:'#1F78B4',vm:'#2E7D32',ter:'#E08A1E',via:'#00838F',mat:'#8E24AA',sasi:'#7c3aed',sis:'#546E7A',ger:'#6A1B9A'};
- const TI={cobert:'📡',and:'🧭',prec:'📥',pspc:'📞',mpr:'📞',hoje:'☀️',venda:'💰',agenda:'📅',ficha:'🪪',cart:'📂',mapa:'🗺️',perto:'📍',abc:'🔠',queda:'📉',novos:'🌱',rev:'🔄',cadi:'📝',precos:'💲',orc:'🧾',painel:'📊',resumo:'🧮',meta:'🎯',proj:'🔮',vendas:'📈',cal:'🗓️',hist:'🕘',cidn:'🏙️',camp:'📣',cobreg:'🧭',orfaos:'🙋',confl:'⚔️',desp:'💼',vis:'✅',rel:'🤝',conq:'🏆',bib:'📚',sasi:'🤖',pedidos:'🛒',imp:'📥',dup:'👯',saude:'🩺',pcp:'🏭',repn:'🗒️',recr:'🧑‍💼',most:'🖼️',prosp:'🧑‍💼',nov:'✨',relsem:'📋',repterm:'🌡️'};window.LCTI=TI;
+ const TI={cobert:'📡',and:'🧭',prec:'📥',pspc:'📞',mpr:'📞',cnov:'➕',cnovg:'🆕',hoje:'☀️',venda:'💰',agenda:'📅',ficha:'🪪',cart:'📂',mapa:'🗺️',perto:'📍',abc:'🔠',queda:'📉',novos:'🌱',rev:'🔄',cadi:'📝',precos:'💲',orc:'🧾',painel:'📊',resumo:'🧮',meta:'🎯',proj:'🔮',vendas:'📈',cal:'🗓️',hist:'🕘',cidn:'🏙️',camp:'📣',cobreg:'🧭',orfaos:'🙋',confl:'⚔️',desp:'💼',vis:'✅',rel:'🤝',conq:'🏆',bib:'📚',sasi:'🤖',pedidos:'🛒',imp:'📥',dup:'👯',saude:'🩺',pcp:'🏭',repn:'🗒️',recr:'🧑‍💼',most:'🖼️',prosp:'🧑‍💼',nov:'✨',relsem:'📋',repterm:'🌡️'};window.LCTI=TI;
  const st=document.createElement('style');st.id='lcst';st.textContent=`
 body.lc header,body.lc #gbar,body.lc #nav,body.lc #fbar,body.lc #nx3f,body.lc #mbar{display:none!important}
 html:has(body.lc),body.lc{overflow-x:hidden;max-width:100vw}body.lc main{overflow-x:auto;max-width:100vw;-webkit-overflow-scrolling:touch}body.lc{padding-bottom:96px}
@@ -3650,6 +3650,7 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v258',d:'25/11/2026',t:'Cliente novo fora do pedido',l:[['g','Representante: nova opção Clientes › ➕ Cliente novo (CNPJ/CPF com busca na Receita, telefones com máscara, e-mail, Instagram, marcas). Entra na carteira dele e chega a você mesmo sem pedido.'],['g','Gestor: nova tela 🆕 Clientes novos dos representantes, com contador e Marcar como visto.']]},
   {v:'v257',d:'25/11/2026',t:'Supabase (etapa 1): recados e "visto"',l:[
    ['g','Recado do gestor (com "li") agora passa pelo Supabase para os 33 representantes liberados, junto com o Drive. Se um falhar, o outro entrega.'],
    ['g','"Testar sincronismo": a última abertura de cada representante também é registrada no Supabase, e o painel mostra a mais recente dos dois.'],
@@ -10570,6 +10571,168 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
   finally{try{await call('sb_teste',{p_k:RK[rep],p_rep:rep,p_acao:'limpa'})}catch(e){}}
   return true};
 }catch(e){console.error('lcCV',e)}})();
+
+// ===== v258 · Cliente novo fora do pedido (representante) + "Clientes novos dos representantes" (gestor) =====
+// Representante: aba Clientes › Cliente novo. Salva no aparelho (e a cópia vai junto com a sincronização) e envia ao gestor pelo Supabase.
+// Gestor: aba Clientes › Clientes novos dos representantes, com contador e "Marcar como visto".
+(function(){try{
+ if(window.__lcCW||typeof D==='undefined')return;window.__lcCW=1;
+ const REP=!!D.rm,L0=localStorage;
+ const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+ const lj=(k,d)=>{try{const v=JSON.parse(L0.getItem(k)||'null');return v==null?d:v}catch(e){return d}};
+ const sj=(k,v)=>{try{L0.setItem(k,JSON.stringify(v))}catch(e){}};
+ const GK='';
+ const dg=s=>String(s||'').replace(/\D/g,'');
+ // ---------- máscaras e conferências (evitam número errado)
+ const DDD=new Set('11 12 13 14 15 16 17 18 19 21 22 24 27 28 31 32 33 34 35 37 38 41 42 43 44 45 46 47 48 49 51 53 54 55 61 62 63 64 65 66 67 68 69 71 73 74 75 77 79 81 82 83 84 85 86 87 88 89 91 92 93 94 95 96 97 98 99'.split(' '));
+ const mTel=v=>{const d=dg(v).slice(0,11);if(!d)return'';if(d.length<=2)return'('+d;if(d.length<=6)return'('+d.slice(0,2)+') '+d.slice(2);if(d.length<=10)return'('+d.slice(0,2)+') '+d.slice(2,6)+(d.length>6?'-'+d.slice(6):'');return'('+d.slice(0,2)+') '+d.slice(2,7)+'-'+d.slice(7)};
+ const telErro=(v,obr)=>{const d=dg(v);if(!d)return obr?'Informe o telefone.':'';if(d.length<10)return'Telefone incompleto: DDD + número.';if(!DDD.has(d.slice(0,2)))return'DDD '+d.slice(0,2)+' não existe.';
+  const n=d.slice(2);if(n.length===9&&n[0]!=='9')return'Celular precisa começar com 9.';if(/^(\d)\1+$/.test(n)||/^(0123456|1234567|12345678|123456789)/.test(n))return'Número parece falso.';return''};
+ const mDoc=v=>{const d=dg(v).slice(0,14);if(d.length<=11)return d.replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2');return d.replace(/^(\d{2})(\d)/,'$1.$2').replace(/^(\d{2})\.(\d{3})(\d)/,'$1.$2.$3').replace(/\.(\d{3})(\d)/,'.$1/$2').replace(/(\d{4})(\d)/,'$1-$2')};
+ const cpfOk=d=>{if(d.length!==11||/^(\d)\1+$/.test(d))return false;for(const t of[9,10]){let s=0;for(let i=0;i<t;i++)s+=+d[i]*(t+1-i);if((s*10%11)%10!==+d[t])return false}return true};
+ const cnpjOk=d=>{if(d.length!==14||/^(\d)\1+$/.test(d))return false;const c=n=>{let s=0,p=n-7;for(let i=0;i<n;i++){s+=+d[i]*p--;if(p<2)p=9}const r=s%11;return r<2?0:11-r};return c(12)===+d[12]&&c(13)===+d[13]};
+ const docErro=v=>{const d=dg(v);if(!d)return'Informe o CNPJ ou CPF.';if(d.length===11)return cpfOk(d)?'':'CPF inválido.';if(d.length===14)return cnpjOk(d)?'':'CNPJ inválido.';return'CNPJ/CPF incompleto.'};
+ const mailErro=v=>{v=String(v||'').trim();return!v||/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)?'':'E-mail inválido (precisa ter @ e um domínio, como .com.br).'};
+ const insta=v=>{v=String(v||'').trim().replace(/^https?:\/\/(www\.)?instagram\.com\//i,'').replace(/[\/?#].*$/,'').replace(/^@+/,'');return v?'@'+v.replace(/[^A-Za-z0-9._]/g,''):''};
+ const sb=()=>window.lcSB;
+ const cod=()=>String((D.bk&&D.bk.c)||'');
+ const brData=t=>{if(!t)return'';const d=new Date(+t),p=n=>String(n).padStart(2,'0');return p(d.getDate())+'/'+p(d.getMonth()+1)+'/'+d.getFullYear()+' '+p(d.getHours())+':'+p(d.getMinutes())};
+ const repNome=c=>{try{const r=(D.reps||[]).find(x=>String(x[0])===String(c));if(!r)return String(c);const ap=window.lcApel&&window.lcApel.get?window.lcApel.get(r[0]):'';return ap||String(r[1]).replace(/\s*-?\s*INATIVO/i,'')}catch(e){return String(c)}};
+ const barra=()=>{const m=window.__cwModo||'lista';return '<div style="display:flex;gap:6px;margin:0 0 10px;flex-wrap:wrap"><button class="cw-b cw_tab '+(m==='lista'?'p':'')+'" data-m="lista">📋 Recebidos dos representantes</button><button class="cw-b cw_tab '+(m==='form'?'p':'')+'" data-m="form">➕ Cadastrar cliente novo</button></div>'};
+ const ligaBarra=o=>{o.querySelectorAll('.cw_tab').forEach(b=>b.onclick=()=>{window.__cwModo=b.dataset.m;if(b.dataset.m==='form')window.lcCNov.draw();else window.lcCNovG.draw()})};
+ const css=document.createElement('style');css.textContent=`.cw-f{display:grid;gap:10px;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.cw-f label>div{min-width:0}.cw-c{max-width:100%;box-sizing:border-box;overflow:hidden}.cw-f label{display:flex;flex-direction:column;font-size:12px;color:#556;gap:3px}.cw-f .w{grid-column:1/-1}
+.cw-f input{width:100%;box-sizing:border-box;font:15px Arial;padding:9px;border:1px solid #b9c8dd;border-radius:8px;background:#fff;color:inherit;min-width:0}.cw-f input.bad{border-color:#c62828;background:#fff5f5}.cw-er{color:#c62828;font-size:11.5px;min-height:0}
+.cw-chip{display:inline-flex;gap:5px;align-items:center;background:#e3eefc;border:1px solid #9db9e3;color:#1f4e78;border-radius:14px;padding:4px 10px;font-size:12px;font-weight:700;margin:2px 4px 2px 0}.cw-chip button{border:0;background:none;color:#1f4e78;font-size:13px;padding:0;cursor:pointer}
+.cw-n{background:#fff7e6;border:1px solid #e8c16b;border-radius:8px;padding:8px 10px;font-size:12.5px;color:#6b4a00;margin:6px 0}.cw-ok{background:#e8f5ec;border:1px solid #9ccfae;border-radius:8px;padding:8px 10px;font-size:13px;color:#14522a;margin:8px 0}.cw-bad{background:#fdeaea;border:1px solid #e3a0a0;border-radius:8px;padding:8px 10px;font-size:13px;color:#8a1c1c;margin:8px 0}
+.cw-c{background:#fff;border:1px solid #dde4ef;border-radius:10px;padding:10px 12px;margin-bottom:12px}.cw-t{display:inline-block;font-size:11px;font-weight:700;padding:3px 8px;border-radius:12px;margin:4px 4px 0 0;color:#fff;background:#1f4e78}.cw-t.nv{background:#2a6fdb;font-size:10px;padding:2px 7px}.cw-t.g{background:#2e7d32}.cw-t.c{background:#7a8699}.cw-t.o{background:#e08a00}
+.cw-a{margin-top:8px;background:#eef3fa;border-radius:8px;padding:8px;display:flex;gap:6px;flex-wrap:wrap}.cw-k{font-size:13px;color:#334;margin-top:2px}.cw-b{max-width:100%;border:1px solid #1f4e78;color:#1f4e78;background:#fff;border-radius:8px;padding:8px 12px;font-size:13px;cursor:pointer}.cw-b.p{background:#1f4e78;color:#fff}.cw-b:disabled{opacity:.45;cursor:not-allowed}
+.cw-bd{background:#c62828;color:#fff;border-radius:999px;font-size:12px;font-weight:800;padding:1px 8px;margin-left:8px}`;document.head.appendChild(css);
+ const note=(o,id)=>{const d=o.querySelector('#'+id);return d};
+ // =====================================================================  REPRESENTANTE
+ {
+  const GES=!REP;
+  const KEY=nxK('cnov');const lista=()=>lj(KEY,[]);const grava=l=>sj(KEY,l);
+  const novoId=()=>(GES?'G':cod())+'-'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+  const ST={f:{doc:'',nome:'',ie:'',resp:'',tel1:'',tel2:'',mail:'',end:'',cid:'',uf:'',insta:'',marcas:[]},fonte:'manual',conf:false,msg:'',err:'',busca:'',dup:'',rd:''};
+  const sbOn=()=>GES?!!(sb()&&sb().cfg()&&sb().cfg().u):!!(sb()&&sb().on(cod())&&D.bk&&D.bk.k);
+  const listaReps=()=>{try{const t=new Set();(D.cl||[]).forEach(c=>{});return (D.reps||[]).filter(r=>String(r[0]).length>=4).map(r=>[String(r[0]),repNome(r[0])]).sort((a,b)=>a[1].localeCompare(b[1]))}catch(e){return[]}};
+  // ---- envio ao gestor (pelo Supabase); se falhar fica na fila e segue sozinho
+  let envBusy=false;
+  async function envia(){if(envBusy||!sbOn()||navigator.onLine===false)return;envBusy=true;
+   try{const l=lista();let mud=false;for(const c of l){if(c.env)continue;try{const r=await sb().rpc('sb_cnovo',{p_k:GES?GK:D.bk.k,p_rep:GES?String(c.repDest||'0'):cod(),p_acao:GES?'salvar_g':'salvar',p_id:c.id,p_dados:dadosEnvio(c)},15000);if(r&&r.ok){c.env=Date.now();c.dupRep=(r.dup||[]).length?r.dup:undefined;mud=true}}catch(e){break}}
+    if(mud){grava(l);if(VIEW==='cnov')draw()}}finally{envBusy=false}}
+  const dadosEnvio=c=>({doc:c.doc,nome:c.nome,ie:c.ie,resp:c.resp,tel1:c.tel1,tel2:c.tel2,mail:c.mail,end:c.end,cid:c.cid,uf:c.uf,insta:c.insta,marcas:c.marcas||[],fonte:c.fonte,conf:!!c.conf,ex:c.ex||'',criado:c.t,origem:GES?'gestor':(c.origem||'aba')});
+  // ---- carteira: o cliente novo aparece no app de pedidos
+  const noApp=c=>{if(GES)return;try{const f=document.getElementById('appFr'),w=f&&f.contentWindow;if(!w||typeof w.eval!=='function')return;
+   const o={c:'N'+c.id,novo:true,n:c.nome,doc:c.doc,ie:c.ie,tel:c.tel1,end:c.end,cep:'',cid:c.cid+(c.uf?' - '+c.uf:''),uf:c.uf,mail:c.mail,comp:c.resp,insta:c.insta,obsc:(c.marcas&&c.marcas.length?'Marcas que vende: '+c.marcas.join(', '):'')+(c.tel2?(c.marcas&&c.marcas.length?' · ':'')+'Telefone 2: '+c.tel2:'')};
+   w.eval('(function(c){try{if(typeof novos==="undefined"||typeof CLI==="undefined")return;if(!novos.some(function(x){return x.c===c.c})){novos.push(c);CLI.set(c.c,c);store.set("novos",novos)}}catch(e){}})('+JSON.stringify(o)+')')}catch(e){}};
+  // ---- cadastros feitos dentro do pedido também chegam ao gestor
+  function puxaDoApp(){if(GES)return;try{const f=document.getElementById('appFr'),w=f&&f.contentWindow;if(!w||typeof w.eval!=='function')return;const arr=JSON.parse(w.eval('typeof novos==="undefined"?"[]":JSON.stringify(novos)')||'[]');if(!arr.length)return;
+   const l=lista();let mud=false;arr.forEach(n=>{if(!n||!n.c||String(n.c).indexOf('N'+cod()+'-')===0)return;const id='p'+cod()+'-'+String(n.c).replace(/\W/g,'').slice(-14);if(l.some(x=>x.id===id))return;
+    const ufs=(n.uf||'').toUpperCase();l.unshift({id,t:+String(n.c).replace(/\D/g,'')||Date.now(),doc:n.doc||'',nome:n.n||'',ie:n.ie||'',resp:n.comp||'',tel1:mTel(n.tel||''),tel2:'',mail:n.mail||'',end:n.end||'',cid:String(n.cid||'').replace(/\s*-\s*[A-Z]{2}$/,''),uf:ufs,insta:insta(n.insta),marcas:[],fonte:'manual',conf:false,env:0,origem:'pedido'});mud=true});
+   if(mud){grava(l);envia()}}catch(e){}}
+  async function puxaDoGestor(){if(GES||!sbOn()||navigator.onLine===false)return;try{const r=await sb().rpc('sb_cnovo',{p_k:D.bk.k,p_rep:cod(),p_acao:'minhas'},15000);if(!r||!r.ok)return;const l=lista();let mud=false;(r.lista||[]).forEach(x=>{const d=x.dados||{};if(d.origem!=='gestor'||l.some(y=>y.id===x.id))return;const c=Object.assign({id:x.id,t:+d.criado||+x.t,env:Date.now()},d,{origem:'gestor'});l.unshift(c);mud=true;noApp(c)});if(mud){grava(l);if(VIEW==='cnov')draw()}}catch(e){}}
+  // ---- Receita Federal (precisa de internet)
+  async function receita(){const d=dg(ST.f.doc);ST.err='';ST.msg='';
+   if(d.length!==14||!cnpjOk(d)){ST.err='Digite um CNPJ válido (14 números) para buscar na Receita.';draw();return}
+   if(navigator.onLine===false){ST.err='Sem internet agora. Digite os dados à mão.';draw();return}
+   ST.busca='run';draw();const ct=new AbortController(),t=setTimeout(()=>ct.abort(),12000);
+   try{const r=await fetch('https://brasilapi.com.br/api/cnpj/v1/'+d,{signal:ct.signal});if(!r.ok)throw new Error(r.status===404?'nf':'http');const j=await r.json();
+    const f=ST.f;f.nome=j.razao_social||f.nome;const lg=[j.descricao_tipo_de_logradouro,j.logradouro].filter(Boolean).join(' ');f.end=[lg+(j.numero?', '+j.numero:''),j.bairro].filter(Boolean).join(' - ')||f.end;
+    f.cid=j.municipio?String(j.municipio).toLowerCase().replace(/(^|\s)\S/g,x=>x.toUpperCase()):f.cid;f.uf=j.uf||f.uf;if(j.ddd_telefone_1&&!f.tel1)f.tel1=mTel(j.ddd_telefone_1);if(j.ddd_telefone_2&&!f.tel2)f.tel2=mTel(j.ddd_telefone_2);if(j.email&&!f.mail)f.mail=String(j.email).toLowerCase();
+    ST.fonte='receita';ST.conf=false;ST.msg='Dados da Receita Federal'+(j.descricao_situacao_cadastral&&String(j.descricao_situacao_cadastral).toUpperCase()!=='ATIVA'?' · ATENÇÃO: situação '+j.descricao_situacao_cadastral:'')}
+   catch(e){ST.err=(e&&e.message==='nf')?'CNPJ não encontrado na Receita. Digite os dados à mão.':'Não consegui consultar a Receita agora. Digite os dados à mão.'}
+   finally{clearTimeout(t);ST.busca='';draw()}}
+  function existente(){try{const f=document.getElementById('appFr'),w=f&&f.contentWindow;if(!w||typeof w.eval!=='function')return null;const r=w.eval('typeof clienteExistente==="function"?JSON.stringify((function(){var x=clienteExistente('+JSON.stringify(ST.f.doc)+','+JSON.stringify(ST.f.nome)+');return x?{tipo:x.tipo,ativo:!!x.ativo,n:x.c&&x.c.n}:null})()):"null"');return JSON.parse(r)}catch(e){return null}}
+  const campo=(id,rot,val,ex)=>`<label class="${ex&&ex.w?'w':''}">${rot}<input id="cw_${id}" value="${E(val)}" ${ex&&ex.im?'inputmode="'+ex.im+'"':''} ${ex&&ex.ph?'placeholder="'+ex.ph+'"':''} autocomplete="off"><span class="cw-er" id="cw_e_${id}"></span></label>`;
+  function valida(show){const f=ST.f,e={doc:docErro(f.doc),nome:f.nome.trim()?'':'Informe a razão social ou o nome.',tel1:telErro(f.tel1,true),tel2:telErro(f.tel2,false),mail:mailErro(f.mail),cid:f.cid.trim()?'':'Informe a cidade.',uf:/^[A-Za-z]{2}$/.test(f.uf.trim())?'':'UF com 2 letras.'};
+   if(f.tel2&&dg(f.tel2)===dg(f.tel1))e.tel2='O telefone 2 é igual ao telefone 1.';
+   if(show)Object.keys(e).forEach(k=>{const el=document.getElementById('cw_e_'+k),inp=document.getElementById('cw_'+k);if(el)el.textContent=e[k];if(inp)inp.classList.toggle('bad',!!e[k])});return e}
+  function minhas(){const l=lista();return l.length?l.map(c=>`<div class="cw-c"><div style="display:flex;justify-content:space-between;gap:8px"><b>${E(c.nome)}</b><span class="cw-t nv">${(Date.now()-c.t)<864e5*2?'novo':'cadastrado'}</span></div><div class="cw-k">${E(c.cid)}${c.uf?'/'+E(c.uf):''} · cadastrado ${brData(c.t)}</div>
+    <span class="cw-t g">${GES?(c.repDest&&c.repDest!=='0'?'Na carteira de '+E(repNome(c.repDest)):'Sem representante'):(c.origem==='gestor'?'Cadastrado pelo escritório · na sua carteira':'Na sua carteira')}</span>${c.env?'<span class="cw-t">✔ Enviado</span>':'<span class="cw-t o" title="Salvo neste aparelho. Segue sozinho quando houver internet.">Aguardando envio</span>'}
+    <div class="cw-a">${[c.tel1,c.tel2].filter(Boolean).map(t=>`<button class="cw-b cw_cp" data-t="${E(dg(t))}">📞 ${E(t)} · Copiar</button>`).join('')}${GES?'':'<button class="cw-b cw_ped">🛒 Fazer pedido</button>'}</div></div>`).join(''):'<div class="cw-c" style="color:#667">Nenhum cliente novo cadastrado ainda.</div>'}
+  function draw(){const o=document.getElementById('v2out');if(!o)return;const f=ST.f,off=navigator.onLine===false,conf=ST.conf;
+   o.innerHTML=`${GES?barra():''}<div class="vmh"><h2>➕ Cliente novo</h2><p>${GES?'Cadastre um cliente novo e escolha o representante que vai atender. Ele entra na carteira do representante escolhido.':'Cadastre um cliente novo da sua região. Ele entra na sua carteira e chega para a Metalmig automaticamente, mesmo sem pedido.'}</p></div>
+   <div class="cw-c"><div class="cw-f">
+    ${GES?'<label class="w">Representante que vai atender<select id="cw_rd" style="font:15px Arial;padding:9px;border:1px solid #b9c8dd;border-radius:8px;width:100%"><option value="">— escolha —</option><option value="0" '+(ST.rd==="0"?'selected':'')+'>Sem representante (Metalmig)</option>'+listaReps().map(r=>'<option value="'+E(r[0])+'" '+(ST.rd===r[0]?'selected':'')+'>'+E(r[1])+'</option>').join('')+'</select><span class="cw-er" id="cw_e_rd"></span></label>':''}
+    <label class="w">CNPJ / CPF<div style="display:flex;gap:6px"><input id="cw_doc" style="flex:1;width:auto" value="${E(f.doc)}" inputmode="numeric" placeholder="00.000.000/0000-00" autocomplete="off"><button class="cw-b p" id="cw_rec" type="button" ${off||ST.busca?'disabled':''} style="white-space:nowrap">${ST.busca?'Buscando…':off?'Sem internet agora':'🔎 Buscar na Receita'}</button></div><span class="cw-er" id="cw_e_doc"></span>
+     <span style="font-size:11.5px;color:#6b4a00">🌐 A busca na Receita Federal só funciona com internet. Sem internet, digite os dados à mão.</span></label>
+    ${ST.fonte==='receita'?'<div class="w"><div class="cw-n">📋 Os dados vieram da Receita Federal. <b>Confira com o cliente</b> se estão corretos antes de salvar.</div></div>':''}
+    ${ST.err?'<div class="w"><div class="cw-bad">'+E(ST.err)+'</div></div>':''}
+    ${campo('nome','Razão social / nome',f.nome,{w:1})}${campo('ie','Inscrição estadual',f.ie)}${campo('resp','Nome do responsável',f.resp)}
+    ${campo('tel1','Telefone 1 (obrigatório)',f.tel1,{im:'tel',ph:'(00) 00000-0000'})}${campo('tel2','Telefone 2 (opcional)',f.tel2,{im:'tel',ph:'(00) 0000-0000'})}
+    ${campo('mail','E-mail do cliente',f.mail,{w:1,im:'email'})}${campo('end','Endereço, nº e bairro',f.end,{w:1})}${campo('cid','Cidade',f.cid)}${campo('uf','UF',f.uf)}${campo('insta','Instagram da loja',f.insta,{w:1,ph:'@loja'})}
+    <label class="w">Marcas que a loja vende<div id="cw_mc">${(f.marcas||[]).map((m,i)=>`<span class="cw-chip">${E(m)}<button type="button" data-i="${i}" class="cw_rm" title="Tirar">✕</button></span>`).join('')}</div><div style="display:flex;gap:6px"><input id="cw_mn" style="flex:1;width:auto" placeholder="Digite a marca" autocomplete="off"><button class="cw-b" id="cw_ma" type="button">+ Adicionar</button></div></label>
+   </div>
+   <div id="cw_dup"></div>
+   <label style="display:flex;gap:10px;align-items:flex-start;background:#fff;border:2px solid #1f4e78;border-radius:10px;padding:10px;margin:12px 0 8px;font-size:14px;font-weight:700"><input type="checkbox" id="cw_cf" ${conf?'checked':''} style="width:20px;height:20px;flex:none;margin-top:1px">Conferi os dados com o cliente e estão corretos</label>
+   <div class="cw-a" style="background:#eef3fa"><button class="cw-b p" id="cw_sv" type="button" ${conf?'':'disabled'}>💾 Salvar cliente novo</button><button class="cw-b" id="cw_lp" type="button">Limpar</button></div>
+   <div style="font-size:12px;color:#667;margin-top:4px">O botão Salvar só libera depois de marcar a caixinha. Vale também para cadastro digitado à mão.</div>
+   ${ST.ok?'<div class="cw-ok">'+E(ST.ok)+'</div>':''}</div>
+   <p style="font:700 16px Arial;margin:14px 0 6px">Cadastrados por mim</p><div id="cw_l">${minhas()}</div>`;
+   liga(o)}
+  function liga(o){const f=ST.f;if(GES)ligaBarra(o);
+   const rdS=o.querySelector('#cw_rd');if(rdS)rdS.onchange=()=>{ST.rd=rdS.value};
+   const im=(id,fn)=>{const el=o.querySelector('#cw_'+id);if(!el)return;el.oninput=()=>{const p=el.selectionStart,a=el.value.length;f[id]=fn?fn(el.value):el.value;if(fn&&el.value!==f[id]){el.value=f[id];try{el.setSelectionRange(p+(el.value.length-a),p+(el.value.length-a))}catch(e){}}ST.ok='';};el.onblur=()=>valida(true)};
+   ['nome','ie','resp','end','cid'].forEach(k=>im(k));im('doc',mDoc);im('tel1',mTel);im('tel2',mTel);im('mail',v=>v.replace(/\s/g,'').toLowerCase());im('uf',v=>v.replace(/[^A-Za-z]/g,'').toUpperCase().slice(0,2));
+   const ins=o.querySelector('#cw_insta');if(ins){ins.oninput=()=>{f.insta=ins.value};ins.onblur=()=>{f.insta=insta(ins.value);ins.value=f.insta}}
+   const dc=o.querySelector('#cw_doc');if(dc)dc.addEventListener('blur',()=>{const ex=docErro(f.doc)?null:existente(),b=o.querySelector('#cw_dup');if(!b)return;ST.dup='';
+    if(ex&&(ex.tipo==='meu'||ex.tipo==='nome'))b.innerHTML='<div class="cw-bad"><b>Este cliente já está na sua carteira:</b> '+E(ex.n||'')+'. Use o cadastro que já existe.</div>',ST.dup='meu';
+    else if(ex&&ex.tipo==='outro'&&ex.ativo)b.innerHTML='<div class="cw-bad"><b>Este CNPJ/CPF já é cliente ativo da Metalmig com outro representante.</b> Fale com o escritório.</div>',ST.dup='outro';
+    else if(ex)b.innerHTML='<div class="cw-n"><b>Este CNPJ/CPF já foi cliente da Metalmig</b>, mas está sem comprar há mais de 4 meses. O escritório vai confirmar o cadastro.</div>',ST.ex='ja foi cliente';else b.innerHTML=''});
+   o.querySelector('#cw_rec').onclick=receita;
+   const addM=()=>{const el=o.querySelector('#cw_mn'),v=el.value.trim();if(!v)return;const m=v.replace(/\s+/g,' ').slice(0,30);if(!(f.marcas||[]).some(x=>x.toLowerCase()===m.toLowerCase()))(f.marcas=f.marcas||[]).push(m);el.value='';draw();const n=document.getElementById('cw_mn');if(n)n.focus()};
+   o.querySelector('#cw_ma').onclick=addM;o.querySelector('#cw_mn').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();addM()}};
+   o.querySelectorAll('.cw_rm').forEach(b=>b.onclick=()=>{f.marcas.splice(+b.dataset.i,1);draw()});
+   o.querySelector('#cw_cf').onchange=e=>{ST.conf=e.target.checked;o.querySelector('#cw_sv').disabled=!ST.conf};
+   o.querySelector('#cw_lp').onclick=()=>{ST.f={doc:'',nome:'',ie:'',resp:'',tel1:'',tel2:'',mail:'',end:'',cid:'',uf:'',insta:'',marcas:[]};ST.fonte='manual';ST.conf=false;ST.err='';ST.ok='';ST.dup='';ST.ex='';draw()};
+   o.querySelector('#cw_sv').onclick=()=>{ST.ok='';if(GES&&ST.rd===''){const el=document.getElementById('cw_e_rd');if(el)el.textContent='Escolha o representante.';const s=document.getElementById('cw_rd');if(s){s.scrollIntoView({block:'center'});s.focus()}return}if(ST.dup==='meu'||ST.dup==='outro'){return}const e=valida(true);const ruim=Object.keys(e).filter(k=>e[k]);
+    if(ruim.length){const el=document.getElementById('cw_'+ruim[0]);if(el){el.scrollIntoView({block:'center'});el.focus()}return}
+    const l=lista(),dd=dg(f.doc);if(l.some(x=>dg(x.doc)===dd)){ST.err='Este CNPJ/CPF já foi cadastrado por você.';draw();return}
+    const c={id:novoId(),t:Date.now(),doc:mDoc(f.doc),nome:f.nome.trim(),ie:f.ie.trim(),resp:f.resp.trim(),tel1:f.tel1,tel2:f.tel2,mail:f.mail.trim(),end:f.end.trim(),cid:f.cid.trim(),uf:f.uf.trim().toUpperCase(),insta:insta(f.insta),marcas:(f.marcas||[]).slice(),fonte:ST.fonte,conf:true,env:0,ex:ST.ex||'',origem:GES?'gestor':'aba',repDest:GES?ST.rd:undefined};
+    l.unshift(c);grava(l);noApp(c);ST.f={doc:'',nome:'',ie:'',resp:'',tel1:'',tel2:'',mail:'',end:'',cid:'',uf:'',insta:'',marcas:[]};ST.fonte='manual';ST.conf=false;ST.err='';ST.dup='';ST.ex='';
+    ST.rd='';ST.ok=GES?(sbOn()&&navigator.onLine!==false?'✔ Cliente novo salvo. Enviando para a carteira do representante…':'✔ Cliente novo salvo neste aparelho. Vai para o representante sozinho quando houver internet.'):((sbOn()&&navigator.onLine!==false)?'✔ Cliente novo salvo na sua carteira. Enviando ao gestor…':'✔ Cliente novo salvo na sua carteira, neste aparelho. Vai para o gestor sozinho quando houver internet.');draw();envia().then(()=>{const r=lista().find(x=>x.id===c.id);if(r&&r.env){ST.ok=GES?'✔ Cliente novo salvo e enviado para a carteira do representante.':'✔ Cliente novo salvo na sua carteira e enviado ao gestor. Já pode usar em um pedido.';if(VIEW==='cnov')draw()}})};
+   o.querySelectorAll('.cw_cp').forEach(b=>b.onclick=()=>{const t=b.dataset.t;try{navigator.clipboard.writeText(t).then(()=>{b.textContent='✔ Copiado'})}catch(e){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy')}catch(x){}a.remove();b.textContent='✔ Copiado'}});
+   o.querySelectorAll('.cw_ped').forEach(b=>b.onclick=()=>{try{setView('pedidos')}catch(e){}})}
+  try{const nav=document.getElementById('nav');if(!GES&&nav&&!nav.querySelector('[data-v="cnov"]')){const b=document.createElement('button');b.dataset.v='cnov';b.textContent='Cliente novo';nav.appendChild(b)}}catch(e){}
+    const rd=render;render=function(){if(VIEW==='cnov')return;return rd.apply(this,arguments)};
+  const sv0=setView;setView=function(v){if(v==='cnov'&&!GES){sv0(v);try{draw();envia()}catch(e){console.error(e)}return}return sv0(v)};
+  const tick=()=>{try{lista().forEach(noApp);puxaDoApp();envia();puxaDoGestor()}catch(e){}};
+  setInterval(tick,30000);setTimeout(tick,4000);setTimeout(tick,12000);window.addEventListener('online',()=>setTimeout(tick,1500));
+  try{const fr=document.getElementById('appFr');if(fr)fr.addEventListener('load',()=>[800,3000].forEach(t=>setTimeout(tick,t)))}catch(e){}
+  window.lcCNov={lista,envia,puxaDoGestor,draw,erros:{telErro,docErro,mailErro},mTel,mDoc,insta};
+ }
+ // =====================================================================  GESTOR
+ if(!REP){
+  const ST={aba:'novos',L:[],busy:false,err:'',t:0};
+  const cfgOk=()=>sb()&&sb().cfg()&&sb().cfg().u;
+  async function carrega(){if(ST.busy||!cfgOk())return;ST.busy=true;try{const r=await sb().rpc('sb_cnovo',{p_k:GK,p_acao:'lista'},20000);if(r&&r.ok){ST.L=r.lista||[];ST.err='';ST.t=Date.now()}else ST.err='O Supabase recusou a chave do gestor.'}catch(e){ST.err=(e&&e.cod==='sbsql')?'As tabelas novas ainda não foram criadas no Supabase (rode o SQL da etapa 2).':'Sem conexão com o Supabase agora.'}finally{ST.busy=false;badge();if(VIEW==='cnovg')draw()}}
+  const novos=()=>ST.L.filter(x=>!x.visto);
+  function badge(){try{const b=document.querySelector('#nav button[data-v="cnovg"]');if(!b)return;const n=novos().length;let s=b.querySelector('.cw-bd');if(!n){if(s)s.remove();return}if(!s){s=document.createElement('span');s.className='cw-bd';b.appendChild(s)}s.textContent=n;s.title='Cadastros novos que você ainda não marcou como visto'}catch(e){}}
+  async function visto(ids){try{await sb().rpc('sb_cnovo',{p_k:GK,p_acao:'visto',p_ids:ids},15000);const t=Date.now();ST.L.forEach(x=>{if(ids.indexOf(x.id)>=0&&!x.visto)x.visto=t})}catch(e){ST.err='Não consegui marcar agora. Tente de novo.'}badge();draw()}
+  const card=x=>{const d=x.dados||{};return `<div class="cw-c"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b>${E(d.nome)}</b>${x.visto?'':'<span class="cw-t nv">novo</span>'}</div>
+   <div class="cw-k">CNPJ/CPF <b>${E(d.doc)}</b>${d.ie?' · IE '+E(d.ie):''}</div><div class="cw-k">${E(d.cid)}${d.uf?'/'+E(d.uf):''}${d.end?' · '+E(d.end):''}</div>
+   ${d.resp||d.insta?'<div class="cw-k">'+(d.resp?'Responsável: <b>'+E(d.resp)+'</b>':'')+(d.resp&&d.insta?' · ':'')+(d.insta?'Instagram: <b>'+E(d.insta)+'</b>':'')+'</div>':''}${d.mail?'<div class="cw-k">E-mail: <b>'+E(d.mail)+'</b></div>':''}
+   ${(d.marcas||[]).length?'<div class="cw-k">Marcas que vende: '+d.marcas.map(m=>'<span class="cw-chip">'+E(m)+'</span>').join('')+'</div>':''}
+   <div class="cw-k">Representante: <b>${x.rep==='0'?'—':E(repNome(x.rep))}</b> · cadastrado ${brData(d.criado||x.t)}</div>
+   <span class="cw-t g">${x.rep==='0'?'Sem representante (Metalmig)':'Na carteira de '+E(repNome(x.rep))}</span>${d.fonte==='receita'?'<span class="cw-t">Dados da Receita Federal</span>':'<span class="cw-t c">Digitado à mão</span>'}${d.origem==='gestor'?'<span class="cw-t">Cadastrado por você</span>':d.conf?'<span class="cw-t g">✓ Representante conferiu com o cliente</span>':'<span class="cw-t o">Cadastrado dentro do pedido (sem conferência)</span>'}${d.ex?'<span class="cw-t o">Já foi cliente da Metalmig</span>':''}
+   <div class="cw-a">${[d.tel1,d.tel2].filter(Boolean).map(t=>`<button class="cw-b cw_cp" data-t="${E(dg(t))}">📞 ${E(t)} · Copiar</button>`).join('')}${x.visto?'':`<button class="cw-b cw_vi" data-id="${E(x.id)}">👁 Marcar como visto</button>`}</div></div>`};
+  function draw(){const o=document.getElementById('v2out');if(!o)return;if(window.__cwModo==='form'&&window.lcCNov){window.lcCNov.draw();return}const N=ST.L.filter(x=>!x.visto),V=ST.L.filter(x=>x.visto),l=ST.aba==='novos'?N:V;
+   o.innerHTML=`${barra()}<div class="vmh"><h2>🆕 Clientes novos</h2><p>Cadastrados pelos representantes, com ou sem pedido. Já entram na carteira de quem cadastrou. Chegam sozinhos pela ida e volta.</p></div>
+   ${ST.err?'<div class="cw-bad">'+E(ST.err)+'</div>':''}
+   <div style="display:flex;gap:6px;margin:8px 0;flex-wrap:wrap"><button class="cw-b ${ST.aba==='novos'?'p':''} cw_ab" data-a="novos">Novos (${N.length})</button><button class="cw-b ${ST.aba==='vistos'?'p':''} cw_ab" data-a="vistos">Já vistos (${V.length})</button><button class="cw-b" id="cw_re">${ST.busy?'Atualizando…':'🔄 Atualizar'}</button>${ST.aba==='novos'&&N.length>1?'<button class="cw-b" id="cw_vt">👁 Marcar todos como vistos</button>':''}</div>
+   ${ST.t?'<div style="font-size:12px;color:#667;margin-bottom:8px">Atualizado às '+brData(ST.t).slice(11)+'</div>':''}
+   ${l.length?l.map(card).join(''):'<div class="cw-c" style="color:#667">'+(ST.aba==='novos'?'Nenhum cliente novo para ver.':'Nenhum cliente marcado como visto ainda.')+'</div>'}`;
+   ligaBarra(o);o.querySelectorAll('.cw_ab').forEach(b=>b.onclick=()=>{ST.aba=b.dataset.a;draw()});o.querySelector('#cw_re').onclick=carrega;const vt=o.querySelector('#cw_vt');if(vt)vt.onclick=()=>visto(N.map(x=>x.id));
+   o.querySelectorAll('.cw_vi').forEach(b=>b.onclick=()=>visto([b.dataset.id]));
+   o.querySelectorAll('.cw_cp').forEach(b=>b.onclick=()=>{const t=b.dataset.t;try{navigator.clipboard.writeText(t).then(()=>{b.textContent='✔ Copiado'})}catch(e){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy')}catch(x){}a.remove();b.textContent='✔ Copiado'}})}
+  try{const nav=document.getElementById('nav');if(nav&&!nav.querySelector('[data-v="cnovg"]')){const b=document.createElement('button');b.dataset.v='cnovg';b.textContent='Clientes novos';nav.appendChild(b)}}catch(e){}
+  const rd=render;render=function(){if(VIEW==='cnovg')return;return rd.apply(this,arguments)};
+  const sv0=setView;setView=function(v){if(v==='cnovg'){sv0(v);try{window.__cwModo='lista';draw();carrega()}catch(e){console.error(e)}return}return sv0(v)};
+  setInterval(()=>{if(!document.hidden)carrega()},120000);setTimeout(carrega,5000);
+  window.lcCNovG={carrega,draw,L:()=>ST.L};
+ }
+}catch(e){console.error('lcCW',e)}})();
 
 
 </script></body></html>
