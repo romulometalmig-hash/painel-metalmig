@@ -1963,7 +1963,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v249';
+const NX_VER = 'v250';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3650,6 +3650,9 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v250',d:'24/11/2026',t:'Selo Em análise',l:[
+   ['g','Ficha: o selo "Em análise" agora traz junto com quem o cliente está e em que ponto (antes aparecia em dois selos).'],
+  ]},
   {v:'v249',d:'24/11/2026',t:'Ajustes no celular',l:[
    ['a','Botão Voltar do celular: agora volta para a tela anterior (antes ia para o início do programa).'],
    ['g','Ficha no celular: cabeçalho do cartão reorganizado e sem espaço branco sobrando embaixo da lista.'],
@@ -10220,10 +10223,12 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
  function card2(ci,el){
   const c=D.cli[ci],code=cod(ci),o=nxOrd(ci),n=o.length,last=n?o[n-1]:null,first=n?o[0]:null;
   const rm=window.lcRitmoMap?lcRitmoMap().get(ci):null,typ=rm?rm.typ:0,cyc=rm?rm.cyc:0;
-  const selos=[...el.querySelectorAll('.lcq .n .s')].map(s=>s.outerHTML).join('');
-  const t=anal(code),cep=String(c[10]||'').replace(/\D/g,''),e1=String(c[9]||'').trim();
+  const t=anal(code);let sl=[...el.querySelectorAll('.lcq .n .s')],ex='';
+  if(t){const i=sl.findIndex(s=>/^♻\s*(Aguardando resposta|Sem resposta|Recusou|Vendeu|Prazo acabou|Em acompanhamento) ·/.test(s.textContent.trim()));if(i>=0){ex=sl[i].textContent.trim().replace(/^♻\s*/,'');sl.splice(i,1)}}
+  const selos=sl.map(s=>s.outerHTML).join('');
+  const cep=String(c[10]||'').replace(/\D/g,''),e1=String(c[9]||'').trim();
   const ad=[e1,c[2],cep.length===8?'CEP '+cep.slice(0,5)+'-'+cep.slice(5):''].filter(Boolean).join(' · ');
-  let h='<div class="cs-hd"><div class="cs-cod"><small>cód.</small>'+E(c[0])+'</div><div style="min-width:0"><div><span class="cs-nm">'+E(c[1])+'</span><span class="cs-sl">'+selos+(t?'<span class="s lcgl" style="background:#C55A11" data-gl="analise" title="Em análise: o cliente foi passado para outro representante e o repasse ainda está em andamento.">🔄 Em análise</span>':'')+'</span></div><div class="cs-ad">📍 '+E(ad||'endereço não informado')+'</div></div></div>';
+  let h='<div class="cs-hd"><div class="cs-cod"><small>cód.</small>'+E(c[0])+'</div><div style="min-width:0"><div><span class="cs-nm">'+E(c[1])+'</span><span class="cs-sl">'+selos+(t?'<span class="s lcgl" style="background:#C55A11" data-gl="analise" title="Em análise: o cliente foi passado para outro representante e o repasse ainda está em andamento.">🔄 Em análise'+(ex?' · '+E(ex):'')+'</span>':'')+'</span></div><div class="cs-ad">📍 '+E(ad||'endereço não informado')+'</div></div></div>';
   h+='<div class="cs-nums"><div><span>Total comprado</span><b>'+R2c(c[11])+'</b><small>'+(c[12]||0)+' pedidos</small></div>'
    +'<div><span>Última compra</span><b>'+(last?dd(typeof dstr==='function'?dstr(last.d):last.d):'—')+'</b><small>'+(last?'há '+(D.ref-last.d)+' dias':'')+'</small></div>'
    +'<div><span>Valor da última compra</span><b>'+(last?R2c(last.v):'—')+'</b><small>'+(last?'último pedido':'')+'</small></div>'
