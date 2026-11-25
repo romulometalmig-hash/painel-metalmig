@@ -1963,7 +1963,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v253';
+const NX_VER = 'v254';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3650,6 +3650,10 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v254',d:'24/11/2026',t:'Supabase (entrega 1)',l:[
+   ['g','Recado do gestor com "li" agora também passa pelo Supabase (só para o representante de teste liberado). O Drive continua funcionando igual: se um falhar, o outro entrega.'],
+   ['g','Testar ida e volta ganhou a etapa 5, "Supabase: gestor → representante", com a explicação do erro.'],
+  ]},
   {v:'v253',d:'24/11/2026',t:'Testar ida e volta',l:[
    ['g','Sistema → Saúde do sistema: botão "Testar ida e volta agora". Confere em 4 etapas se o que você muda chega à nuvem e à página do representante e se o que o representante grava volta para você. Se falhar, explica o que pode ser e o que fazer.'],
   ]},
@@ -8663,7 +8667,8 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
  const GK='',L0=localStorage,gs=k=>{try{return L0.getItem(k)}catch(e){return null}};
  const E=t=>String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
  const URL_=()=>{let u=(gs('metalmig_bkp_syncurl')||'').trim();if(!u){try{const c=JSON.parse(gs('metalmig_bkp_drvcfg')||'null');u=(D.bk&&D.bk.u)||(c&&c.u)||''}catch(e){}}return u};
- const post=async o=>{const u=URL_();if(!u)throw new Error('sem endereço');const r=await fetch(u,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(o)});const j=await r.json();if(!j||!j.ok)throw new Error(j&&j.erro||'falha');return j};
+ const post0=async o=>{const u=URL_();if(!u)throw new Error('sem endereço');const r=await fetch(u,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(o)});const j=await r.json();if(!j||!j.ok)throw new Error(j&&j.erro||'falha');return j};
+ const post=async o=>(o&&o.t==='recado'&&window.lcSBRecado)?window.lcSBRecado(o,post0):post0(o);   // v254: recado também pelo Supabase (só quem estiver liberado)
  const dh=t=>{if(!t)return'nunca';const d=new Date(+t),p=n=>String(n).padStart(2,'0');return p(d.getDate())+'/'+p(d.getMonth()+1)+' '+p(d.getHours())+':'+p(d.getMinutes())};
  const ago=t=>{if(!t)return'nunca';const m=(Date.now()-t)/6e4;return m<2?'agora':m<60?Math.round(m)+' min':m<1440?Math.round(m/60)+' h':Math.round(m/1440)+' dia(s)'};
  const box=(id,h)=>{let m=document.getElementById(id);if(m)m.remove();m=document.createElement('div');m.id=id;m.style.cssText='position:fixed;inset:0;z-index:2147482500;background:#0007;display:flex;align-items:center;justify-content:center;padding:14px';m.innerHTML='<div style="background:#fff;color:#14233f;border-radius:14px;padding:16px;width:min(560px,100%);max-height:92vh;overflow:auto;font-family:system-ui,Arial">'+h+'</div>';document.body.appendChild(m);m.onclick=e=>{if(e.target===m)m.remove()};const x=m.querySelector('[data-x]');if(x)x.onclick=()=>m.remove();return m};
@@ -9288,7 +9293,7 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
   o.querySelectorAll('.ln_en').forEach(e=>e.onclick=async()=>{const x=byc[e.dataset.c],a=ATR[e.dataset.c];if(!x||!a)return;e.disabled=true;e.textContent='Enviando…';
    const f=fone(x.tel),tx=('Indicação de loja nova (CNPJ aberto há '+x.dias+' dias): '+x.nome+' · '+x.cid+'/'+x.uf+(x.bai?' · '+x.bai:'')+(x.end?' · '+x.end:'')+(f?' · tel. '+f:'')+'. Ainda não é cliente da Metalmig: vale uma visita ou contato para apresentar nossa linha.').slice(0,600);
    try{const u=(()=>{let u=(localStorage.getItem('metalmig_bkp_syncurl')||'').trim();if(!u){try{const c=JSON.parse(localStorage.getItem('metalmig_bkp_drvcfg')||'null');u=(c&&c.u)||''}catch(_){}}return u})();if(!u)throw new Error('sem endereço');
-    const r=await fetch(u,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({k:'',rep:a.c,t:'recado',acao:'enviar',texto:tx,de:(window.lcQuem?window.lcQuem():'Romulo')})});const j=await r.json();if(!j||!j.ok)throw new Error(j&&j.erro||'falha');
+    const o0={k:'',rep:a.c,t:'recado',acao:'enviar',texto:tx,de:(window.lcQuem?window.lcQuem():'Romulo')},dv=async x=>{const r=await fetch(u,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(x)});return await r.json()};const j=await(window.lcSBRecado?window.lcSBRecado(o0,dv):dv(o0));if(!j||!j.ok)throw new Error(j&&j.erro||'falha');
     a.env=Date.now();salvaAtr();draw()}catch(er){e.disabled=false;e.textContent='Não consegui enviar · tentar de novo'}});
   const on=(c,k,reset)=>{const e=o.querySelector(c);if(e)e.onchange=()=>{F[k]=e.value;(reset||[]).forEach(r=>F[r]='');draw()}};on('.ln_rg','rg',['uf','mes']);on('.ln_uf','uf',['mes']);on('.ln_mes','mes');on('.ln_so','so');on('.ln_ind','ind');on('.ln_ds','ds');
   const qi=o.querySelector('.ln_q');qi.oninput=()=>{F.q=qi.value;const p=qi.selectionStart;draw();const n=document.querySelector('.ln_q');n.focus();try{n.setSelectionRange(p,p)}catch(_){}};
@@ -10389,6 +10394,11 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
   desat:{o:'A página de um ou mais representantes está numa versão antiga (falta publicar).',f:'Toque em “Publicar páginas agora”. Se der erro, veja Sistema → Páginas na nuvem.'},
   sempag:{o:'Esta nuvem ainda não tem endereço de páginas dos representantes.',f:'Avise o suporte para ligar a nuvem de páginas.'},
   parado:{o:'Há representantes que não enviam nada há vários dias. O aparelho deles pode estar sem internet ou sem abrir a página.',f:'Fale com eles e peça para abrir a página com internet.'},
+  sbsql:{o:'O Supabase não tem as tabelas e funções (o texto do Editor SQL ainda não foi colado ou deu erro).',f:'Abra o Supabase → Editor SQL, cole o texto que eu mandei e toque em Run. Depois teste de novo.'},
+  sbchave:{o:'O Supabase recusou a chave (do gestor ou do representante de teste).',f:'Rode o texto do Editor SQL de novo, pois ele grava as chaves. Se continuar, avise o suporte.'},
+  sbfora:{o:'O Supabase não respondeu a tempo. Pode ser internet fraca ou o projeto pausado (o plano gratuito pausa após 1 semana sem uso).',f:'Abra o Supabase, veja se o projeto Sasi está Saudável e, se estiver pausado, toque em Restaurar. Depois teste de novo.'},
+  sbnaoguardou:{o:'O Supabase respondeu, mas o valor de teste não voltou igual.',f:'Teste de novo. Se repetir, mande o print para o suporte.'},
+  semsb:{o:'O painel não encontrou o endereço do Supabase (drive.json).',f:'Abra o painel pelo link oficial, com internet, e teste de novo.'},
   outro:{o:'Erro que o painel ainda não conhece.',f:'Tire um print desta tela e mande para o suporte.'}
  };
  const classifica=e=>{const m=String(e&&e.message||e||'');
@@ -10411,7 +10421,7 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
  const nomeRep=c=>{const i=riDe(c);return i<0?String(c):String(D.reps[i][1]).replace(/\s*-?\s*INATIVO/i,'').split(' ').slice(0,2).join(' ')};
  // ---------- o teste (4 etapas). Cada etapa devolve {ok, aviso?, det?}
  async function roda(op,prog){op=op||{};const post=op.post||mkPost(),c=await(op.cfg?op.cfg():cfgR());
-  const R=[{n:'Gestor → nuvem'},{n:'Nuvem → página do representante'},{n:'Representante → nuvem'},{n:'Nuvem → gestor'}];
+  const R=[{n:'Gestor → nuvem'},{n:'Nuvem → página do representante'},{n:'Representante → nuvem'},{n:'Nuvem → gestor'}];const comSB=!!(window.lcSBTeste&&window.lcSB&&window.lcSB.cfg());if(comSB)R.push({n:'Supabase: gestor → representante'});
   const RK=op.RK||window.LC_RK||{};const t0=Date.now();
   const pCod=String((op.probeRep||[2001].concat((c&&c.pgreps)||[]).find(x=>RK[String(x)])));const pKey=RK[pCod];
   const nonce1='g'+Date.now()+Math.random().toString(36).slice(2,7),nonce2='r'+Date.now()+Math.random().toString(36).slice(2,7);
@@ -10443,6 +10453,7 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
    const V=await post(c.u,{k:GK,t:'visto_lista'});const lim=Date.now()-(op.diasParado||7)*864e5,par=[];
    if(V&&V.visto)((c.pgreps||[]).map(String)).forEach(cod=>{const v=V.visto[cod];if(v&&v.nuvem&&v.nuvem<lim)par.push(nomeRep(cod)+' ('+Math.floor((Date.now()-v.nuvem)/864e5)+' dias)')});
    if(par.length){R[3].lista=par;return{aviso:'parado'}}});
+  if(comSB)await passo(4,async()=>{await window.lcSBTeste(op.sb)});
   await limpa();
   const fail=R.some(r=>r.ok===false),warn=R.some(r=>r.aviso);
   return{R,t:Date.now()-t0,ok:!fail,warn,pCod};
@@ -10457,9 +10468,9 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
    let lst='';const L=(r.lista||[]);
    x='<div class="iv-x"><b>O que pode ser:</b> '+E(e.o)+(L.length?'<div class="iv-m">'+L.slice(0,8).map(E).join(' · ')+(L.length>8?' … e mais '+(L.length-8):'')+'</div>':'')+'<br><b>O que fazer:</b> '+E(e.f)+(k==='desat'?'<br><button class="iv-b" id="iv_pub" style="margin-top:6px;padding:7px 12px">Publicar páginas agora</button>':'')+(k==='outro'||k==='naoguardou'?'<div class="iv-t">Detalhe técnico: '+E(r.tec||'')+'</div>':'')+'</div>'}
   return '<div class="iv-s"><i>'+ic+'</i><div style="flex:1"><b>'+(i+1)+'. '+E(r.n)+'</b>'+(r.ms&&estado!=='run'?' <span class="iv-m">· '+(r.ms/1000).toFixed(1)+'s</span>':'')+x+'</div></div>'}
- function monta(box){box.innerHTML='<b style="font-size:15px">🔄 Testar ida e volta</b><div class="iv-m" style="margin:3px 0 8px">Confere se o que você muda chega aos representantes e se o que eles fazem chega até você. Usa um dado de teste que é apagado no fim; não mexe em clientes nem pedidos.</div><button class="iv-b" id="iv_go" style="margin-bottom:6px">🔄 Testar ida e volta agora</button><div id="iv_r"></div>';
+ function monta(box){box.innerHTML='<b style="font-size:15px">🔄 Testar ida e volta</b><div class="iv-m" style="margin:3px 0 8px">Confere se o que você muda chega aos representantes e se o que eles fazem chega até você (nuvem do Google e, quando ligado, Supabase). Usa um dado de teste que é apagado no fim; não mexe em clientes nem pedidos.</div><button class="iv-b" id="iv_go" style="margin-bottom:6px">🔄 Testar ida e volta agora</button><div id="iv_r"></div>';
   const go=box.querySelector('#iv_go'),out=box.querySelector('#iv_r');
-  go.onclick=async()=>{go.disabled=true;go.textContent='Testando…';const NM=['Gestor → nuvem','Nuvem → página do representante','Representante → nuvem','Nuvem → gestor'];const S=NM.map(n=>({n}));const est=[];
+  go.onclick=async()=>{go.disabled=true;go.textContent='Testando…';const NM=['Gestor → nuvem','Nuvem → página do representante','Representante → nuvem','Nuvem → gestor'];if(window.lcSBTeste&&window.lcSB&&window.lcSB.cfg())NM.push('Supabase: gestor → representante');const S=NM.map(n=>({n}));const est=[];
    const pinta=()=>{out.innerHTML=S.map((r,i)=>pintaS(r,i,est[i])).join('')};pinta();
    let res;try{res=await roda({},(i,e,r)=>{est[i]=e;if(r)S[i]=r;pinta()})}catch(e){const[k,m]=classifica(e);res={ok:false,R:[{n:NM[0],ok:false,cod:k,tec:m}]};S[0]=res.R[0];est[0]='err';pinta()}
    go.disabled=false;go.textContent='🔄 Testar de novo';
@@ -10471,6 +10482,60 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
  function tick(){try{if(typeof VIEW==='undefined'||VIEW!=='saude'||document.getElementById('iv_card'))return;const v=document.getElementById('v2out');if(!v||v.children.length<2)return;const d=document.createElement('div');d.id='iv_card';d.className='iv-c';monta(d);const f=[...v.children].find(c=>c.id!=='nx3t');if(!f)return;f.after(d)}catch(e){}}
  setInterval(tick,1200);
 }catch(e){console.error('lcCU',e)}})();
+
+// ===== v254 · Supabase (entrega 1): recado com "li" e teste de ida e volta passando pelo Supabase =====
+// Só vale para os representantes listados em drive.json › sb.reps. O Drive continua funcionando igual (recado vai pelos dois).
+(function(){try{
+ if(window.__lcCV||typeof D==='undefined')return;window.__lcCV=1;
+ const L0=localStorage,gs=k=>{try{return L0.getItem(k)}catch(e){return null}},ss=(k,v)=>{try{L0.setItem(k,v)}catch(e){}};
+ const GK='';
+ let CFG=null;
+ const cfg=()=>{if(CFG)return CFG;try{const c=JSON.parse(gs('metalmig_bkp_drvcfg')||'null');if(c&&c.sb)CFG=c.sb}catch(e){}return CFG};
+ // lê drive.json (com cópia guardada no aparelho para funcionar sem internet)
+ (async()=>{try{const r=await fetch(new URL('drive.json?t='+Date.now(),location.href).href,{cache:'no-store'});const j=await r.json();if(j&&j.sb){CFG=j.sb;try{const c=JSON.parse(gs('metalmig_bkp_drvcfg')||'{}')||{};c.sb=j.sb;ss('metalmig_bkp_drvcfg',JSON.stringify(c))}catch(e){}}}catch(e){}})();
+ const on=rep=>{const c=cfg();return !!(c&&c.u&&c.k&&Array.isArray(c.reps)&&c.reps.map(String).indexOf(String(rep))>=0)};
+ const er=(cod,m)=>{const x=new Error(m||cod);x.cod=cod;return x};
+ async function rpc(nome,args,tmo){const c=cfg();if(!c||!c.u||!c.k)throw er('semsb','sem endereço do Supabase');
+  const ct=new AbortController(),t=setTimeout(()=>ct.abort(),tmo||15000);
+  try{const r=await fetch(c.u.replace(/\/$/,'')+'/rest/v1/rpc/'+nome,{method:'POST',headers:{'apikey':c.k,'Content-Type':'application/json'},body:JSON.stringify(args),signal:ct.signal});
+   let j=null;try{j=await r.json()}catch(e){}
+   if(!r.ok){const m=(j&&(j.message||j.hint||j.details))||('HTTP '+r.status);
+    throw er(r.status===404||/Could not find the function|schema cache/i.test(m)?'sbsql':(r.status===401||r.status===403?'sbchave':'sbfora'),m)}
+   return j}catch(e){if(e&&e.name==='AbortError')throw er('sbfora','timeout');if(e&&!e.cod)throw er('sbfora',String(e.message||e));throw e}finally{clearTimeout(t)}}
+ // ---------- recado: junta Drive + Supabase sem repetir
+ const MAP={};   // id mostrado → id no Supabase
+ const igual=(a,b)=>String(a.texto||'')===String(b.texto||'')&&Math.abs((+a.t||0)-(+b.t||0))<180000;
+ function junta(dl,sl){const out=[];(dl||[]).forEach(d=>{const s=(sl||[]).find(x=>igual(d,x));const li=Math.max(+d.li||0,s?+s.li||0:0);if(s)MAP[d.id]=s.id;out.push(Object.assign({},d,{li}))});
+  (sl||[]).forEach(s=>{if(!out.some(d=>igual(d,s))){MAP['sb'+s.id]=s.id;out.push(Object.assign({},s,{id:'sb'+s.id}))}});
+  out.sort((a,b)=>(+b.t||0)-(+a.t||0));return out.slice(0,30)}
+ window.lcSBRecado=async function(o,drive){
+  if(!o||o.t!=='recado'||!on(o.rep))return drive(o);
+  const rep=String(o.rep),a=o.acao;
+  const sb=async(ex)=>rpc('sb_recado',Object.assign({p_k:o.k,p_rep:rep,p_acao:a==='ver'?'ler':a},ex||{}));
+  let dj=null,sj=null,de=null,se=null;
+  if(a==='li'){const ids=o.ids||[];
+   const dIds=ids.filter(i=>!/^sb/.test(i)),sIds=ids.map(i=>MAP[i]).filter(Boolean).map(Number);
+   try{if(dIds.length)dj=await drive(Object.assign({},o,{ids:dIds}))}catch(e){de=e}
+   try{if(sIds.length)sj=await sb({p_ids:sIds})}catch(e){se=e}
+   if(de&&(se||!sIds.length))throw de;if(se&&!dj)throw se;return dj||sj}
+  try{dj=await drive(o);if(dj&&dj.ok===false)throw new Error(dj.erro||'falha')}catch(e){de=e;dj=null}
+  try{sj=await sb(a==='enviar'?{p_texto:o.texto,p_de:o.de}:{})}catch(e){se=e;sj=null}
+  if(!dj&&!sj)throw de||se;
+  const lista=junta(dj&&dj.lista,sj&&sj.lista);return Object.assign({},dj||sj,{ok:true,lista,sb:!!sj,drv:!!dj})};
+ window.lcSB={on,rpc,cfg,erro:er};
+ // ---------- etapa do "Testar ida e volta": gestor grava no Supabase, representante lê, apaga
+ window.lcSBTeste=async function(op){op=op||{};const c=cfg();if(!c)throw er('semsb','sem sb em drive.json');
+  const RK=window.LC_RK||{},rep=String((c.reps||[])[0]||'');if(!rep||!RK[rep])throw er('sbchave','sem chave do representante de teste');
+  const nonce='sb'+Date.now()+Math.random().toString(36).slice(2,6);
+  const call=op.rpc||rpc;
+  try{const a=await call('sb_teste',{p_k:GK,p_rep:rep,p_acao:'set',p_nonce:nonce});
+   if(!a||!a.ok)throw er(a&&a.erro==='chave'?'sbchave':'sbsql','sb_teste set: '+JSON.stringify(a||{}).slice(0,100));
+   const b=await call('sb_teste',{p_k:RK[rep],p_rep:rep,p_acao:'get'});
+   if(!b||!b.ok)throw er(b&&b.erro==='chave'?'sbchave':'sbsql','sb_teste get: '+JSON.stringify(b||{}).slice(0,100));
+   if(b.nonce!==nonce)throw er('sbnaoguardou','leitura trouxe '+b.nonce)}
+  finally{try{await call('sb_teste',{p_k:RK[rep],p_rep:rep,p_acao:'limpa'})}catch(e){}}
+  return true};
+}catch(e){console.error('lcCV',e)}})();
 
 
 </script></body></html>
