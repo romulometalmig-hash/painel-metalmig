@@ -1963,7 +1963,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v248';
+const NX_VER = 'v249';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3650,6 +3650,10 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v249',d:'24/11/2026',t:'Ajustes no celular',l:[
+   ['a','Botão Voltar do celular: agora volta para a tela anterior (antes ia para o início do programa).'],
+   ['g','Ficha no celular: cabeçalho do cartão reorganizado e sem espaço branco sobrando embaixo da lista.'],
+  ]},
   {v:'v248',d:'24/11/2026',t:'Novo cartão do cliente (Ficha)',l:[
    ['g','Ficha: cartão novo. Cabeçalho cinza com código, razão social, selos e endereço; cinco quadros (total, última compra, valor, pedido típico, primeira compra); ritmo de compra; Em análise; Registros do cliente; O que mais compra; Observações; Ações em botões retangulares. Cada bloco tem setinha para recolher e o sistema lembra.'],
   ]},
@@ -10181,6 +10185,7 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
  +'.cs-b{border:1px solid #e1e6ef;border-radius:10px;padding:9px 12px;margin-top:10px;font-size:13px;background:#fff}.cs-b.an{background:#fff8ec;border-color:#f0d9a8}.cs-b.ok{background:#f0f8f1;border-color:#cfe5d1}.cs-b.ac{background:#e4edf9;border-color:#c5d6ee}'
  +'.cs-t{display:flex;gap:8px;align-items:center;font-size:10.5px;letter-spacing:.7px;text-transform:uppercase;color:#7a8799;font-weight:700;cursor:pointer;user-select:none}.cs-t>span:first-child{flex:0 0 auto}.cs-sm{flex:1;text-transform:none;letter-spacing:0;font-weight:400;font-size:12px;color:#556;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cs-ar{margin-left:auto;color:#1F4E78;font-size:13px}.cs-bd{margin-top:4px}'
  +'.cs-r{display:grid;grid-template-columns:repeat(8,1fr);gap:8px}.cs-r button{background:#fff;border:1.5px solid #9dbde8;border-radius:12px;padding:10px 4px;height:74px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:3px;font:600 10.5px Arial,sans-serif;color:#1F4E78;cursor:pointer;text-align:center}.cs-r button i{font-style:normal;font-size:20px}.cs-r button:disabled{opacity:.4}'
+ +'@media(max-width:700px){#f_res>div[style*="max-height"]{max-height:none!important;overflow:visible!important}.cs-hd{flex-direction:column;align-items:flex-start;gap:8px;padding:10px}.cs-cod{display:flex;gap:5px;align-items:baseline;padding:3px 9px}.cs-cod small{display:inline}.cs-nm{font-size:15px;line-height:1.25}.cs-sl{margin-left:0;gap:6px;display:flex}.cs-ad{font-size:12px}.cs-pill{font-size:13px;padding:7px 12px}.cs-nums b{font-size:13.5px}}'
  +'@media(max-width:900px){.cs-nums{grid-template-columns:repeat(2,1fr)}.cs-r{grid-template-columns:repeat(4,1fr)}.cs-sl{margin-left:0}}'
 ;
  document.head.appendChild(st);
@@ -10320,6 +10325,14 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
   else if(viuPend){viuPend=false;aviso('✔ Tudo enviado, pode fechar','ok');tmr=setTimeout(()=>{tira();tmr=0},3000)}}catch(e){}};
  setInterval(tick,700);
  addEventListener('beforeunload',e=>{if(D.rm&&(+window.__lcPend||0)>0&&navigator.onLine!==false){e.preventDefault();e.returnValue=''}});
+
+ // v249 · botão Voltar do celular volta para a tela anterior (e não para o início)
+ try{if(typeof setView==='function'&&typeof VIEW!=='undefined'&&!window.__lcBk){window.__lcBk=1;let skip=0;
+  try{history.replaceState({nxv:VIEW},'')}catch(e){}
+  const sv0=setView;
+  setView=function(v){const antes=VIEW;const r=sv0.apply(this,arguments);try{if(!skip&&VIEW!==antes&&!(history.state&&history.state.nxv===VIEW))history.pushState({nxv:VIEW},'')}catch(e){}return r};
+  window.addEventListener('popstate',e=>{const s=e.state;if(s&&s.nxv&&s.nxv!==VIEW){skip=1;try{sv0.call(window,s.nxv)}catch(x){}skip=0}});
+ }}catch(e){}
 }catch(e){console.error('lcCR',e)}})();
 
 
