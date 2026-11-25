@@ -1963,7 +1963,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v251';
+const NX_VER = 'v252';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3650,6 +3650,9 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v252',d:'24/11/2026',t:'Ficha no celular',l:[
+   ['a','Ficha: com o cabeçalho recolhido, a caixa de busca não some mais enquanto nenhum cliente estiver aberto (a tela ficava vazia).'],
+  ]},
   {v:'v251',d:'24/11/2026',t:'Filtro de representante em todas as telas',l:[
    ['g','Em todas as telas, o filtro "Representante" lista só quem tem clientes na carteira e mostra, ao lado do nome, quantos clientes tem.'],
    ['a','Celular: a setinha de recolher o cabeçalho e o selo da nuvem foram para o canto de baixo, para não cobrir o conteúdo.'],
@@ -10306,9 +10309,9 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
 (function(){try{
  if(window.__lcCR||typeof D==='undefined')return;window.__lcCR=1;
  const L0=localStorage,gs=k=>{try{return L0.getItem(k)}catch(e){return null}},ss=(k,v)=>{try{L0.setItem(k,v)}catch(e){}};
- const st=document.createElement('style');st.textContent='body.lcup #lctop,body.lcup #nvh,body.lcup #v2bar,body.lcup #nx3t,body.lcup #f_st,body.lcup #pedTop,body.lcup #alertbar,body.lcup [data-lcabc]{display:none!important}'
+ const st=document.createElement('style');st.textContent='body.lcup #lctop,body.lcup #nvh,body.lcup:not(.lcfs) #v2bar,body.lcup #nx3t,body.lcup:not(.lcfs) #f_st,body.lcup #pedTop,body.lcup #alertbar,body.lcup [data-lcabc]{display:none!important}'
  +'#lcupb{position:fixed;right:10px;z-index:2147480400;border:1px solid #b9c7e2;background:#fff;color:#1F4E78;border-radius:0 0 10px 10px;padding:0 12px;height:20px;font:700 12px/18px Arial;cursor:pointer;box-shadow:0 2px 4px #0003;opacity:.92}'
-   +'@media(max-width:700px){#lcupb,#lcsel.lcs-fx{top:auto!important;bottom:72px!important;border-radius:10px!important;height:26px!important;line-height:24px!important;border:1px solid #b9c7e2}#lcupb{right:auto!important;left:8px!important}#lcsel.lcs-fx{right:64px!important}}'
+   +'@media(max-width:700px){body #lcupb,body #lcsel.lcs-fx{top:auto!important;bottom:72px!important;border-radius:10px!important;height:26px!important;line-height:24px!important;border:1px solid #b9c7e2}body #lcupb{right:auto!important;left:8px!important}body #lcsel.lcs-fx{right:64px!important}}'
   +'#lcsel.lcs-fx{position:fixed!important;bottom:auto!important;left:auto!important;right:172px!important;height:20px!important;box-sizing:border-box;display:flex;align-items:center;padding:0 9px!important;border-radius:0 0 10px 10px!important;font-size:11px!important;opacity:.95;z-index:2147480400!important}'
  +'#lcenv{position:fixed;left:50%;transform:translateX(-50%);top:calc(6px + env(safe-area-inset-top,0px));z-index:2147480700;max-width:94vw;background:#1F4E78;color:#fff;border-radius:12px;padding:7px 14px;font:700 13px/1.25 Arial;box-shadow:0 3px 10px #0005;text-align:center}'
  +'#lcenv.ok{background:#2E7D32}#lcenv.off{background:#b45309}';
@@ -10328,7 +10331,7 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
  let env=null,viuPend=false,tmr=0;
  const aviso=(t,c)=>{if(!env){env=document.createElement('div');env.id='lcenv';document.body.appendChild(env)}if(env.textContent!==t)env.textContent=t;if(env.className!==c)env.className=c};
  const tira=()=>{if(env){env.remove();env=null}};
- const tick=()=>{try{paint();selo();abc();
+ const tick=()=>{try{paint();selo();abc();{const fs=typeof VIEW!=='undefined'&&VIEW==='ficha'&&!document.querySelector('#f_res .fch');if(document.body.classList.contains('lcfs')!==fs)document.body.classList.toggle('lcfs',fs)}
   if(!D.rm)return;
   const p=+window.__lcPend||0,on=navigator.onLine!==false;
   if(p>0){viuPend=true;clearTimeout(tmr);tmr=0;if(on)aviso('☁ Enviando seus dados… não feche esta tela','');else aviso('Sem internet. Seus dados estão salvos no aparelho e sobem quando a conexão voltar.','off')}
