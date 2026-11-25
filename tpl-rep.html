@@ -1963,7 +1963,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v250';
+const NX_VER = 'v251';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3650,6 +3650,10 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v251',d:'24/11/2026',t:'Filtro de representante em todas as telas',l:[
+   ['g','Em todas as telas, o filtro "Representante" lista só quem tem clientes na carteira e mostra, ao lado do nome, quantos clientes tem.'],
+   ['a','Celular: a setinha de recolher o cabeçalho e o selo da nuvem foram para o canto de baixo, para não cobrir o conteúdo.'],
+  ]},
   {v:'v250',d:'24/11/2026',t:'Selo Em análise',l:[
    ['g','Ficha: o selo "Em análise" agora traz junto com quem o cliente está e em que ponto (antes aparecia em dois selos).'],
   ]},
@@ -10304,6 +10308,7 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
  const L0=localStorage,gs=k=>{try{return L0.getItem(k)}catch(e){return null}},ss=(k,v)=>{try{L0.setItem(k,v)}catch(e){}};
  const st=document.createElement('style');st.textContent='body.lcup #lctop,body.lcup #nvh,body.lcup #v2bar,body.lcup #nx3t,body.lcup #f_st,body.lcup #pedTop,body.lcup #alertbar,body.lcup [data-lcabc]{display:none!important}'
  +'#lcupb{position:fixed;right:10px;z-index:2147480400;border:1px solid #b9c7e2;background:#fff;color:#1F4E78;border-radius:0 0 10px 10px;padding:0 12px;height:20px;font:700 12px/18px Arial;cursor:pointer;box-shadow:0 2px 4px #0003;opacity:.92}'
+   +'@media(max-width:700px){#lcupb,#lcsel.lcs-fx{top:auto!important;bottom:72px!important;border-radius:10px!important;height:26px!important;line-height:24px!important;border:1px solid #b9c7e2}#lcupb{right:auto!important;left:8px!important}#lcsel.lcs-fx{right:64px!important}}'
   +'#lcsel.lcs-fx{position:fixed!important;bottom:auto!important;left:auto!important;right:172px!important;height:20px!important;box-sizing:border-box;display:flex;align-items:center;padding:0 9px!important;border-radius:0 0 10px 10px!important;font-size:11px!important;opacity:.95;z-index:2147480400!important}'
  +'#lcenv{position:fixed;left:50%;transform:translateX(-50%);top:calc(6px + env(safe-area-inset-top,0px));z-index:2147480700;max-width:94vw;background:#1F4E78;color:#fff;border-radius:12px;padding:7px 14px;font:700 13px/1.25 Arial;box-shadow:0 3px 10px #0005;text-align:center}'
  +'#lcenv.ok{background:#2E7D32}#lcenv.off{background:#b45309}';
@@ -10339,6 +10344,27 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
   window.addEventListener('popstate',e=>{const s=e.state;if(s&&s.nxv&&s.nxv!==VIEW){skip=1;try{sv0.call(window,s.nxv)}catch(x){}skip=0}});
  }}catch(e){}
 }catch(e){console.error('lcCR',e)}})();
+
+// v251 · filtro de representante padronizado: só quem tem clientes (todas as telas do gestor)
+(function(){try{
+ if(window.__lcCT||typeof D==='undefined'||!D.cli||!D.reps||D.rm)return;window.__lcCT=1;
+ let cnt=null,sig='';const NO=new Set(['vf_rp','ln_rp']);let cod2i=null;
+ const conta=()=>{const m=new Map();for(let i=0;i<D.cli.length;i++){const r=D.cli[i][8];if(r>0)m.set(r,(m.get(r)||0)+1)}return m};
+ const idx=v=>{if(!/^\d+$/.test(v))return -1;if(!cod2i){cod2i=new Map();D.reps.forEach((r,i)=>{if(i>0&&r)cod2i.set(String(r[0]),i)})}const n=+v;if(n>0&&n<D.reps.length&&D.reps[n]&&!cod2i.has(v))return n;return cod2i.has(v)?cod2i.get(v):-1};
+ const ehRep=s=>{if(!s||NO.has(s.id)||s.options.length<10)return false;let n=0,t=0;for(const o of s.options){if(o.value===''||o.value==='0')continue;t++;if(idx(o.value)>0)n++}return t>=10&&n>=t*0.9};
+ function passa(){
+  const s0=D.cli.length+'|'+D.cli.reduce((a,c)=>a+(c[8]>0?1:0),0);
+  if(!cnt||sig!==s0){cnt=conta();sig=s0}
+  document.querySelectorAll('select').forEach(s=>{
+   if(s.dataset.lcct===sig+'|'+s.options.length)return;
+   if(!ehRep(s))return;
+   const sel=s.value;let tirou=0;
+   [...s.options].forEach(o=>{if(o.value===''||o.value==='0'||o.value===sel)return;if(!cnt.has(idx(o.value))){o.remove();tirou++}});
+   [...s.options].forEach(o=>{if(o.value===''||o.value==='0')return;const n=cnt.get(idx(o.value))||0;const l=o.text.replace(/\s*\(\d+ clientes?\)\s*$/,'')+' ('+n+' cliente'+(n===1?'':'s')+')';if(o.label!==l)o.label=l});
+   s.dataset.lcct=sig+'|'+s.options.length;
+  })}
+ setInterval(()=>{try{passa()}catch(e){console.error('lcCT',e)}},1200);
+}catch(e){console.error('lcCT',e)}})();
 
 
 </script></body></html>
