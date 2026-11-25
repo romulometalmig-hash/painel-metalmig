@@ -1963,7 +1963,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v258';
+const NX_VER = 'v259';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3650,6 +3650,7 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v259',d:'25/11/2026',t:'Nome da aba de cadastro',l:[['g','A aba de cadastro de cliente novo agora se chama Cadastrar clientes (representante e gestor), para não confundir com a aba Novos.']]},
   {v:'v258',d:'25/11/2026',t:'Cliente novo fora do pedido',l:[['g','Representante: nova opção Clientes › ➕ Cliente novo (CNPJ/CPF com busca na Receita, telefones com máscara, e-mail, Instagram, marcas). Entra na carteira dele e chega a você mesmo sem pedido.'],['g','Gestor: nova tela 🆕 Clientes novos dos representantes, com contador e Marcar como visto.']]},
   {v:'v257',d:'25/11/2026',t:'Supabase (etapa 1): recados e "visto"',l:[
    ['g','Recado do gestor (com "li") agora passa pelo Supabase para os 33 representantes liberados, junto com o Drive. Se um falhar, o outro entrega.'],
@@ -10652,7 +10653,7 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
     <span class="cw-t g">${GES?(c.repDest&&c.repDest!=='0'?'Na carteira de '+E(repNome(c.repDest)):'Sem representante'):(c.origem==='gestor'?'Cadastrado pelo escritório · na sua carteira':'Na sua carteira')}</span>${c.env?'<span class="cw-t">✔ Enviado</span>':'<span class="cw-t o" title="Salvo neste aparelho. Segue sozinho quando houver internet.">Aguardando envio</span>'}
     <div class="cw-a">${[c.tel1,c.tel2].filter(Boolean).map(t=>`<button class="cw-b cw_cp" data-t="${E(dg(t))}">📞 ${E(t)} · Copiar</button>`).join('')}${GES?'':'<button class="cw-b cw_ped">🛒 Fazer pedido</button>'}</div></div>`).join(''):'<div class="cw-c" style="color:#667">Nenhum cliente novo cadastrado ainda.</div>'}
   function draw(){const o=document.getElementById('v2out');if(!o)return;const f=ST.f,off=navigator.onLine===false,conf=ST.conf;
-   o.innerHTML=`${GES?barra():''}<div class="vmh"><h2>➕ Cliente novo</h2><p>${GES?'Cadastre um cliente novo e escolha o representante que vai atender. Ele entra na carteira do representante escolhido.':'Cadastre um cliente novo da sua região. Ele entra na sua carteira e chega para a Metalmig automaticamente, mesmo sem pedido.'}</p></div>
+   o.innerHTML=`${GES?barra():''}<div class="vmh"><h2>➕ Cadastrar clientes</h2><p>${GES?'Cadastre um cliente novo e escolha o representante que vai atender. Ele entra na carteira do representante escolhido.':'Cadastre um cliente novo da sua região. Ele entra na sua carteira e chega para a Metalmig automaticamente, mesmo sem pedido.'}</p></div>
    <div class="cw-c"><div class="cw-f">
     ${GES?'<label class="w">Representante que vai atender<select id="cw_rd" style="font:15px Arial;padding:9px;border:1px solid #b9c8dd;border-radius:8px;width:100%"><option value="">— escolha —</option><option value="0" '+(ST.rd==="0"?'selected':'')+'>Sem representante (Metalmig)</option>'+listaReps().map(r=>'<option value="'+E(r[0])+'" '+(ST.rd===r[0]?'selected':'')+'>'+E(r[1])+'</option>').join('')+'</select><span class="cw-er" id="cw_e_rd"></span></label>':''}
     <label class="w">CNPJ / CPF<div style="display:flex;gap:6px"><input id="cw_doc" style="flex:1;width:auto" value="${E(f.doc)}" inputmode="numeric" placeholder="00.000.000/0000-00" autocomplete="off"><button class="cw-b p" id="cw_rec" type="button" ${off||ST.busca?'disabled':''} style="white-space:nowrap">${ST.busca?'Buscando…':off?'Sem internet agora':'🔎 Buscar na Receita'}</button></div><span class="cw-er" id="cw_e_doc"></span>
@@ -10694,7 +10695,7 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
     ST.rd='';ST.ok=GES?(sbOn()&&navigator.onLine!==false?'✔ Cliente novo salvo. Enviando para a carteira do representante…':'✔ Cliente novo salvo neste aparelho. Vai para o representante sozinho quando houver internet.'):((sbOn()&&navigator.onLine!==false)?'✔ Cliente novo salvo na sua carteira. Enviando ao gestor…':'✔ Cliente novo salvo na sua carteira, neste aparelho. Vai para o gestor sozinho quando houver internet.');draw();envia().then(()=>{const r=lista().find(x=>x.id===c.id);if(r&&r.env){ST.ok=GES?'✔ Cliente novo salvo e enviado para a carteira do representante.':'✔ Cliente novo salvo na sua carteira e enviado ao gestor. Já pode usar em um pedido.';if(VIEW==='cnov')draw()}})};
    o.querySelectorAll('.cw_cp').forEach(b=>b.onclick=()=>{const t=b.dataset.t;try{navigator.clipboard.writeText(t).then(()=>{b.textContent='✔ Copiado'})}catch(e){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy')}catch(x){}a.remove();b.textContent='✔ Copiado'}});
    o.querySelectorAll('.cw_ped').forEach(b=>b.onclick=()=>{try{setView('pedidos')}catch(e){}})}
-  try{const nav=document.getElementById('nav');if(!GES&&nav&&!nav.querySelector('[data-v="cnov"]')){const b=document.createElement('button');b.dataset.v='cnov';b.textContent='Cliente novo';nav.appendChild(b)}}catch(e){}
+  try{const nav=document.getElementById('nav');if(!GES&&nav&&!nav.querySelector('[data-v="cnov"]')){const b=document.createElement('button');b.dataset.v='cnov';b.textContent='Cadastrar clientes';nav.appendChild(b)}}catch(e){}
     const rd=render;render=function(){if(VIEW==='cnov')return;return rd.apply(this,arguments)};
   const sv0=setView;setView=function(v){if(v==='cnov'&&!GES){sv0(v);try{draw();envia()}catch(e){console.error(e)}return}return sv0(v)};
   const tick=()=>{try{lista().forEach(noApp);puxaDoApp();envia();puxaDoGestor()}catch(e){}};
@@ -10718,7 +10719,7 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
    <span class="cw-t g">${x.rep==='0'?'Sem representante (Metalmig)':'Na carteira de '+E(repNome(x.rep))}</span>${d.fonte==='receita'?'<span class="cw-t">Dados da Receita Federal</span>':'<span class="cw-t c">Digitado à mão</span>'}${d.origem==='gestor'?'<span class="cw-t">Cadastrado por você</span>':d.conf?'<span class="cw-t g">✓ Representante conferiu com o cliente</span>':'<span class="cw-t o">Cadastrado dentro do pedido (sem conferência)</span>'}${d.ex?'<span class="cw-t o">Já foi cliente da Metalmig</span>':''}
    <div class="cw-a">${[d.tel1,d.tel2].filter(Boolean).map(t=>`<button class="cw-b cw_cp" data-t="${E(dg(t))}">📞 ${E(t)} · Copiar</button>`).join('')}${x.visto?'':`<button class="cw-b cw_vi" data-id="${E(x.id)}">👁 Marcar como visto</button>`}</div></div>`};
   function draw(){const o=document.getElementById('v2out');if(!o)return;if(window.__cwModo==='form'&&window.lcCNov){window.lcCNov.draw();return}const N=ST.L.filter(x=>!x.visto),V=ST.L.filter(x=>x.visto),l=ST.aba==='novos'?N:V;
-   o.innerHTML=`${barra()}<div class="vmh"><h2>🆕 Clientes novos</h2><p>Cadastrados pelos representantes, com ou sem pedido. Já entram na carteira de quem cadastrou. Chegam sozinhos pela ida e volta.</p></div>
+   o.innerHTML=`${barra()}<div class="vmh"><h2>➕ Cadastrar clientes</h2><p>Cadastrados pelos representantes, com ou sem pedido. Já entram na carteira de quem cadastrou. Chegam sozinhos pela ida e volta.</p></div>
    ${ST.err?'<div class="cw-bad">'+E(ST.err)+'</div>':''}
    <div style="display:flex;gap:6px;margin:8px 0;flex-wrap:wrap"><button class="cw-b ${ST.aba==='novos'?'p':''} cw_ab" data-a="novos">Novos (${N.length})</button><button class="cw-b ${ST.aba==='vistos'?'p':''} cw_ab" data-a="vistos">Já vistos (${V.length})</button><button class="cw-b" id="cw_re">${ST.busy?'Atualizando…':'🔄 Atualizar'}</button>${ST.aba==='novos'&&N.length>1?'<button class="cw-b" id="cw_vt">👁 Marcar todos como vistos</button>':''}</div>
    ${ST.t?'<div style="font-size:12px;color:#667;margin-bottom:8px">Atualizado às '+brData(ST.t).slice(11)+'</div>':''}
@@ -10726,7 +10727,7 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
    ligaBarra(o);o.querySelectorAll('.cw_ab').forEach(b=>b.onclick=()=>{ST.aba=b.dataset.a;draw()});o.querySelector('#cw_re').onclick=carrega;const vt=o.querySelector('#cw_vt');if(vt)vt.onclick=()=>visto(N.map(x=>x.id));
    o.querySelectorAll('.cw_vi').forEach(b=>b.onclick=()=>visto([b.dataset.id]));
    o.querySelectorAll('.cw_cp').forEach(b=>b.onclick=()=>{const t=b.dataset.t;try{navigator.clipboard.writeText(t).then(()=>{b.textContent='✔ Copiado'})}catch(e){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy')}catch(x){}a.remove();b.textContent='✔ Copiado'}})}
-  try{const nav=document.getElementById('nav');if(nav&&!nav.querySelector('[data-v="cnovg"]')){const b=document.createElement('button');b.dataset.v='cnovg';b.textContent='Clientes novos';nav.appendChild(b)}}catch(e){}
+  try{const nav=document.getElementById('nav');if(nav&&!nav.querySelector('[data-v="cnovg"]')){const b=document.createElement('button');b.dataset.v='cnovg';b.textContent='Cadastrar clientes';nav.appendChild(b)}}catch(e){}
   const rd=render;render=function(){if(VIEW==='cnovg')return;return rd.apply(this,arguments)};
   const sv0=setView;setView=function(v){if(v==='cnovg'){sv0(v);try{window.__cwModo='lista';draw();carrega()}catch(e){console.error(e)}return}return sv0(v)};
   setInterval(()=>{if(!document.hidden)carrega()},120000);setTimeout(carrega,5000);
