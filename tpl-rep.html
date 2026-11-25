@@ -1963,7 +1963,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v255';
+const NX_VER = 'v256';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3650,6 +3650,9 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v256',d:'25/11/2026',t:'Publicar páginas pelo teste',l:[
+   ['g','O botão "Publicar páginas agora" do Testar ida e volta passa a funcionar também durante o teste, mostra o andamento ("3 de 33") e lista quem não publicou.'],
+  ]},
   {v:'v255',d:'24/11/2026',t:'Testar ida e volta mais confiável',l:[
    ['g','O teste usa um representante que está liberado nas páginas e tenta de novo uma vez quando a nuvem do Google está ocupada (ela atende uma tarefa de cada vez).'],
    ['g','Se uma etapa falha, a seguinte aparece como "não testada" em vez de dar um erro falso.'],
@@ -10477,6 +10480,18 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
   return '<div class="iv-s"><i>'+ic+'</i><div style="flex:1"><b>'+(i+1)+'. '+E(r.n)+'</b>'+(r.ms&&estado!=='run'?' <span class="iv-m">· '+(r.ms/1000).toFixed(1)+'s</span>':'')+x+'</div></div>'}
  function monta(box){box.innerHTML='<b style="font-size:15px">🔄 Testar ida e volta</b><div class="iv-m" style="margin:3px 0 8px">Confere se o que você muda chega aos representantes e se o que eles fazem chega até você (nuvem do Google e, quando ligado, Supabase). Usa um dado de teste que é apagado no fim; não mexe em clientes nem pedidos.</div><button class="iv-b" id="iv_go" style="margin-bottom:6px">🔄 Testar ida e volta agora</button><div id="iv_r"></div>';
   const go=box.querySelector('#iv_go'),out=box.querySelector('#iv_r');
+  let pubRoda=false;
+  out.addEventListener('click',async ev=>{const pb=ev.target&&ev.target.closest&&ev.target.closest('#iv_pub');if(!pb)return;
+   if(pubRoda){pb.textContent='Já está publicando… aguarde.';return}
+   if(go.disabled){pb.textContent='Espere o teste terminar e toque de novo.';return}
+   pubRoda=true;let ok=0,er=[];const sh=t=>{const b=out.querySelector('#iv_pub');if(b){b.textContent=t;b.disabled=true}};
+   try{sh('Começando…');const c=await cfgR();const L=(c.pgreps||[]).filter(cod=>riDe(cod)>=0);
+    if(!window.lcPgPublica)throw new Error('função de publicar não encontrada');
+    for(let n=0;n<L.length;n++){const cod=L[n];try{await window.lcPgPublica(cod,t=>sh((n+1)+' de '+L.length+' · '+t));ok++}catch(e){er.push(nomeRep(cod)+': '+(e&&e.message||e))}}
+    const b=out.querySelector('#iv_pub');if(b){b.disabled=false;b.textContent=er.length?'Publicadas '+ok+' de '+L.length+'. Toque para tentar de novo.':'Pronto: '+ok+' páginas publicadas. Teste de novo.'}
+    if(er.length)out.insertAdjacentHTML('beforeend','<div class="iv-er">⛔ Não publicou: '+er.slice(0,6).map(E).join(' · ')+(er.length>6?' … e mais '+(er.length-6):'')+'</div>')}
+   catch(e){const b=out.querySelector('#iv_pub');if(b){b.disabled=false;b.textContent='Erro: '+(e&&e.message||e)}}
+   pubRoda=false});
   go.onclick=async()=>{go.disabled=true;go.textContent='Testando…';const NM=['Gestor → nuvem','Nuvem → página do representante','Representante → nuvem','Nuvem → gestor'];if(window.lcSBTeste&&window.lcSB&&window.lcSB.cfg())NM.push('Supabase: gestor → representante');const S=NM.map(n=>({n}));const est=[];
    const pinta=()=>{out.innerHTML=S.map((r,i)=>pintaS(r,i,est[i])).join('')};pinta();
    let res;try{res=await roda({},(i,e,r)=>{est[i]=e;if(r)S[i]=r;pinta()})}catch(e){const[k,m]=classifica(e);res={ok:false,R:[{n:NM[0],ok:false,cod:k,tec:m}]};S[0]=res.R[0];est[0]='err';pinta()}
@@ -10484,7 +10499,6 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
    const bad=(res.R||[]).filter(r=>r.ok===false);
    out.insertAdjacentHTML('beforeend',bad.length?'<div class="iv-er">⛔ Algo não chegou. Veja acima o que fazer.</div>':res.warn?'<div class="iv-ok" style="background:#fff4e5;border-color:#C55A11">⚠️ Chegou nos dois sentidos, mas há um aviso acima ('+(res.t/1000).toFixed(0)+'s).</div>':'<div class="iv-ok">✅ Tudo chegou nos dois sentidos em '+(res.t/1000).toFixed(0)+' segundos.</div>');
    try{L0.setItem('metalmig_iv_ult',JSON.stringify({t:Date.now(),ok:!bad.length}))}catch(e){}
-   const pb=out.querySelector('#iv_pub');if(pb)pb.onclick=async()=>{pb.disabled=true;pb.textContent='Publicando…';try{const c=await cfgR();for(const cod of(c.pgreps||[])){const ri=riDe(cod);if(ri<0)continue;if(window.lcPgPublica)await window.lcPgPublica(cod,t=>{pb.textContent=t})}pb.textContent='Pronto. Teste de novo.'}catch(e){pb.textContent='Erro: '+e.message}}
   }}
  function tick(){try{if(typeof VIEW==='undefined'||VIEW!=='saude'||document.getElementById('iv_card'))return;const v=document.getElementById('v2out');if(!v||v.children.length<2)return;const d=document.createElement('div');d.id='iv_card';d.className='iv-c';monta(d);const f=[...v.children].find(c=>c.id!=='nx3t');if(!f)return;f.after(d)}catch(e){}}
  setInterval(tick,1200);
