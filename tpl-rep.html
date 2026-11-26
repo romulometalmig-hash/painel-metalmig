@@ -1963,7 +1963,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v259';
+const NX_VER = 'v260';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3650,6 +3650,7 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v260',d:'25/11/2026',t:'Gestor faz pedido pelo representante',l:[['g','Sistema › Pedidos (aplicativo): novo botão 🛒 Fazer pedido: você escolhe o representante na hora; abre o aplicativo dele dentro do painel e o pedido segue para a lista de pedidos pelo Drive, como se ele tivesse enviado.']]},
   {v:'v259',d:'25/11/2026',t:'Nome da aba de cadastro',l:[['g','A aba de cadastro de cliente novo agora se chama Cadastrar clientes (representante e gestor), para não confundir com a aba Novos.']]},
   {v:'v258',d:'25/11/2026',t:'Cliente novo fora do pedido',l:[['g','Representante: nova opção Clientes › ➕ Cliente novo (CNPJ/CPF com busca na Receita, telefones com máscara, e-mail, Instagram, marcas). Entra na carteira dele e chega a você mesmo sem pedido.'],['g','Gestor: nova tela 🆕 Clientes novos dos representantes, com contador e Marcar como visto.']]},
   {v:'v257',d:'25/11/2026',t:'Supabase (etapa 1): recados e "visto"',l:[
@@ -10652,8 +10653,8 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
   function minhas(){const l=lista();return l.length?l.map(c=>`<div class="cw-c"><div style="display:flex;justify-content:space-between;gap:8px"><b>${E(c.nome)}</b><span class="cw-t nv">${(Date.now()-c.t)<864e5*2?'novo':'cadastrado'}</span></div><div class="cw-k">${E(c.cid)}${c.uf?'/'+E(c.uf):''} · cadastrado ${brData(c.t)}</div>
     <span class="cw-t g">${GES?(c.repDest&&c.repDest!=='0'?'Na carteira de '+E(repNome(c.repDest)):'Sem representante'):(c.origem==='gestor'?'Cadastrado pelo escritório · na sua carteira':'Na sua carteira')}</span>${c.env?'<span class="cw-t">✔ Enviado</span>':'<span class="cw-t o" title="Salvo neste aparelho. Segue sozinho quando houver internet.">Aguardando envio</span>'}
     <div class="cw-a">${[c.tel1,c.tel2].filter(Boolean).map(t=>`<button class="cw-b cw_cp" data-t="${E(dg(t))}">📞 ${E(t)} · Copiar</button>`).join('')}${GES?'':'<button class="cw-b cw_ped">🛒 Fazer pedido</button>'}</div></div>`).join(''):'<div class="cw-c" style="color:#667">Nenhum cliente novo cadastrado ainda.</div>'}
-  function draw(){const o=document.getElementById('v2out');if(!o)return;const f=ST.f,off=navigator.onLine===false,conf=ST.conf;
-   o.innerHTML=`${GES?barra():''}<div class="vmh"><h2>➕ Cadastrar clientes</h2><p>${GES?'Cadastre um cliente novo e escolha o representante que vai atender. Ele entra na carteira do representante escolhido.':'Cadastre um cliente novo da sua região. Ele entra na sua carteira e chega para a Metalmig automaticamente, mesmo sem pedido.'}</p></div>
+  function draw(){try{ctl('')}catch(e){}const o=document.getElementById('v2out');if(!o)return;const f=ST.f,off=navigator.onLine===false,conf=ST.conf;
+   o.innerHTML=`<div class="vmh"><h2>➕ Cadastrar clientes</h2><p>${GES?'Cadastre um cliente novo e escolha o representante que vai atender. Ele entra na carteira do representante escolhido.':'Cadastre um cliente novo da sua região. Ele entra na sua carteira e chega para a Metalmig automaticamente, mesmo sem pedido.'}</p></div>${GES?barra():''}
    <div class="cw-c"><div class="cw-f">
     ${GES?'<label class="w">Representante que vai atender<select id="cw_rd" style="font:15px Arial;padding:9px;border:1px solid #b9c8dd;border-radius:8px;width:100%"><option value="">— escolha —</option><option value="0" '+(ST.rd==="0"?'selected':'')+'>Sem representante (Metalmig)</option>'+listaReps().map(r=>'<option value="'+E(r[0])+'" '+(ST.rd===r[0]?'selected':'')+'>'+E(r[1])+'</option>').join('')+'</select><span class="cw-er" id="cw_e_rd"></span></label>':''}
     <label class="w">CNPJ / CPF<div style="display:flex;gap:6px"><input id="cw_doc" style="flex:1;width:auto" value="${E(f.doc)}" inputmode="numeric" placeholder="00.000.000/0000-00" autocomplete="off"><button class="cw-b p" id="cw_rec" type="button" ${off||ST.busca?'disabled':''} style="white-space:nowrap">${ST.busca?'Buscando…':off?'Sem internet agora':'🔎 Buscar na Receita'}</button></div><span class="cw-er" id="cw_e_doc"></span>
@@ -10718,8 +10719,8 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
    <div class="cw-k">Representante: <b>${x.rep==='0'?'—':E(repNome(x.rep))}</b> · cadastrado ${brData(d.criado||x.t)}</div>
    <span class="cw-t g">${x.rep==='0'?'Sem representante (Metalmig)':'Na carteira de '+E(repNome(x.rep))}</span>${d.fonte==='receita'?'<span class="cw-t">Dados da Receita Federal</span>':'<span class="cw-t c">Digitado à mão</span>'}${d.origem==='gestor'?'<span class="cw-t">Cadastrado por você</span>':d.conf?'<span class="cw-t g">✓ Representante conferiu com o cliente</span>':'<span class="cw-t o">Cadastrado dentro do pedido (sem conferência)</span>'}${d.ex?'<span class="cw-t o">Já foi cliente da Metalmig</span>':''}
    <div class="cw-a">${[d.tel1,d.tel2].filter(Boolean).map(t=>`<button class="cw-b cw_cp" data-t="${E(dg(t))}">📞 ${E(t)} · Copiar</button>`).join('')}${x.visto?'':`<button class="cw-b cw_vi" data-id="${E(x.id)}">👁 Marcar como visto</button>`}</div></div>`};
-  function draw(){const o=document.getElementById('v2out');if(!o)return;if(window.__cwModo==='form'&&window.lcCNov){window.lcCNov.draw();return}const N=ST.L.filter(x=>!x.visto),V=ST.L.filter(x=>x.visto),l=ST.aba==='novos'?N:V;
-   o.innerHTML=`${barra()}<div class="vmh"><h2>➕ Cadastrar clientes</h2><p>Cadastrados pelos representantes, com ou sem pedido. Já entram na carteira de quem cadastrou. Chegam sozinhos pela ida e volta.</p></div>
+  function draw(){try{ctl('')}catch(e){}const o=document.getElementById('v2out');if(!o)return;if(window.__cwModo==='form'&&window.lcCNov){window.lcCNov.draw();return}const N=ST.L.filter(x=>!x.visto),V=ST.L.filter(x=>x.visto),l=ST.aba==='novos'?N:V;
+   o.innerHTML=`<div class="vmh"><h2>➕ Cadastrar clientes</h2><p>Cadastrados pelos representantes, com ou sem pedido. Já entram na carteira de quem cadastrou. Chegam sozinhos pela ida e volta.</p></div>${barra()}
    ${ST.err?'<div class="cw-bad">'+E(ST.err)+'</div>':''}
    <div style="display:flex;gap:6px;margin:8px 0;flex-wrap:wrap"><button class="cw-b ${ST.aba==='novos'?'p':''} cw_ab" data-a="novos">Novos (${N.length})</button><button class="cw-b ${ST.aba==='vistos'?'p':''} cw_ab" data-a="vistos">Já vistos (${V.length})</button><button class="cw-b" id="cw_re">${ST.busy?'Atualizando…':'🔄 Atualizar'}</button>${ST.aba==='novos'&&N.length>1?'<button class="cw-b" id="cw_vt">👁 Marcar todos como vistos</button>':''}</div>
    ${ST.t?'<div style="font-size:12px;color:#667;margin-bottom:8px">Atualizado às '+brData(ST.t).slice(11)+'</div>':''}
@@ -10734,6 +10735,37 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
   window.lcCNovG={carrega,draw,L:()=>ST.L};
  }
 }catch(e){console.error('lcCW',e)}})();
+
+// ===== v260 · Gestor faz pedido em nome do representante (abre o aplicativo do representante dentro do painel e liga ao Drive com a chave dele)
+(function(){try{
+ if(window.__lcCX||typeof D==='undefined'||D.rm)return;window.__lcCX=1;
+ const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+ function fecha(){const o=document.getElementById('cx_ov');if(o)o.remove();document.documentElement.style.overflow=''}
+ const nome=r=>{try{const ap=window.lcApel&&window.lcApel.get?window.lcApel.get(r[0]):'';return ap||String(r[1]).replace(/\s*-?\s*INATIVO/i,'')}catch(e){return String(r[1])}};
+ function carrega(o,idx,ms){
+  const msg=o.querySelector('#cx_m'),fr=o.querySelector('#cx_fr'),rp=D.reps[idx];
+  if(!(idx>=0)||!rp){fr.removeAttribute('srcdoc');fr.style.display='none';msg.style.display='block';msg.textContent='Escolha acima o representante em nome de quem o pedido será feito.';return}
+  const bk=typeof lcBkFor==='function'?lcBkFor(rp[0]):null;
+  if(!bk||!bk.k){fr.style.display='none';msg.style.display='block';msg.textContent='Este representante ainda não está liberado na nuvem (sem chave). O pedido ficaria só neste aparelho.';return}
+  try{const h=apBuild(idx,ms);msg.style.display='none';fr.style.display='block';
+   const lig=()=>{try{const w=fr.contentWindow;if(!w||typeof w.eval!=='function')return;w.eval('drvBk=function(){return '+JSON.stringify(bk)+'}');if(typeof w.drvAgenda==='function')w.drvAgenda(1500)}catch(e){}};
+   fr.onload=()=>[50,800,2500,6000].forEach(t=>setTimeout(lig,t));fr.srcdoc=h;window.__cxBk=bk;
+  }catch(e){fr.style.display='none';msg.style.display='block';msg.textContent='Não foi possível abrir: '+e.message}}
+ function abre(){
+  const pm=document.getElementById('p_mes'),ms=pm?pm.value:'';
+  fecha();
+  const L=(D.reps||[]).map((r,i)=>[i,r]).filter(x=>+x[1][0]>0&&typeof lcBkFor==='function'&&lcBkFor(x[1][0])).sort((p,q)=>nome(p[1]).localeCompare(nome(q[1]),'pt'));
+  const o=document.createElement('div');o.id='cx_ov';o.style.cssText='position:fixed;inset:0;z-index:2147483000;background:#fff;display:flex;flex-direction:column';
+  o.innerHTML='<div style="background:#b45f06;color:#fff;padding:8px 12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;font:700 14px Arial"><span>🛒 Pedido em nome de:</span><select id="cx_sel" style="flex:1;min-width:220px;font:15px Arial;padding:8px;border-radius:8px;border:0"><option value="">— escolha o representante —</option>'+L.map(x=>'<option value="'+x[0]+'">'+E(nome(x[1]))+' ('+x[1][0]+')</option>').join('')+'</select><button id="cx_x" style="background:#fff;color:#7a3f00;border:0;border-radius:8px;padding:8px 12px;font-weight:700;cursor:pointer">✕ Fechar</button></div><div id="cx_m" style="padding:30px;font:15px Arial;color:#555"></div><iframe id="cx_fr" allow="microphone" title="Aplicativo de pedidos" style="flex:1;border:0;width:100%;background:#fff;display:none"></iframe>';
+  document.body.appendChild(o);document.documentElement.style.overflow='hidden';
+  o.querySelector('#cx_x').onclick=fecha;
+  const sel=o.querySelector('#cx_sel');
+  sel.onchange=()=>carrega(o,sel.value===''?-1:+sel.value,ms);
+  carrega(o,-1,ms)}
+ function poe(){const b=document.getElementById('p_open');if(!b||document.getElementById('p_fped'))return;const n=document.createElement('button');n.id='p_fped';n.type='button';n.textContent='🛒 Fazer pedido (escolher o representante)';n.style.cssText='background:#b45f06;color:#fff;font-weight:bold;padding:8px 14px;margin-left:6px';n.onclick=abre;b.insertAdjacentElement('afterend',n)}
+ new MutationObserver(()=>poe()).observe(document.body,{childList:true,subtree:true});poe();
+ window.lcCXAbre=abre;
+}catch(e){console.error('lcCX',e)}})();
 
 
 </script></body></html>
