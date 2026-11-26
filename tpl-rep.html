@@ -1963,7 +1963,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v264';
+const NX_VER = 'v265';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3674,6 +3674,7 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v265',d:'26/11/2026',t:'Retaguarda: pedido digitado avisa o representante',l:[['g','Sistema › Pedidos recebidos: ao marcar “✔ Já digitei na fábrica” você informa o nº do pedido no ERP e o painel avisa o representante e, se você digitar, também o cliente, por e-mail (do seu Gmail, com cópia para você). O e-mail do representante e o do cliente podem ser digitados na hora. Novo bloco “📧 E-mails dos representantes”.'],['g','Nova página própria da Débora (retaguarda), com senha: só mostra os pedidos recebidos, com filtro por representante. O que ela marca aparece no seu painel.'],['a','Lançados: quando a Metalmig digita o pedido, o cartão mostra “✔ Digitado na Metalmig · nº …”.']]},
   {v:'v264',d:'26/11/2026',t:'Fazer pedido: envio para qualquer representante',l:[['g','Corrigido: pedido feito em Fazer pedido para representante que ainda não estava liberado na nuvem ficava parado na fila (“⏳ ainda não enviado”). Agora o painel envia mesmo assim, e cada pedido só sobe com o código do representante para o qual foi feito.']]},
   {v:'v263',d:'26/11/2026',t:'Garra Representações com o código real',l:[['g','Ferreira Garra Representação agora tem o código real da fábrica (20156) no lugar do provisório: carteira, repasses e histórico foram migrados, e a página dele passa a funcionar ligada à nuvem (pedido, cadastro de cliente e recados).']]},
   {v:'v262',d:'25/11/2026',t:'Ficha do cliente mais fácil',l:[['a','Ficha do cliente: ao tocar no cliente da busca a tela vai direto para a ficha dele. Os outros resultados ficam escondidos, com o botão ← voltar aos resultados.'],['a','A lista Quem atende fica recolhida (toque para abrir). O botão do cliente na busca mostra o nome em uma linha.'],['g','Fazer pedido (gestor): agora dá para escolher qualquer cliente da lista, não só os do representante selecionado.'],['g','Fazer pedido (gestor): faixa mostrando se o pedido já foi enviado e recebido pela Metalmig; ao fechar com pedido na fila, o painel tenta enviar antes e avisa se não conseguir.']]},
@@ -6762,17 +6763,18 @@ window.lcRelPos=function(w,S){
  const URLK='metalmig_bkp_pedurl',CK='metalmig_bkp_pedcache';
  const brl=v=>'R$ '+(+v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
  const dBR=iso=>{if(!iso)return'';const d=new Date(iso);if(isNaN(d))return'';return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})};
- let URL_=(gs(URLK)||'').trim(),LISTA=[],LOAD=null,ERR='',ST={rep:'',st:'novos',per:'7',q:''},BUSY=false,TM=null;
+ let URL_=(gs(URLK)||'').trim(),LISTA=[],LOAD=null,ERR='',ST={rep:'',st:'novos',per:'7',q:'',dk:'',msg:{}},BUSY=false,TM=null,EM={},CFGJ=null;
  try{LISTA=(JSON.parse(gs(CK)||'null')||{}).lista||[]}catch(e){}
  async function cfg(){ // endereço vem do drive.json do site (ou do campo manual)
-  try{const r=await fetch(new URL('drive.json?t='+Date.now(),location.href).href,{cache:'no-store'});const j=await r.json();if(j&&j.u){URL_=j.u;return j}}catch(e){}
+  try{const r=await fetch(new URL('drive.json?t='+Date.now(),location.href).href,{cache:'no-store'});const j=await r.json();if(j&&j.u){URL_=j.u;CFGJ=j;return j}}catch(e){}
   return URL_?{u:URL_}:null}
  async function carregar(){
   if(BUSY)return;BUSY=true;ERR='';
   try{const c=await cfg();if(!c||!c.u){ERR='sem-url';return}
    const r=await fetch(c.u+(c.u.indexOf('?')>0?'&':'?')+'k='+GK+'&a=lista&t='+Date.now());const j=await r.json();
    if(!j||!j.ok)throw new Error(j&&j.erro||'falha');
-   LISTA=j.lista||[];LOAD=Date.now();ss(CK,JSON.stringify({t:LOAD,lista:LISTA}))
+   LISTA=j.lista||[];LOAD=Date.now();ss(CK,JSON.stringify({t:LOAD,lista:LISTA}));
+   try{const e2=await (await fetch(c.u+(c.u.indexOf('?')>0?'&':'?')+'k='+GK+'&a=emails&t='+Date.now())).json();if(e2&&e2.ok&&e2.emails)EM=e2.emails}catch(x){}
   }catch(e){ERR=String(e&&e.message||e)}finally{BUSY=false;badge();if(VIEW==='prec')draw()}}
  const naoImp=()=>LISTA.filter(p=>!p.impresso).length;
  function badge(){const b=document.querySelector('#nav button[data-v="prec"]');if(b){const n=naoImp();b.textContent='Pedidos recebidos'+(n?' ('+n+')':'')}
@@ -6786,6 +6788,7 @@ window.lcRelPos=function(w,S){
 .pr-t{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}.pr-t b{font-size:15.5px;color:#14233f}.pr-m{font-size:12.5px;color:#5b6b82;margin-top:2px}
 .pr-v{font-size:18px;font-weight:800;color:#14233f;text-align:right}.pr-l{border-top:1px solid #eef1f6;margin-top:9px;padding-top:9px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .pr-l button{border:0;border-radius:9px;padding:10px 14px;font-weight:700;font-size:13.5px;cursor:pointer;background:#eef2f9;color:#1F4E78}.pr-l button.p{background:#1F4E78;color:#fff}.pr-l button.g{background:#2E7D32;color:#fff}
+.pr-fm{background:#f1f4f8;border-radius:10px;padding:10px;margin-top:9px;width:100%}.pr-fm label{font-size:12px;color:#5d6f84;display:block;margin-bottom:4px}.pr-fm input{width:100%;padding:10px;border:1px solid #b9c7e2;border-radius:9px;font-size:15px;margin-bottom:8px;box-sizing:border-box}.pr-av{font-size:12.5px;margin-top:6px;padding:5px 8px;border-radius:8px;background:#eef2f9;color:#1F4E78}.pr-av.w{background:#fff3cd;color:#7a5d00}.pr-em{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:6px 10px;align-items:center;margin-top:8px}.pr-em span{font-size:13px}.pr-em input{padding:8px;border:1px solid #b9c7e2;border-radius:8px;font-size:14px;min-width:0}
 .pr-g{display:inline-block;font-size:11.5px;font-weight:700;border-radius:999px;padding:2px 9px;margin-left:6px}
 .pr-it{font-size:13px;margin:8px 0 0}.pr-it table{width:100%;border-collapse:collapse}.pr-it td{padding:4px 6px;border-bottom:1px solid #f0f2f6}.pr-it td:nth-child(2),.pr-it td:nth-child(3){text-align:right;white-space:nowrap}`;
  document.head.appendChild(css);
@@ -6796,17 +6799,28 @@ window.lcRelPos=function(w,S){
    if(ST.st!=='novos'&&ST.st!=='pend'&&lim&&new Date(p.recebido).getTime()<lim)return false;
    if(q&&!((p.cliNome||'')+' '+(p.repNome||'')+' '+(p.num||'')+' '+(p.cid||'')).toLowerCase().includes(q))return false;return true}).sort((a,b)=>String(b.recebido).localeCompare(String(a.recebido)))}
  function card(p){const n=!p.impresso;
-  return `<div class="pr-c ${n?'n':(p.digitado?'ok':'')}" data-k="${E(p.key)}"><div class="pr-t"><div><b>${E(p.cliNome||'Cliente '+p.cli)}</b>${p.revisado?tag('REVISADO','#C62828'):''}${n?tag('NOVO','#E65100'):''}${p.impresso?tag('🖨 impresso','#1F4E78'):''}${p.digitado?tag('✔ digitado','#2E7D32'):''}
+  return `<div class="pr-c ${n?'n':(p.digitado?'ok':'')}" data-k="${E(p.key)}"><div class="pr-t"><div><b>${E(p.cliNome||'Cliente '+p.cli)}</b>${p.revisado?tag('REVISADO','#C62828'):''}${n?tag('NOVO','#E65100'):''}${p.impresso?tag('🖨 impresso','#1F4E78'):''}${p.digitado?tag('✔ digitado'+(p.erp?' · nº '+E(p.erp):''),'#2E7D32'):''}
    <div class="pr-m">Pedido ${E(p.num)} · ${E(p.cid||'')}</div><div class="pr-m">${E(String(p.repNome||'').replace(/\s*-?\s*INATIVO/i,''))} · recebido ${dBR(p.recebido)}${p.vendNome?' · vendedor: <b>'+E(p.vendNome)+'</b>':''}</div></div>
    <div><div class="pr-v">${brl(p.geral)}</div><div class="pr-m" style="text-align:right">${p.pecas||0} peça(s) · ${(p.itens||[]).length} item(ns)</div></div></div>
    ${p.obs?`<div class="pr-m" style="margin-top:6px">📝 ${E(p.obs)}</div>`:''}
    <details class="pr-it"><summary style="cursor:pointer;color:#1F4E78;font-weight:600">Ver itens</summary><table>${(p.itens||[]).map(i=>`<tr><td>${E(i.n)}</td><td>${i.q} un</td><td>${brl(i.p)}</td></tr>`).join('')}</table><div class="pr-m" style="margin-top:6px">Faturamento ${E(p.fat||'—')} · Cobrança ${E(p.cob||'—')}${p.frete?' · Frete '+E(p.frete):''}</div></details>
-   <div class="pr-l"><button class="${n?'p':''}" data-a="imp">🖨 Abrir e imprimir</button><button class="${p.digitado?'':'g'}" data-a="dig">${p.digitado?'↩ Desfazer digitado':'✔ Já digitei na fábrica'}</button></div></div>`}
+   ${p.digitado?avInfo(p):''}${p.digitado&&(!p.aviso||p.aviso.st!=='enviado')?`<div class="pr-fm"><label>E-mail do representante (recebe o aviso)</label><input data-f="emrep" type="email" placeholder="email@exemplo.com" value="${E(EM[String(p.rep)]||'')}"><label>E-mail do cliente (opcional: o cliente também recebe a confirmação)</label><input data-f="emcli" type="email" placeholder="email@cliente.com" value="${E(p.emCli||'')}"></div>`:''}${ST.dk===p.key&&!p.digitado?`<div class="pr-fm"><label>Nº do pedido no sistema da Metalmig (ERP)</label><input data-f="erp" inputmode="numeric" placeholder="Ex.: 48213"><label>E-mail do representante (recebe o aviso)</label><input data-f="emrep" type="email" placeholder="email@exemplo.com" value="${E(EM[String(p.rep)]||'')}"><label>E-mail do cliente (opcional: o cliente também recebe a confirmação)</label><input data-f="emcli" type="email" placeholder="email@cliente.com" value="${E(p.emCli||'')}"><button class="g" data-a="dig2" style="width:100%;border:0;border-radius:9px;padding:11px;font-weight:700;background:#2E7D32;color:#fff;cursor:pointer">✔ Marcar como digitado e avisar o representante</button><div class="pr-m" style="margin-top:6px">Os avisos saem do seu Gmail, com cópia para você. Sem e-mail do representante, ele vê o “✔ Digitado” só no app.</div></div>`:''}
+   <div class="pr-l"><button class="${n?'p':''}" data-a="imp">🖨 Abrir e imprimir</button><button class="${p.digitado?'':'g'}" data-a="dig">${p.digitado?'↩ Desfazer digitado':'✔ Já digitei na fábrica'}</button>${p.digitado&&(!p.aviso||p.aviso.st!=='enviado')?'<button data-a="av">✉ Enviar aviso</button>':''}</div></div>`}
+ function avInfo(p){const a=p.aviso,m=ST.msg[p.key];
+  if(m)return `<div class="pr-av ${/⚠/.test(m)?'w':''}">${E(m)}</div>`;
+  if(!a)return `<div class="pr-m" style="margin-top:6px">${p.por?'Digitado por '+E(p.por)+'. ':''}Sem aviso por e-mail.</div>`;
+  if(a.st==='enviado')return `<div class="pr-av">✉ Aviso enviado a ${E([a.para,a.cli?a.cli+' (cliente)':''].filter(Boolean).join(' e '))} · ${dBR(a.ts)}${p.por?' · digitado por '+E(p.por):''}</div>`;
+  if(a.st==='sem-email')return `<div class="pr-av w">⚠ Nenhum e-mail informado — o representante vê o “✔ Digitado” no app. Digite o e-mail abaixo e toque em “Enviar aviso”.</div>`;
+  return `<div class="pr-av w">⚠ Não consegui enviar o e-mail agora. Toque em “Enviar aviso” para tentar de novo.</div>`}
+ function emBloco(){const tem=new Set();(D.cli||[]).forEach(c=>tem.add(c[8]));const hab=(CFGJ&&Array.isArray(CFGJ.reps))?new Set(CFGJ.reps.map(String)):null;const L=(D.reps||[]).map((r,i)=>i?[i,String(r[0]),String(r[1]||'')]:null).filter(x=>x&&tem.has(x[0])&&(!hab||hab.has(x[1]))).sort((a,b)=>a[2].localeCompare(b[2]));
+  const n=L.filter(x=>EM[x[1]]).length;
+  return `<details class="pr-b" id="pr_emb"><summary style="cursor:pointer;font-weight:700;color:#14233f">📧 E-mails dos representantes <span class="pr-m">(${n} de ${L.length} cadastrados)</span></summary><div class="pr-m" style="margin-top:6px">Usados só para avisar o representante quando o pedido dele for digitado. O aviso sai do seu Gmail.</div><div class="pr-em">${L.map(x=>`<span>${E(x[2].replace(/\s*-?\s*INATIVO/i,''))}</span><input data-em="${E(x[1])}" type="email" placeholder="email@exemplo.com" value="${E(EM[x[1]]||'')}">`).join('')}</div><div style="margin-top:10px"><button id="pr_emsv" style="border:0;border-radius:9px;padding:10px 14px;font-weight:700;cursor:pointer;background:#1F4E78;color:#fff">Salvar e-mails</button> <span class="pr-m" id="pr_emm"></span></div></details>`}
  function draw(){const o=document.getElementById('v2out');if(!o)return;
   const reps=[...new Map(LISTA.map(p=>[String(p.rep),p.repNome])).entries()].sort((a,b)=>String(a[1]).localeCompare(String(b[1])));
   const L=filtrada(),tot=L.reduce((s,p)=>s+(+p.geral||0),0);
   o.innerHTML=`<div class="vmh"><h2>📥 Pedidos recebidos</h2><p>Pedidos que os representantes digitaram e chegaram na sua pasta <b>“Pedidos recebidos”</b> do Google Drive. Use para imprimir e passar para quem digita no sistema da fábrica. <b>Só conferência:</b> as vendas continuam sendo atualizadas pelo relatório do sistema.</p></div>
   ${ERR==='sem-url'?`<div class="pr-b"><h3>Ligação com o Google</h3><div class="pr-m" style="margin-bottom:8px">Cole o endereço do Apps Script (termina em /exec). Se o arquivo <b>drive.json</b> já estiver no site, isso é automático.</div><div class="pr-f"><input id="pr_u" style="flex:1;min-width:240px" placeholder="https://script.google.com/macros/s/…/exec" value="${E(URL_)}"><button class="pr-l" style="all:unset"></button><button id="pr_ug" style="background:#1F4E78;color:#fff;border:0;border-radius:9px;padding:10px 14px;font-weight:700;cursor:pointer">Ligar</button></div></div>`:''}
+  ${emBloco()}
   <div class="pr-b"><h3>Filtros</h3><div class="pr-f"><select id="pr_s"><option value="novos">Não impressos</option><option value="pend">Ainda não digitados</option><option value="imp">Impressos, a digitar</option><option value="dig">Já digitados</option><option value="todos">Todos</option></select>
    <select id="pr_r"><option value="">Todos os representantes</option>${reps.map(r=>`<option value="${E(r[0])}">${E(String(r[1]).replace(/\s*-?\s*INATIVO/i,''))}</option>`).join('')}</select>
    <select id="pr_p"><option value="1">Hoje</option><option value="7">Últimos 7 dias</option><option value="30">Últimos 30 dias</option><option value="todos">Todo o período</option></select>
@@ -6818,7 +6832,12 @@ window.lcRelPos=function(w,S){
   $('#pr_q').oninput=e=>{ST.q=e.target.value;clearTimeout(draw.t);draw.t=setTimeout(()=>{draw();const i=document.getElementById('pr_q');if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}},350)};
   $('#pr_a').onclick=()=>carregar();
   const ug=$('#pr_ug');if(ug)ug.onclick=()=>{const v=$('#pr_u').value.trim();if(!/^https:\/\/script\.google\.com\/macros\/s\/[^\s]+\/exec$/.test(v)){alert('O endereço precisa começar com https://script.google.com/macros/s/ e terminar em /exec');return}URL_=v;ss(URLK,v);carregar()};
-  o.querySelectorAll('.pr-c').forEach(c=>{const k=c.dataset.k;c.querySelector('[data-a="imp"]').onclick=()=>abrir(k);c.querySelector('[data-a="dig"]').onclick=()=>marcar(k,'digitado')})}
+  o.querySelectorAll('.pr-c').forEach(c=>{const k=c.dataset.k;c.querySelector('[data-a="imp"]').onclick=()=>abrir(k);c.querySelector('[data-a="dig"]').onclick=()=>{const p=LISTA.find(x=>x.key===k);if(p&&p.digitado)marcar(k,'digitado');else{ST.dk=ST.dk===k?'':k;draw()}};
+   const mails=()=>{const a=((c.querySelector('[data-f="emrep"]')||{}).value||'').trim(),d=((c.querySelector('[data-f="emcli"]')||{}).value||'').trim(),re=/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;if((a&&!re.test(a))||(d&&!re.test(d))){alert('E-mail inválido: precisa ter @ e um domínio, como .com.br');return null}return {r:a,c:d}};
+   const b2=c.querySelector('[data-a="dig2"]');if(b2)b2.onclick=()=>{const v=(c.querySelector('[data-f="erp"]').value||'').trim();if(!v){alert('Digite o número do pedido no sistema da Metalmig.');return}const m=mails();if(!m)return;digita(k,v,m)};
+   const b3=c.querySelector('[data-a="av"]');if(b3)b3.onclick=()=>{const m=mails();if(!m)return;reavisa(k,m)}});
+  const sv=$('#pr_emsv');if(sv)sv.onclick=async()=>{const m={};o.querySelectorAll('[data-em]').forEach(i=>{m[i.dataset.em]=i.value.trim()});const bad=Object.keys(m).find(c=>m[c]&&!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(m[c]));if(bad){$('#pr_emm').textContent='⚠ E-mail inválido (precisa ter @ e .com).';return}
+   $('#pr_emm').textContent='Salvando…';try{const j=await post({t:'emails_set',mapa:m});if(!j||!j.ok)throw 0;EM=j.emails||EM;draw();const d=document.getElementById('pr_emb');if(d){d.open=true;const mm=d.querySelector('#pr_emm');if(mm)mm.textContent='✔ Salvo.'}}catch(e){$('#pr_emm').textContent='⚠ Não salvou. Confira a internet e tente de novo.'}}}
  async function chamar(q){const r=await fetch(URL_+(URL_.indexOf('?')>0?'&':'?')+'k='+GK+'&'+q+'&t='+Date.now());return r.json()}
  async function abrir(k){const p=LISTA.find(x=>x.key===k);if(!p)return;
   const w=window.open('','_blank');if(w)w.document.write('<p style="font-family:sans-serif">Abrindo o pedido…</p>');
@@ -6827,8 +6846,18 @@ window.lcRelPos=function(w,S){
    const url=URL.createObjectURL(new Blob([u],{type:'application/pdf'}));
    if(w)w.location.href=url;else location.href=url;
    if(!p.impresso)marcar(k,'impresso',true)}catch(e){if(w)w.close();alert('Não consegui abrir o PDF agora. Confira a internet e tente de novo.')}}
+ async function post(o){const r=await fetch(URL_,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(Object.assign({k:GK},o))});return r.json()}
+ function msgAv(a){return !a?'':a.st==='enviado'?'✉ Aviso enviado a '+[a.para,a.cli?a.cli+' (cliente)':''].filter(Boolean).join(' e '):a.st==='sem-email'?'⚠ Nenhum e-mail informado. O representante vê o “✔ Digitado” no app.':'⚠ Não consegui enviar o e-mail agora.'}
+ async function digita(k,erp,m){const p=LISTA.find(x=>x.key===k);if(!p)return;
+  try{const j=await post({t:'marcar',key:k,campo:'digitado',valor:true,erp:erp,por:(window.lcQuem?lcQuem():'Gestor'),avisar:true,emRep:m.r,emCli:m.c});if(!j||!j.ok)throw 0;if(m.r)EM[String(p.rep)]=m.r.toLowerCase();p.emCli=m.c.toLowerCase();
+   p.digitado=new Date().toISOString();p.erp=erp;p.por=(window.lcQuem?lcQuem():'Gestor');p.aviso=j.aviso||null;ST.msg[k]=msgAv(j.aviso);ST.dk=''}
+  catch(e){ST.msg[k]='⚠ Não consegui salvar agora. Confira a internet e tente de novo.'}
+  ss(CK,JSON.stringify({t:LOAD,lista:LISTA}));badge();draw()}
+ async function reavisa(k,m){const p=LISTA.find(x=>x.key===k);if(!p)return;ST.msg[k]='Enviando aviso…';draw();
+  try{const j=await post({t:'marcar',key:k,campo:'aviso',valor:true,emRep:m.r,emCli:m.c});if(!j||!j.ok)throw 0;if(m.r)EM[String(p.rep)]=m.r.toLowerCase();if(m.c)p.emCli=m.c.toLowerCase();p.aviso=j.aviso||null;ST.msg[k]=msgAv(j.aviso)}catch(e){ST.msg[k]='⚠ Não consegui enviar agora.'}
+  ss(CK,JSON.stringify({t:LOAD,lista:LISTA}));draw()}
  async function marcar(k,campo,so1){const p=LISTA.find(x=>x.key===k);if(!p)return;const novo=so1?true:!p[campo];
-  p[campo]=novo?new Date().toISOString():null;ss(CK,JSON.stringify({t:LOAD,lista:LISTA}));badge();draw();
+  p[campo]=novo?new Date().toISOString():null;if(campo==='digitado'&&!novo){p.erp='';p.por='';p.aviso=null;delete ST.msg[k]}ss(CK,JSON.stringify({t:LOAD,lista:LISTA}));badge();draw();
   try{await fetch(URL_,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({k:GK,t:'marcar',key:k,campo,valor:novo})})}catch(e){}}
  window.lcPedRecCarregar=carregar;
  setTimeout(()=>{carregar()},6000);setInterval(()=>{if(!document.hidden)carregar()},180000);
@@ -10837,6 +10866,25 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
  const fixa=()=>{document.querySelectorAll('button.lcbtn').forEach(b=>{if(b.dataset.cy||!/^\s*⚡/.test(b.textContent))return;b.dataset.cy=1;b.style.whiteSpace='nowrap';b.style.maxWidth='100%';b.style.overflow='hidden';b.style.textOverflow='ellipsis'})};
  new MutationObserver(fixa).observe(document.body,{childList:true,subtree:true});fixa();
 }catch(e){console.error('lcCY',e)}})();
+
+// ===== v265 · No aplicativo de pedidos do representante: mostra "✔ Digitado na Metalmig · nº X" quando a retaguarda digita o pedido =====
+(function(){try{if(window.__lcDA)return;window.__lcDA=1;
+ const ANC="async function exportarDados(){";
+ const COD=`/* v265 · estado Digitado (vem da retaguarda) */
+async function dgSync(){ try{ const j=DRV.cfg||await drvCfg(); if(!drvAtivo(j)||navigator.onLine===false) return; const bk=drvBk(); if(!bk||!bk.k) return;
+  const r=await fetch(j.u,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({k:bk.k,t:'ped_st',rep:bk.c||D.codRep})}); const jr=await r.json(); if(!jr||!jr.ok||!jr.st) return;
+  let ch=false; pedidos.forEach(p=>{ const s=jr.st[p.id]; const novo=s?{n:s.erp||'',t:s.dig}:null; if(JSON.stringify(p.dg||null)!==JSON.stringify(novo)){ if(novo) p.dg=novo; else delete p.dg; ch=true; } });
+  if(ch){ store.set('pedidos',pedidos); try{ if(tab==='mes') render(); }catch(e){} } dgMarca(); }catch(e){} }
+function dgMarca(){ try{ document.querySelectorAll('.ped[data-ped]').forEach(el=>{ const p=pedidos.find(x=>x.id===+el.dataset.ped); let b=el.querySelector('.dgst');
+  if(!p||!p.dg){ if(b) b.remove(); return; }
+  if(!b){ b=document.createElement('div'); b.className='dgst'; b.style.cssText='font-size:12.5px;font-weight:700;color:#1b6b34;background:#e6f4ea;border-radius:8px;padding:5px 8px;margin-top:4px'; const ev=el.querySelector('.drvst')||el.querySelector('.envst'); if(ev) ev.insertAdjacentElement('afterend',b); else el.appendChild(b); }
+  b.textContent='✔ Digitado na Metalmig'+(p.dg.n?' · nº '+p.dg.n:'')+(p.dg.t?' · '+dBR(String(p.dg.t).slice(0,10)).slice(0,5):''); }); }catch(e){} }
+try{ const mo=new MutationObserver(()=>{ clearTimeout(window.__dgT); window.__dgT=setTimeout(dgMarca,120); }); const mm=document.getElementById('main'); if(mm) mo.observe(mm,{childList:true,subtree:true}); }catch(e){}
+setTimeout(dgSync,6000); setInterval(()=>{ if(!document.hidden) dgSync(); },120000); window.addEventListener('online',()=>setTimeout(dgSync,2000));
+`;
+ const fix=h=>{h=String(h);if(h.indexOf(ANC)<0||h.indexOf('function dgSync')>=0)return h;const i=h.indexOf(ANC);return h.slice(0,i)+COD+h.slice(i)};
+ if(typeof apBuild==='function'&&!apBuild.__da){const ab=apBuild;apBuild=function(){return fix(ab.apply(this,arguments))};apBuild.__da=1}
+}catch(e){console.error('lcDA',e)}})();
 
 
 </script></body></html>
