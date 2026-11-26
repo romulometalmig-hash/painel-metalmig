@@ -1,6 +1,6 @@
 // MM-BACKEND
 // Caixa de correio Metalmig - cole em script.google.com e implante como Aplicativo da Web
-const VERSAO='v265';
+const VERSAO='v266';
 const PASTA='Backups Metalmig';
 const PASTA_PED='Pedidos recebidos';   // pedidos dos representantes (PDF + dados)
 
@@ -192,6 +192,16 @@ function doPost(e){
       }
       if(achou)grava_(p,'indice.json',JSON.stringify(l));
       return resp_({ok:achou,aviso:av});
+    }
+    if(b.t==='apagar'){       // v266: só o gestor apaga pedido (teste). Sai da lista; PDF e dados vão para a lixeira do Drive (30 dias para recuperar)
+      if(b.k!==CHAVE_GESTOR)return resp_({ok:false,erro:'chave'});
+      const p=pastaPed_(),l=lerIdx_(p),n=[];let ok=false;
+      for(let i=0;i<l.length;i++){
+        if(l[i].key===b.key){ok=true;try{DriveApp.getFileById(l[i].pdfId).setTrashed(true)}catch(x){}try{DriveApp.getFileById(l[i].jsonId).setTrashed(true)}catch(x){}}
+        else n.push(l[i]);
+      }
+      if(ok)grava_(p,'indice.json',JSON.stringify(n));
+      return resp_({ok:ok});
     }
     if(b.t==='emails_set'){   // v265: e-mails dos representantes (para o aviso de pedido digitado)
       if(!okRet_(b.k))return resp_({ok:false,erro:'chave'});

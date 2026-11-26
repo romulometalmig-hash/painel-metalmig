@@ -1963,7 +1963,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v265';
+const NX_VER = 'v266';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3674,6 +3674,7 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v266',d:'26/11/2026',t:'Apagar pedido de teste',l:[['g','Sistema › Pedidos recebidos: novo botão “🗑 Apagar” em cada pedido, com confirmação. O pedido sai da sua lista, da página da Débora e da pasta do Google (o PDF vai para a lixeira do Drive, onde fica 30 dias).']]},
   {v:'v265',d:'26/11/2026',t:'Retaguarda: pedido digitado avisa o representante',l:[['g','Sistema › Pedidos recebidos: ao marcar “✔ Já digitei na fábrica” você informa o nº do pedido no ERP e o painel avisa o representante e, se você digitar, também o cliente, por e-mail (do seu Gmail, com cópia para você). O e-mail do representante e o do cliente podem ser digitados na hora. Novo bloco “📧 E-mails dos representantes”.'],['g','Nova página própria da Débora (retaguarda), com senha: só mostra os pedidos recebidos, com filtro por representante. O que ela marca aparece no seu painel.'],['a','Lançados: quando a Metalmig digita o pedido, o cartão mostra “✔ Digitado na Metalmig · nº …”.']]},
   {v:'v264',d:'26/11/2026',t:'Fazer pedido: envio para qualquer representante',l:[['g','Corrigido: pedido feito em Fazer pedido para representante que ainda não estava liberado na nuvem ficava parado na fila (“⏳ ainda não enviado”). Agora o painel envia mesmo assim, e cada pedido só sobe com o código do representante para o qual foi feito.']]},
   {v:'v263',d:'26/11/2026',t:'Garra Representações com o código real',l:[['g','Ferreira Garra Representação agora tem o código real da fábrica (20156) no lugar do provisório: carteira, repasses e histórico foram migrados, e a página dele passa a funcionar ligada à nuvem (pedido, cadastro de cliente e recados).']]},
@@ -6763,7 +6764,7 @@ window.lcRelPos=function(w,S){
  const URLK='metalmig_bkp_pedurl',CK='metalmig_bkp_pedcache';
  const brl=v=>'R$ '+(+v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
  const dBR=iso=>{if(!iso)return'';const d=new Date(iso);if(isNaN(d))return'';return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})};
- let URL_=(gs(URLK)||'').trim(),LISTA=[],LOAD=null,ERR='',ST={rep:'',st:'novos',per:'7',q:'',dk:'',msg:{}},BUSY=false,TM=null,EM={},CFGJ=null;
+ let URL_=(gs(URLK)||'').trim(),LISTA=[],LOAD=null,ERR='',ST={ap:'',rep:'',st:'novos',per:'7',q:'',dk:'',msg:{}},BUSY=false,TM=null,EM={},CFGJ=null;
  try{LISTA=(JSON.parse(gs(CK)||'null')||{}).lista||[]}catch(e){}
  async function cfg(){ // endereço vem do drive.json do site (ou do campo manual)
   try{const r=await fetch(new URL('drive.json?t='+Date.now(),location.href).href,{cache:'no-store'});const j=await r.json();if(j&&j.u){URL_=j.u;CFGJ=j;return j}}catch(e){}
@@ -6805,7 +6806,7 @@ window.lcRelPos=function(w,S){
    ${p.obs?`<div class="pr-m" style="margin-top:6px">📝 ${E(p.obs)}</div>`:''}
    <details class="pr-it"><summary style="cursor:pointer;color:#1F4E78;font-weight:600">Ver itens</summary><table>${(p.itens||[]).map(i=>`<tr><td>${E(i.n)}</td><td>${i.q} un</td><td>${brl(i.p)}</td></tr>`).join('')}</table><div class="pr-m" style="margin-top:6px">Faturamento ${E(p.fat||'—')} · Cobrança ${E(p.cob||'—')}${p.frete?' · Frete '+E(p.frete):''}</div></details>
    ${p.digitado?avInfo(p):''}${p.digitado&&(!p.aviso||p.aviso.st!=='enviado')?`<div class="pr-fm"><label>E-mail do representante (recebe o aviso)</label><input data-f="emrep" type="email" placeholder="email@exemplo.com" value="${E(EM[String(p.rep)]||'')}"><label>E-mail do cliente (opcional: o cliente também recebe a confirmação)</label><input data-f="emcli" type="email" placeholder="email@cliente.com" value="${E(p.emCli||'')}"></div>`:''}${ST.dk===p.key&&!p.digitado?`<div class="pr-fm"><label>Nº do pedido no sistema da Metalmig (ERP)</label><input data-f="erp" inputmode="numeric" placeholder="Ex.: 48213"><label>E-mail do representante (recebe o aviso)</label><input data-f="emrep" type="email" placeholder="email@exemplo.com" value="${E(EM[String(p.rep)]||'')}"><label>E-mail do cliente (opcional: o cliente também recebe a confirmação)</label><input data-f="emcli" type="email" placeholder="email@cliente.com" value="${E(p.emCli||'')}"><button class="g" data-a="dig2" style="width:100%;border:0;border-radius:9px;padding:11px;font-weight:700;background:#2E7D32;color:#fff;cursor:pointer">✔ Marcar como digitado e avisar o representante</button><div class="pr-m" style="margin-top:6px">Os avisos saem do seu Gmail, com cópia para você. Sem e-mail do representante, ele vê o “✔ Digitado” só no app.</div></div>`:''}
-   <div class="pr-l"><button class="${n?'p':''}" data-a="imp">🖨 Abrir e imprimir</button><button class="${p.digitado?'':'g'}" data-a="dig">${p.digitado?'↩ Desfazer digitado':'✔ Já digitei na fábrica'}</button>${p.digitado&&(!p.aviso||p.aviso.st!=='enviado')?'<button data-a="av">✉ Enviar aviso</button>':''}</div></div>`}
+   <div class="pr-l"><button class="${n?'p':''}" data-a="imp">🖨 Abrir e imprimir</button><button class="${p.digitado?'':'g'}" data-a="dig">${p.digitado?'↩ Desfazer digitado':'✔ Já digitei na fábrica'}</button>${p.digitado&&(!p.aviso||p.aviso.st!=='enviado')?'<button data-a="av">✉ Enviar aviso</button>':''}<span style="flex:1"></span>${ST.ap===p.key?'<span class="pr-m" style="color:#C62828;font-weight:700">Apagar este pedido?</span><button data-a="apsim" style="background:#C62828;color:#fff">Sim, apagar</button><button data-a="apnao">Não</button>':'<button data-a="ap" title="Apagar pedido de teste" style="background:#fdecea;color:#C62828">🗑 Apagar</button>'}</div>${ST.msg['ap'+p.key]?'<div class="pr-av w">'+E(ST.msg['ap'+p.key])+'</div>':''}</div>`}
  function avInfo(p){const a=p.aviso,m=ST.msg[p.key];
   if(m)return `<div class="pr-av ${/⚠/.test(m)?'w':''}">${E(m)}</div>`;
   if(!a)return `<div class="pr-m" style="margin-top:6px">${p.por?'Digitado por '+E(p.por)+'. ':''}Sem aviso por e-mail.</div>`;
@@ -6835,9 +6836,14 @@ window.lcRelPos=function(w,S){
   o.querySelectorAll('.pr-c').forEach(c=>{const k=c.dataset.k;c.querySelector('[data-a="imp"]').onclick=()=>abrir(k);c.querySelector('[data-a="dig"]').onclick=()=>{const p=LISTA.find(x=>x.key===k);if(p&&p.digitado)marcar(k,'digitado');else{ST.dk=ST.dk===k?'':k;draw()}};
    const mails=()=>{const a=((c.querySelector('[data-f="emrep"]')||{}).value||'').trim(),d=((c.querySelector('[data-f="emcli"]')||{}).value||'').trim(),re=/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;if((a&&!re.test(a))||(d&&!re.test(d))){alert('E-mail inválido: precisa ter @ e um domínio, como .com.br');return null}return {r:a,c:d}};
    const b2=c.querySelector('[data-a="dig2"]');if(b2)b2.onclick=()=>{const v=(c.querySelector('[data-f="erp"]').value||'').trim();if(!v){alert('Digite o número do pedido no sistema da Metalmig.');return}const m=mails();if(!m)return;digita(k,v,m)};
+   const bA=c.querySelector('[data-a="ap"]');if(bA)bA.onclick=()=>{ST.ap=k;draw()};const bN=c.querySelector('[data-a="apnao"]');if(bN)bN.onclick=()=>{ST.ap='';draw()};const bS=c.querySelector('[data-a="apsim"]');if(bS)bS.onclick=()=>apaga(k);
    const b3=c.querySelector('[data-a="av"]');if(b3)b3.onclick=()=>{const m=mails();if(!m)return;reavisa(k,m)}});
   const sv=$('#pr_emsv');if(sv)sv.onclick=async()=>{const m={};o.querySelectorAll('[data-em]').forEach(i=>{m[i.dataset.em]=i.value.trim()});const bad=Object.keys(m).find(c=>m[c]&&!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(m[c]));if(bad){$('#pr_emm').textContent='⚠ E-mail inválido (precisa ter @ e .com).';return}
    $('#pr_emm').textContent='Salvando…';try{const j=await post({t:'emails_set',mapa:m});if(!j||!j.ok)throw 0;EM=j.emails||EM;draw();const d=document.getElementById('pr_emb');if(d){d.open=true;const mm=d.querySelector('#pr_emm');if(mm)mm.textContent='✔ Salvo.'}}catch(e){$('#pr_emm').textContent='⚠ Não salvou. Confira a internet e tente de novo.'}}}
+ async function apaga(k){ST.ap='';
+  try{const j=await post({t:'apagar',key:k});if(!j||!j.ok)throw new Error(j&&j.erro||'falha');LISTA=LISTA.filter(x=>x.key!==k);delete ST.msg[k];ss(CK,JSON.stringify({t:LOAD,lista:LISTA}));badge()}
+  catch(e){ST.msg['ap'+k]=/chave/.test(String(e&&e.message))?'⚠ Não apagou: o Google ainda não tem o código novo.':'⚠ Não consegui apagar agora. Confira a internet e tente de novo.'}
+  draw()}
  async function chamar(q){const r=await fetch(URL_+(URL_.indexOf('?')>0?'&':'?')+'k='+GK+'&'+q+'&t='+Date.now());return r.json()}
  async function abrir(k){const p=LISTA.find(x=>x.key===k);if(!p)return;
   const w=window.open('','_blank');if(w)w.document.write('<p style="font-family:sans-serif">Abrindo o pedido…</p>');
