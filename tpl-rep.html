@@ -1963,7 +1963,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v261';
+const NX_VER = 'v262';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3650,6 +3650,7 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v262',d:'25/11/2026',t:'Ficha do cliente mais fácil',l:[['a','Ficha do cliente: ao tocar no cliente da busca a tela vai direto para a ficha dele. Os outros resultados ficam escondidos, com o botão ← voltar aos resultados.'],['a','A lista Quem atende fica recolhida (toque para abrir). O botão do cliente na busca mostra o nome em uma linha.'],['g','Fazer pedido (gestor): agora dá para escolher qualquer cliente da lista, não só os do representante selecionado.'],['g','Fazer pedido (gestor): faixa mostrando se o pedido já foi enviado e recebido pela Metalmig; ao fechar com pedido na fila, o painel tenta enviar antes e avisa se não conseguir.']]},
   {v:'v261',d:'25/11/2026',t:'Fazer pedido sem escolher representante antes',l:[['g','Pedidos (aplicativo): o botão 🛒 Fazer pedido agora aparece também quando está em TODOS OS REPRESENTANTES; você escolhe quem é dentro dele.']]},
   {v:'v260',d:'25/11/2026',t:'Gestor faz pedido pelo representante',l:[['g','Sistema › Pedidos (aplicativo): novo botão 🛒 Fazer pedido: você escolhe o representante na hora; abre o aplicativo dele dentro do painel e o pedido segue para a lista de pedidos pelo Drive, como se ele tivesse enviado.']]},
   {v:'v259',d:'25/11/2026',t:'Nome da aba de cadastro',l:[['g','A aba de cadastro de cliente novo agora se chama Cadastrar clientes (representante e gestor), para não confundir com a aba Novos.']]},
@@ -10748,8 +10749,11 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
   if(!(idx>=0)||!rp){fr.removeAttribute('srcdoc');fr.style.display='none';msg.style.display='block';msg.textContent='Escolha acima o representante em nome de quem o pedido será feito.';return}
   const bk=typeof lcBkFor==='function'?lcBkFor(rp[0]):null;
   if(!bk||!bk.k){fr.style.display='none';msg.style.display='block';msg.textContent='Este representante ainda não está liberado na nuvem (sem chave). O pedido ficaria só neste aparelho.';return}
-  try{const h=apBuild(idx,ms);msg.style.display='none';fr.style.display='block';
-   const lig=()=>{try{const w=fr.contentWindow;if(!w||typeof w.eval!=='function')return;w.eval('drvBk=function(){return '+JSON.stringify(bk)+'}');if(typeof w.drvAgenda==='function')w.drvAgenda(1500)}catch(e){}};
+  try{const kc=String(rp[0]),orig=AP.cli[kc]||[];let h;
+   try{const own=new Set(orig.map(c=>c.c)),outros=[];Object.keys(AP.cli).forEach(k=>{if(k!==kc)(AP.cli[k]||[]).forEach(c=>{if(!own.has(c.c))outros.push(c)})});
+    AP.cli[kc]=orig.concat(outros);h=apBuild(idx,ms)}finally{AP.cli[kc]=orig}
+   msg.style.display='none';fr.style.display='block';
+   const lig=()=>{try{const w=fr.contentWindow;if(!w||typeof w.eval!=='function')return;w.eval('drvBk=function(){return '+JSON.stringify(bk)+'}');if(!w.__cxW){w.__cxW=1;w.eval("(function(){const f=window.fetch;window.fetch=function(u,o){const p=f.apply(this,arguments);try{if(o&&o.method==='POST'&&String(o.body||'').indexOf('\"t\":\"ped\"')>0){const hr=()=>new Date().toLocaleTimeString('pt-BR');p.then(r=>r.clone().json().then(j=>{window.__cxLast={ok:!!(j&&j.ok),erro:(j&&j.erro)||'',h:hr()}}).catch(()=>{window.__cxLast={ok:false,erro:'resposta inválida',h:hr()}}),e=>{window.__cxLast={ok:false,erro:String(e&&e.message||e),h:hr()}})}}catch(e){}return p}})()")}if(typeof w.drvAgenda==='function')w.drvAgenda(1500)}catch(e){}};
    fr.onload=()=>[50,800,2500,6000].forEach(t=>setTimeout(lig,t));fr.srcdoc=h;window.__cxBk=bk;
   }catch(e){fr.style.display='none';msg.style.display='block';msg.textContent='Não foi possível abrir: '+e.message}}
  function abre(){
@@ -10757,9 +10761,21 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
   fecha();
   const L=(D.reps||[]).map((r,i)=>[i,r]).filter(x=>+x[1][0]>0&&typeof lcBkFor==='function'&&lcBkFor(x[1][0])).sort((p,q)=>nome(p[1]).localeCompare(nome(q[1]),'pt'));
   const o=document.createElement('div');o.id='cx_ov';o.style.cssText='position:fixed;inset:0;z-index:2147483000;background:#fff;display:flex;flex-direction:column';
-  o.innerHTML='<div style="background:#b45f06;color:#fff;padding:8px 12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;font:700 14px Arial"><span>🛒 Pedido em nome de:</span><select id="cx_sel" style="flex:1;min-width:220px;font:15px Arial;padding:8px;border-radius:8px;border:0"><option value="">— escolha o representante —</option>'+L.map(x=>'<option value="'+x[0]+'">'+E(nome(x[1]))+' ('+x[1][0]+')</option>').join('')+'</select><button id="cx_x" style="background:#fff;color:#7a3f00;border:0;border-radius:8px;padding:8px 12px;font-weight:700;cursor:pointer">✕ Fechar</button></div><div id="cx_m" style="padding:30px;font:15px Arial;color:#555"></div><iframe id="cx_fr" allow="microphone" title="Aplicativo de pedidos" style="flex:1;border:0;width:100%;background:#fff;display:none"></iframe>';
+  o.innerHTML='<div style="background:#b45f06;color:#fff;padding:8px 12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;font:700 14px Arial"><span>🛒 Pedido em nome de:</span><select id="cx_sel" style="flex:1;min-width:220px;font:15px Arial;padding:8px;border-radius:8px;border:0"><option value="">— escolha o representante —</option>'+L.map(x=>'<option value="'+x[0]+'">'+E(nome(x[1]))+' ('+x[1][0]+')</option>').join('')+'</select><span id="cx_st" style="flex-basis:100%;font:600 13px Arial;background:#fff3e0;color:#7a3f00;border-radius:8px;padding:6px 10px;display:none"></span><button id="cx_x" style="background:#fff;color:#7a3f00;border:0;border-radius:8px;padding:8px 12px;font-weight:700;cursor:pointer">✕ Fechar</button></div><div id="cx_m" style="padding:30px;font:15px Arial;color:#555"></div><iframe id="cx_fr" allow="microphone" title="Aplicativo de pedidos" style="flex:1;border:0;width:100%;background:#fff;display:none"></iframe>';
   document.body.appendChild(o);document.documentElement.style.overflow='hidden';
-  o.querySelector('#cx_x').onclick=fecha;
+  const st=o.querySelector('#cx_st'),fr=o.querySelector('#cx_fr');
+  const lerSt=()=>{try{const w=fr.contentWindow;if(!w||typeof w.eval!=='function')return null;return JSON.parse(w.eval("JSON.stringify({q:store.get('drvq',[]).length,l:window.__cxLast||null})"))}catch(e){return null}};
+  const pinta=()=>{if(!document.getElementById('cx_ov'))return;const r=lerSt();if(!r||fr.style.display==='none'){st.style.display='none';return}
+   let t='';if(r.q>0)t='⏳ Pedido ainda não enviado para a Metalmig ('+r.q+' na fila)'+(r.l&&!r.l.ok?' · última tentativa '+r.l.h+' falhou: '+(r.l.erro||'sem resposta'):'');else if(r.l&&r.l.ok)t='✅ Pedido enviado e recebido pela Metalmig às '+r.l.h;
+   st.textContent=t;st.style.display=t?'block':'none';st.style.background=r.q>0?'#ffe0b2':'#dcedc8';st.style.color=r.q>0?'#7a3f00':'#1b5e20'};
+  const tm=setInterval(()=>{if(!document.getElementById('cx_ov')){clearInterval(tm);return}pinta()},1000);
+  let forca=false;
+  o.querySelector('#cx_x').onclick=()=>{const r=lerSt();if(!r||r.q===0||forca){fecha();return}
+   try{fr.contentWindow.drvEnviar()}catch(e){}
+   st.style.display='block';st.style.background='#ffe0b2';st.textContent='⏳ Enviando o pedido… aguarde (até 25 segundos)';let n=0;
+   const w=setInterval(()=>{n++;const x=lerSt();if(!document.getElementById('cx_ov')){clearInterval(w);return}
+    if(!x||x.q===0){clearInterval(w);fecha();return}
+    if(n>=25){clearInterval(w);forca=true;st.textContent='⚠️ O pedido NÃO foi enviado'+(x.l&&x.l.erro?' ('+x.l.erro+')':'')+'. Se fechar agora ele fica só neste aparelho. Toque em Fechar de novo para sair mesmo assim.'}},1000)};
   const sel=o.querySelector('#cx_sel');
   sel.onchange=()=>carrega(o,sel.value===''?-1:+sel.value,ms);
   carrega(o,-1,ms)}
@@ -10769,6 +10785,31 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
  new MutationObserver(()=>poe()).observe(document.body,{childList:true,subtree:true});poe();
  window.lcCXAbre=abre;
 }catch(e){console.error('lcCX',e)}})();
+
+// ===== v262 · Ficha do cliente: ao escolher um cliente a tela vai até a ficha, esconde a lista da busca (com "voltar aos resultados") e recolhe "Quem atende"
+(function(){try{
+ if(window.__lcCY||typeof fichaShow!=='function')return;window.__lcCY=1;
+ const css=document.createElement('style');css.textContent='.cy-back{display:block;margin:10px 0 8px;padding:9px 14px;border:1px solid #1f4e78;background:#fff;color:#1f4e78;border-radius:8px;font:700 14px Arial;cursor:pointer}.cy-sum{cursor:pointer;font-weight:700;color:#1f4e78;padding:2px 0}';document.head.appendChild(css);
+ const fs0=fichaShow;
+ fichaShow=function(ci){
+  const r=fs0.apply(this,arguments);
+  try{
+   const det=document.getElementById('f_det'),res=document.getElementById('f_res');if(!det)return r;
+   if(res)res.style.display='none';
+   document.querySelectorAll('.cy-back').forEach(x=>x.remove());
+   {const b=document.createElement('button');b.type='button';b.className='cy-back';b.textContent='← voltar aos resultados';
+    b.onclick=()=>{b.remove();if(res)res.style.display='';det.innerHTML='';try{window.scrollTo(0,Math.max(0,(res||det).getBoundingClientRect().top+window.scrollY-130))}catch(e){}};det.parentNode.insertBefore(b,det)}
+   // "Quem atende" recolhido
+   const cand=[...det.querySelectorAll('div,p,span')].filter(e=>/^\s*Quem atende:/.test(e.textContent)&&e.textContent.length<4000);
+   const q=cand[cand.length-1];
+   if(q&&!q.closest('details')){const n=(q.textContent.match(/ · /g)||[]).length+1;const d=document.createElement('details');d.innerHTML='<summary class="cy-sum">Quem atende na região ('+n+' representantes)</summary>';const c=document.createElement('div');c.innerHTML=q.innerHTML;d.appendChild(c);q.innerHTML='';q.appendChild(d)}
+   const ir=()=>{try{const h=[...document.querySelectorAll('header.top,.vence,#lctop')].reduce((m,e)=>Math.max(m,e.getBoundingClientRect().bottom),0);const bk=document.querySelector('.cy-back');const alvo=bk||det;window.scrollTo(0,Math.max(0,alvo.getBoundingClientRect().top+window.scrollY-h-8))}catch(e){}};[30,300,900,2200].forEach(t=>setTimeout(ir,t));
+  }catch(e){console.error('lcCY',e)}
+  return r};
+ // botão do cliente na busca: nome em uma linha só
+ const fixa=()=>{document.querySelectorAll('button.lcbtn').forEach(b=>{if(b.dataset.cy||!/^\s*⚡/.test(b.textContent))return;b.dataset.cy=1;b.style.whiteSpace='nowrap';b.style.maxWidth='100%';b.style.overflow='hidden';b.style.textOverflow='ellipsis'})};
+ new MutationObserver(fixa).observe(document.body,{childList:true,subtree:true});fixa();
+}catch(e){console.error('lcCY',e)}})();
 
 
 </script></body></html>
