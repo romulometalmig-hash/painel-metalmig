@@ -1963,7 +1963,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v260';
+const NX_VER = 'v261';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3650,6 +3650,7 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v261',d:'25/11/2026',t:'Fazer pedido sem escolher representante antes',l:[['g','Pedidos (aplicativo): o botão 🛒 Fazer pedido agora aparece também quando está em TODOS OS REPRESENTANTES; você escolhe quem é dentro dele.']]},
   {v:'v260',d:'25/11/2026',t:'Gestor faz pedido pelo representante',l:[['g','Sistema › Pedidos (aplicativo): novo botão 🛒 Fazer pedido: você escolhe o representante na hora; abre o aplicativo dele dentro do painel e o pedido segue para a lista de pedidos pelo Drive, como se ele tivesse enviado.']]},
   {v:'v259',d:'25/11/2026',t:'Nome da aba de cadastro',l:[['g','A aba de cadastro de cliente novo agora se chama Cadastrar clientes (representante e gestor), para não confundir com a aba Novos.']]},
   {v:'v258',d:'25/11/2026',t:'Cliente novo fora do pedido',l:[['g','Representante: nova opção Clientes › ➕ Cliente novo (CNPJ/CPF com busca na Receita, telefones com máscara, e-mail, Instagram, marcas). Entra na carteira dele e chega a você mesmo sem pedido.'],['g','Gestor: nova tela 🆕 Clientes novos dos representantes, com contador e Marcar como visto.']]},
@@ -10762,7 +10763,9 @@ body.lc-ldx #v2out{opacity:.45;transition:opacity .15s}
   const sel=o.querySelector('#cx_sel');
   sel.onchange=()=>carrega(o,sel.value===''?-1:+sel.value,ms);
   carrega(o,-1,ms)}
- function poe(){const b=document.getElementById('p_open');if(!b||document.getElementById('p_fped'))return;const n=document.createElement('button');n.id='p_fped';n.type='button';n.textContent='🛒 Fazer pedido (escolher o representante)';n.style.cssText='background:#b45f06;color:#fff;font-weight:bold;padding:8px 14px;margin-left:6px';n.onclick=abre;b.insertAdjacentElement('afterend',n)}
+ function mk(){const n=document.createElement('button');n.id='p_fped';n.type='button';n.textContent='🛒 Fazer pedido (escolher o representante)';n.style.cssText='background:#b45f06;color:#fff;font-weight:bold;padding:10px 14px;margin:8px 0 0 0;display:block;border:0;border-radius:8px;font-size:15px';n.onclick=abre;return n}
+ function poe(){if(document.getElementById('p_fped'))return;const b=document.getElementById('p_open');if(b){const n=mk();n.style.display='inline-block';n.style.marginLeft='6px';n.style.marginTop='0';b.insertAdjacentElement('afterend',n);return}
+  const out=document.getElementById('v2out')||document.getElementById('out');if(!out||typeof VIEW==='undefined'||VIEW!=='pedidos')return;const ac=[...out.querySelectorAll('.act')].find(x=>/Selecione um representante para gerar o aplicativo/.test(x.textContent));if(ac)ac.appendChild(mk())}
  new MutationObserver(()=>poe()).observe(document.body,{childList:true,subtree:true});poe();
  window.lcCXAbre=abre;
 }catch(e){console.error('lcCX',e)}})();
