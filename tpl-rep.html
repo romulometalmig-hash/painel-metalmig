@@ -1963,7 +1963,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v266';
+const NX_VER = 'v267';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3674,6 +3674,7 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v267',d:'26/11/2026',t:'Status dos pedidos: rascunho × enviar',l:[['g','Aplicativo de pedidos: no fim do pedido agora há dois botões. “💾 Salvar rascunho” guarda só no celular (não vai para a fábrica) e “📤 Enviar para a fábrica” pede confirmação e envia.'],['g','Pedido enviado fica travado: não dá para alterar nem apagar (o Google também recusa). Rascunho também não tem botão de apagar.'],['g','Lista “Lançados” com o status de cada pedido: ✏️ Rascunho (vermelho), 🔒 Enviado (ainda não confirmado pela fábrica) e ✔ Digitado (confirmado pela fábrica), com filtros no alto. Rascunho não conta como venda.'],['g','Sistema › Pedidos recebidos agora abre em “Todos”, para nenhum pedido ficar escondido.']]},
   {v:'v266',d:'26/11/2026',t:'Apagar pedido de teste',l:[['g','Sistema › Pedidos recebidos: novo botão “🗑 Apagar” em cada pedido, com confirmação. O pedido sai da sua lista, da página da Débora e da pasta do Google (o PDF vai para a lixeira do Drive, onde fica 30 dias).']]},
   {v:'v265',d:'26/11/2026',t:'Retaguarda: pedido digitado avisa o representante',l:[['g','Sistema › Pedidos recebidos: ao marcar “✔ Já digitei na fábrica” você informa o nº do pedido no ERP e o painel avisa o representante e, se você digitar, também o cliente, por e-mail (do seu Gmail, com cópia para você). O e-mail do representante e o do cliente podem ser digitados na hora. Novo bloco “📧 E-mails dos representantes”.'],['g','Nova página própria da Débora (retaguarda), com senha: só mostra os pedidos recebidos, com filtro por representante. O que ela marca aparece no seu painel.'],['a','Lançados: quando a Metalmig digita o pedido, o cartão mostra “✔ Digitado na Metalmig · nº …”.']]},
   {v:'v264',d:'26/11/2026',t:'Fazer pedido: envio para qualquer representante',l:[['g','Corrigido: pedido feito em Fazer pedido para representante que ainda não estava liberado na nuvem ficava parado na fila (“⏳ ainda não enviado”). Agora o painel envia mesmo assim, e cada pedido só sobe com o código do representante para o qual foi feito.']]},
@@ -6764,7 +6765,7 @@ window.lcRelPos=function(w,S){
  const URLK='metalmig_bkp_pedurl',CK='metalmig_bkp_pedcache';
  const brl=v=>'R$ '+(+v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
  const dBR=iso=>{if(!iso)return'';const d=new Date(iso);if(isNaN(d))return'';return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})};
- let URL_=(gs(URLK)||'').trim(),LISTA=[],LOAD=null,ERR='',ST={ap:'',rep:'',st:'novos',per:'7',q:'',dk:'',msg:{}},BUSY=false,TM=null,EM={},CFGJ=null;
+ let URL_=(gs(URLK)||'').trim(),LISTA=[],LOAD=null,ERR='',ST={ap:'',rep:'',st:'todos',per:'7',q:'',dk:'',msg:{}},BUSY=false,TM=null,EM={},CFGJ=null;
  try{LISTA=(JSON.parse(gs(CK)||'null')||{}).lista||[]}catch(e){}
  async function cfg(){ // endereço vem do drive.json do site (ou do campo manual)
   try{const r=await fetch(new URL('drive.json?t='+Date.now(),location.href).href,{cache:'no-store'});const j=await r.json();if(j&&j.u){URL_=j.u;CFGJ=j;return j}}catch(e){}
@@ -10891,6 +10892,71 @@ setTimeout(dgSync,6000); setInterval(()=>{ if(!document.hidden) dgSync(); },1200
  const fix=h=>{h=String(h);if(h.indexOf(ANC)<0||h.indexOf('function dgSync')>=0)return h;const i=h.indexOf(ANC);return h.slice(0,i)+COD+h.slice(i)};
  if(typeof apBuild==='function'&&!apBuild.__da){const ab=apBuild;apBuild=function(){return fix(ab.apply(this,arguments))};apBuild.__da=1}
 }catch(e){console.error('lcDA',e)}})();
+
+// ===== v267 · Pedido do representante: RASCUNHO × ENVIAR PARA A FÁBRICA, trava depois de enviado, lista com status e filtros =====
+// Regras (pedido do gestor, 26/11/2026):
+//  - Rascunho: fica só no celular, pode alterar, NÃO vai para a fábrica nem para o Google.
+//  - Enviar para a fábrica (com confirmação): vai para o Google e TRAVA (sem editar, sem excluir).
+//  - Pedidos antigos (sem marca de rascunho) contam como enviados: também travados.
+//  - Ninguém exclui pedido no aplicativo (nem rascunho).
+(function(){try{if(window.__lcDB)return;window.__lcDB=1;
+ const R=(h,a,b,n)=>{n=n||1;if(h.split(a).length!==n+1){console.error('lcDB anchor',a.slice(0,60));return h}return h.split(a).join(b)};
+ const BTN=":`<button class=\"btn pri big\" id=\"salva\" ${ok?'':'disabled'}>${cur.id?'Salvar alterações':'Salvar pedido'}</button>`}";
+ const BTN2=":`<div class=\"rascb\" style=\"display:flex;flex-direction:column;gap:8px;flex:1\"><button class=\"btn big\" id=\"salvaR\" ${ok?'':'disabled'} style=\"display:block;text-align:center;border:2px solid #1F4E78;color:#1F4E78;background:#fff;line-height:1.25\"><b style=\"display:block;font-size:16px\">💾 Salvar rascunho</b><small style=\"display:block;font-weight:400;font-size:12.5px;white-space:normal\">Fica no seu celular e <u>não chega para a fábrica</u>. A Metalmig consegue ver o rascunho, mas só você envia.</small></button><button class=\"btn pri big\" id=\"salvaE\" ${ok?'':'disabled'} style=\"display:block;text-align:center;line-height:1.25\"><b style=\"display:block;font-size:16px\">📤 Enviar para a fábrica</b><small style=\"display:block;font-weight:400;font-size:12.5px;white-space:normal\">Depois de enviado, não dá para alterar nem apagar.</small></button></div>`}";
+ const HND="if($('#salva')) $('#salva').onclick=()=>salvar(false);";
+ const HND2="if($('#salvaR')) $('#salvaR').onclick=()=>{ window.__modoSalva='r'; salvar(false); };\n  if($('#salvaE')) $('#salvaE').onclick=()=>{ lcConfEnviar(()=>{ window.__modoSalva='e'; salvar(false); }); };";
+ const OKS="const okSave = store.set('pedidos', pedidos);";
+ const OKS2="const __m=window.__modoSalva||'e'; { const _id=cur.id||(pedidos[0]&&pedidos[0].id), _p=pedidos.find(x=>x.id===_id); if(_p){ if(__m==='r'){ _p.rasc=1; delete _p.trav; } else { delete _p.rasc; _p.trav=1; } } }\n  const okSave = store.set('pedidos', pedidos);";
+ const FILA="try{ drvFila(cur.id||(pedidos[0]&&pedidos[0].id)); }catch(e){}";
+ const FILA2="if(__m!=='r'){ try{ drvFila(cur.id||(pedidos[0]&&pedidos[0].id)); }catch(e){} } window.__modoSalva=null;";
+ const TOA="toast(okSave?'Pedido salvo. Agora envie por WhatsApp, PDF ou Excel.':";
+ const TOA2="toast(okSave?(__m==='r'?'Rascunho salvo. Ele ainda NÃO foi para a fábrica.':'Pedido enviado para a fábrica ✓ Não dá mais para alterar nem apagar.'):";
+ const PEND="return (!p.env||!!p.alt)&&!rec; }";
+ const PEND2="return !p.rasc&&(!p.env||!!p.alt)&&!rec; }";
+ const TRAV="if(!jr||!jr.ok) throw new Error(jr&&jr.erro||'falha');";
+ const TRAV2="if(jr&&jr.erro==='travado'){ q=store.get('drvq',[]).filter(x=>x!==id); store.set('drvq',q); continue; }\n        if(!jr||!jr.ok) throw new Error(jr&&jr.erro||'falha');";
+ const ANC="async function exportarDados(){";
+ const COD=`/* v267 · rascunho × enviar, trava, status e filtros */
+function lcConfEnviar(cb,ped){ let nm='',vl=''; try{ const q=ped||cur; nm=(CLI.get(q.cli)||{}).n||''; vl=brl(calc(q).geral); }catch(e){} try{ const o=document.createElement('div'); o.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:99999;display:flex;align-items:center;justify-content:center;padding:18px';
+  o.innerHTML='<div style="background:#fff;border-radius:14px;padding:18px;max-width:380px;width:100%;box-shadow:0 8px 30px rgba(0,0,0,.35);color:#14233f"><b style="font-size:18px">Enviar o pedido para a fábrica?</b><p style="font-size:14px;margin:10px 0">'+esc(nm)+(vl?' · <b>'+vl+'</b>':'')+'<br>Depois de enviado <b>não dá para alterar nem apagar</b>. Se estiver errado, fale com a Metalmig.</p><div style="display:flex;gap:8px"><button type="button" id="cfV" style="flex:1;padding:12px;border-radius:10px;border:0;background:#e8edf5;font-weight:700">Voltar e conferir</button><button type="button" id="cfS" style="flex:1;padding:12px;border-radius:10px;border:0;background:#2E7D32;color:#fff;font-weight:700">Sim, enviar</button></div></div>';
+  document.body.appendChild(o); o.querySelector('#cfV').onclick=()=>o.remove(); o.querySelector('#cfS').onclick=()=>{ o.remove(); cb(); }; }catch(e){ try{ if(confirm('Enviar o pedido para a fábrica? Depois de enviado não dá para alterar nem apagar.')) cb(); }catch(x){} } }
+function lcPedSt(p){ return p.rasc?'r':(p.dg?'d':'e'); }
+window.__dbFil=window.__dbFil||'todos';
+function lcDbMarca(){ try{ const mm=document.getElementById('main'); if(!mm) return; const cards=[...mm.querySelectorAll('.ped[data-ped]')]; if(!cards.length){ window.__dbFil='todos'; return; }
+  const sec=cards[0].closest('section')||mm; const n={r:0,e:0,d:0}; const L=cards.map(el=>({el,p:pedidos.find(x=>x.id===+el.dataset.ped)})).filter(x=>x.p);
+  L.forEach(({p})=>n[lcPedSt(p)]++);
+  L.forEach(({el,p})=>{ const st=lcPedSt(p); el.dataset.dbst=st;
+   let t=el.querySelector('.dbst'); const txt=st==='r'?['✏️ RASCUNHO · NÃO ENVIADO','background:#b00020;color:#fff']:st==='d'?['✔ Digitado','background:#e3f3e6;color:#2e7d32']:['🔒 Enviado','background:#fff1d6;color:#8a5a00'];
+   const sub=st==='r'?'Não chegou para a fábrica.':st==='d'?'(confirmado pela fábrica)':'(ainda não confirmado recebimento pela fábrica)';
+   if(!t){ t=document.createElement('div'); t.className='dbst'; t.style.cssText='margin:6px 0 2px'; const l=el.querySelector('.l'); if(l) l.insertAdjacentElement('afterend',t); else el.insertBefore(t,el.firstChild); }
+   const h='<span style="display:inline-block;font-size:12px;font-weight:700;padding:2px 9px;border-radius:9px;'+txt[1]+'">'+txt[0]+'</span> <span style="font-size:12.5px;'+(st==='r'?'color:#b00020;font-weight:600':'color:#5a6b85')+'">'+sub+'</span>';
+   if(t.innerHTML!==h) t.innerHTML=h;
+   el.style.borderLeft=st==='r'?'4px solid #b00020':st==='d'?'4px solid #2E7D32':'4px solid #e0a400';
+   el.querySelectorAll('[data-a="del"]').forEach(b=>b.remove());
+   if(st!=='r'){ el.querySelectorAll('[data-a="edit"]').forEach(b=>b.remove()); }
+   else { ['pdfwa','wa','pdf','xls'].forEach(a=>el.querySelectorAll('[data-a="'+a+'"]').forEach(b=>b.remove())); el.querySelectorAll('.envst,.drvst,.dgst').forEach(b=>{ if(b.style.display!=='none') b.style.display='none'; });
+    const ed=el.querySelector('[data-a="edit"]'); if(ed&&ed.textContent!=='✏️ Alterar o pedido') ed.textContent='✏️ Alterar o pedido';
+    if(!el.querySelector('[data-a="dbenv"]')){ const ac=el.querySelector('.acts'); if(ac){ const b=document.createElement('button'); b.className='btn sm pri'; b.dataset.a='dbenv'; b.type='button'; b.textContent='📤 Enviar para a fábrica'; b.onclick=()=>{ try{ lcConfEnviar(()=>{ const old=cur; cur=JSON.parse(JSON.stringify(p)); window.__modoSalva='e'; try{ salvar(true,true); }finally{ cur=old; try{ salvarRascunho(); }catch(e){} } },p); }catch(e){} }; ac.insertBefore(b,ac.firstChild); } } }
+   el.style.display=(window.__dbFil==='todos'||window.__dbFil===st)?'':'none'; });
+  let bar=mm.querySelector('#dbfil'); const defs=[['todos','Todos ('+L.length+')',''],['r','✏️ Rascunho ('+n.r+')','color:#b00020'],['e','🔒 Enviado ('+n.e+')',''],['d','✔ Digitado ('+n.d+')','']];
+  const bh='<div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0">'+defs.map(d=>'<button type="button" data-f="'+d[0]+'" style="padding:6px 12px;border-radius:16px;border:0;font-weight:600;font-size:13px;'+(window.__dbFil===d[0]?(d[0]==='r'?'background:#b00020;color:#fff':'background:#1f3a6e;color:#fff'):'background:#e3e8f0;'+d[2])+'">'+d[1]+'</button>').join('')+'</div>'+(n.r?'<div style="color:#b00020;font-weight:700;font-size:13px;margin:0 0 8px">✏️ '+n.r+' rascunho(s) ainda não enviado(s) para a fábrica</div>':'');
+  if(!bar){ bar=document.createElement('div'); bar.id='dbfil'; const first=cards[0]; first.parentNode.insertBefore(bar,first); }
+  if(bar.dataset.h!==bh){ bar.dataset.h=bh; bar.innerHTML=bh; bar.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{ window.__dbFil=b.dataset.f; lcDbMarca(); }); }
+ }catch(e){} }
+try{ const mo=new MutationObserver(()=>{ clearTimeout(window.__dbT); window.__dbT=setTimeout(lcDbMarca,150); }); const mm=document.getElementById('main'); if(mm) mo.observe(mm,{childList:true,subtree:true}); }catch(e){}
+setInterval(()=>{ if(!document.hidden) lcDbMarca(); },500);
+`;
+ const fix=h=>{h=String(h);if(h.indexOf('function lcConfEnviar')>=0||h.indexOf(ANC)<0)return h;
+  h=R(h,BTN,BTN2);h=R(h,HND,HND2);h=R(h,OKS,OKS2);h=R(h,FILA,FILA2);h=R(h,TOA,TOA2);if(h.indexOf(PEND)>=0)h=R(h,PEND,PEND2);else if(h.indexOf('!p.env||p.alt')>=0)h=h.split('!p.env||p.alt').join('!p.rasc&&(!p.env||p.alt)');else console.error('lcDB anchor pendente');
+  h=R(h,'return pedidos.filter(p=>p.data.slice(0,7)===ym).reduce((s,p)=>s+calc(p).liq,0);','return pedidos.filter(p=>p.data.slice(0,7)===ym&&!p.rasc).reduce((s,p)=>s+calc(p).liq,0);');
+  h=R(h,'comPedido=new Set(pedidos.filter(p=>p.data.slice(0,7)===ym).map(p=>String(p.cli)))','comPedido=new Set(pedidos.filter(p=>p.data.slice(0,7)===ym&&!p.rasc).map(p=>String(p.cli)))',3);
+  h=R(h,'const l=pedidos.filter(p=>p.data.slice(0,7)===mes && (!ate||+p.data.slice(8,10)<=ate));','const l=pedidos.filter(p=>!p.rasc && p.data.slice(0,7)===mes && (!ate||+p.data.slice(8,10)<=ate));');
+  h=R(h,'n = pedidos.filter(p=>p.data.slice(0,7)===ym).length;','n = pedidos.filter(p=>p.data.slice(0,7)===ym&&!p.rasc).length;');
+  h=R(h,'const pedHoje=pedidos.filter(p=>p.data===hoje).length','const pedHoje=pedidos.filter(p=>p.data===hoje&&!p.rasc).length');
+  h=R(h,'lst=pedidos.filter(p=>p.data.slice(0,7)===ym).slice().reverse();','lst=pedidos.filter(p=>p.data.slice(0,7)===ym&&!p.rasc).slice().reverse();',2);h=R(h,TRAV,TRAV2);
+  const i=h.indexOf(ANC);return h.slice(0,i)+COD+h.slice(i)};
+ if(typeof apBuild==='function'&&!apBuild.__db){const ab=apBuild;apBuild=function(){return fix(ab.apply(this,arguments))};apBuild.__db=1}
+}catch(e){console.error('lcDB',e)}})();
 
 
 </script></body></html>

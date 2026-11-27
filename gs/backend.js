@@ -1,6 +1,6 @@
 // MM-BACKEND
 // Caixa de correio Metalmig - cole em script.google.com e implante como Aplicativo da Web
-const VERSAO='v266';
+const VERSAO='v267';
 const PASTA='Backups Metalmig';
 const PASTA_PED='Pedidos recebidos';   // pedidos dos representantes (PDF + dados)
 
@@ -248,6 +248,7 @@ function doPost(e){
       let i=-1;for(let j=0;j<l.length;j++)if(l[j].key===chave){i=j;break}
       const ant=i>=0?l[i]:null;
       if(ant&&(+ant.ver||0)>=(+b.ver||0))return resp_({ok:true,repetido:true});
+      if(ant)return resp_({ok:false,erro:'travado'});   // v267: pedido já enviado não muda mais (nenhuma nova versão entra)
       const nome=limpaNome_(b.repNome).slice(0,18)+'_'+limpaNome_(b.num)+'_'+limpaNome_(b.cliNome)+(b.rev?'_rev'+b.rev:'');
       const pdf=p.createFile(Utilities.newBlob(Utilities.base64Decode(b.pdf),'application/pdf',nome+'.pdf'));
       const js=p.createFile(nome+'.metalmig.txt',JSON.stringify({metalmig:1,tipo:'pedidos',rep:+cod,repNome:b.repNome,mes:b.mes,gerado:b.gerado,pedidos:[d]}),MimeType.PLAIN_TEXT);
