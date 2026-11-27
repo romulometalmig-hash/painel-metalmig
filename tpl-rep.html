@@ -1963,7 +1963,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v267';
+const NX_VER = 'v268';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3674,6 +3674,7 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
  const NOVS=[
+  {v:'v268',d:'26/11/2026',t:'Meus pedidos sempre à vista',l:[['g','Aplicativo de pedidos: no alto da tela ficam sempre dois botões, “🛒 Novo pedido” e “📋 Meus pedidos”. Antes, no computador, não havia como abrir a lista de pedidos lançados.'],['g','Na lista, abas separadas: Todos, ✏️ Rascunhos, 🔒 Enviados e ✔ Digitados. Os digitados ficam na própria aba, para consultar fácil. Nada foi tirado, só separado.']]},
   {v:'v267',d:'26/11/2026',t:'Status dos pedidos: rascunho × enviar',l:[['g','Aplicativo de pedidos: no fim do pedido agora há dois botões. “💾 Salvar rascunho” guarda só no celular (não vai para a fábrica) e “📤 Enviar para a fábrica” pede confirmação e envia.'],['g','Pedido enviado fica travado: não dá para alterar nem apagar (o Google também recusa). Rascunho também não tem botão de apagar.'],['g','Lista “Lançados” com o status de cada pedido: ✏️ Rascunho (vermelho), 🔒 Enviado (ainda não confirmado pela fábrica) e ✔ Digitado (confirmado pela fábrica), com filtros no alto. Rascunho não conta como venda.'],['g','Sistema › Pedidos recebidos agora abre em “Todos”, para nenhum pedido ficar escondido.']]},
   {v:'v266',d:'26/11/2026',t:'Apagar pedido de teste',l:[['g','Sistema › Pedidos recebidos: novo botão “🗑 Apagar” em cada pedido, com confirmação. O pedido sai da sua lista, da página da Débora e da pasta do Google (o PDF vai para a lixeira do Drive, onde fica 30 dias).']]},
   {v:'v265',d:'26/11/2026',t:'Retaguarda: pedido digitado avisa o representante',l:[['g','Sistema › Pedidos recebidos: ao marcar “✔ Já digitei na fábrica” você informa o nº do pedido no ERP e o painel avisa o representante e, se você digitar, também o cliente, por e-mail (do seu Gmail, com cópia para você). O e-mail do representante e o do cliente podem ser digitados na hora. Novo bloco “📧 E-mails dos representantes”.'],['g','Nova página própria da Débora (retaguarda), com senha: só mostra os pedidos recebidos, com filtro por representante. O que ela marca aparece no seu painel.'],['a','Lançados: quando a Metalmig digita o pedido, o cartão mostra “✔ Digitado na Metalmig · nº …”.']]},
@@ -10922,7 +10923,11 @@ function lcConfEnviar(cb,ped){ let nm='',vl=''; try{ const q=ped||cur; nm=(CLI.g
   document.body.appendChild(o); o.querySelector('#cfV').onclick=()=>o.remove(); o.querySelector('#cfS').onclick=()=>{ o.remove(); cb(); }; }catch(e){ try{ if(confirm('Enviar o pedido para a fábrica? Depois de enviado não dá para alterar nem apagar.')) cb(); }catch(x){} } }
 function lcPedSt(p){ return p.rasc?'r':(p.dg?'d':'e'); }
 window.__dbFil=window.__dbFil||'todos';
-function lcDbMarca(){ try{ const mm=document.getElementById('main'); if(!mm) return; const cards=[...mm.querySelectorAll('.ped[data-ped]')]; if(!cards.length){ window.__dbFil='todos'; return; }
+function lcDbTop(){ try{ let t=document.getElementById('dbtop'); const mn=document.querySelector('main'); if(!mn) return; if(tab!=='novo'&&tab!=='mes'){ if(t) t.remove(); return; }
+  const nn=pedidos.length; const pend=pedidos.filter(p=>p.rasc).length; const h='<button type="button" data-t="novo" style="flex:1;padding:12px 10px;border:0;border-radius:10px;font-weight:700;font-size:15px;'+(tab==='novo'?'background:#1f4e79;color:#fff':'background:#e3e8f0;color:#1f4e79')+'">🛒 Novo pedido</button><button type="button" data-t="mes" style="flex:1;padding:12px 10px;border:0;border-radius:10px;font-weight:700;font-size:15px;'+(tab==='mes'?'background:#1f4e79;color:#fff':'background:#e3e8f0;color:#1f4e79')+'">📋 Meus pedidos ('+nn+')'+(pend?' <span style="color:'+(tab==='mes'?'#ffb4b4':'#b00020')+'">· '+pend+' rascunho'+(pend>1?'s':'')+'</span>':'')+'</button>';
+  if(!t){ t=document.createElement('div'); t.id='dbtop'; t.style.cssText='display:flex;gap:8px;max-width:960px;margin:8px auto 0;padding:0 10px;position:sticky;top:0;z-index:6'; mn.parentNode.insertBefore(t,mn); }
+  if(t.dataset.h!==h){ t.dataset.h=h; t.innerHTML=h; t.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{ tab=b.dataset.t; render(); try{ window.scrollTo(0,0); }catch(e){} }); } }catch(e){} }
+function lcDbMarca(){ try{ lcDbTop(); }catch(e){} try{ const mm=document.getElementById('main'); if(!mm) return; const cards=[...mm.querySelectorAll('.ped[data-ped]')]; if(!cards.length){ window.__dbFil='todos'; return; }
   const sec=cards[0].closest('section')||mm; const n={r:0,e:0,d:0}; const L=cards.map(el=>({el,p:pedidos.find(x=>x.id===+el.dataset.ped)})).filter(x=>x.p);
   L.forEach(({p})=>n[lcPedSt(p)]++);
   L.forEach(({el,p})=>{ const st=lcPedSt(p); el.dataset.dbst=st;
@@ -10938,7 +10943,7 @@ function lcDbMarca(){ try{ const mm=document.getElementById('main'); if(!mm) ret
     const ed=el.querySelector('[data-a="edit"]'); if(ed&&ed.textContent!=='✏️ Alterar o pedido') ed.textContent='✏️ Alterar o pedido';
     if(!el.querySelector('[data-a="dbenv"]')){ const ac=el.querySelector('.acts'); if(ac){ const b=document.createElement('button'); b.className='btn sm pri'; b.dataset.a='dbenv'; b.type='button'; b.textContent='📤 Enviar para a fábrica'; b.onclick=()=>{ try{ lcConfEnviar(()=>{ const old=cur; cur=JSON.parse(JSON.stringify(p)); window.__modoSalva='e'; try{ salvar(true,true); }finally{ cur=old; try{ salvarRascunho(); }catch(e){} } },p); }catch(e){} }; ac.insertBefore(b,ac.firstChild); } } }
    el.style.display=(window.__dbFil==='todos'||window.__dbFil===st)?'':'none'; });
-  let bar=mm.querySelector('#dbfil'); const defs=[['todos','Todos ('+L.length+')',''],['r','✏️ Rascunho ('+n.r+')','color:#b00020'],['e','🔒 Enviado ('+n.e+')',''],['d','✔ Digitado ('+n.d+')','']];
+  let bar=mm.querySelector('#dbfil'); const defs=[['todos','Todos ('+L.length+')',''],['r','✏️ Rascunhos ('+n.r+')','color:#b00020'],['e','🔒 Enviados ('+n.e+')',''],['d','✔ Digitados ('+n.d+')','']];
   const bh='<div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0">'+defs.map(d=>'<button type="button" data-f="'+d[0]+'" style="padding:6px 12px;border-radius:16px;border:0;font-weight:600;font-size:13px;'+(window.__dbFil===d[0]?(d[0]==='r'?'background:#b00020;color:#fff':'background:#1f3a6e;color:#fff'):'background:#e3e8f0;'+d[2])+'">'+d[1]+'</button>').join('')+'</div>'+(n.r?'<div style="color:#b00020;font-weight:700;font-size:13px;margin:0 0 8px">✏️ '+n.r+' rascunho(s) ainda não enviado(s) para a fábrica</div>':'');
   if(!bar){ bar=document.createElement('div'); bar.id='dbfil'; const first=cards[0]; first.parentNode.insertBefore(bar,first); }
   if(bar.dataset.h!==bh){ bar.dataset.h=bh; bar.innerHTML=bh; bar.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{ window.__dbFil=b.dataset.f; lcDbMarca(); }); }
