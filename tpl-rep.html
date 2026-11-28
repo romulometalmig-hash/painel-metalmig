@@ -1963,7 +1963,7 @@ function renderRel(){
  const rp=$('#rl_rp');if(rp)rp.onchange=e=>{RXF.rep=+e.target.value;renderRel()}}
 
 // ===== NVX: Hoje, Orçamentos/perdas, Ocorrências, Concorrência, Queda de valor, Prospectado, menu agrupado, busca única =====
-const NX_VER = 'v268';
+const NX_VER = 'v269';
 const nxLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}};
 const nxSV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){bigMsg('Não consegui guardar: a memória do navegador está cheia (tente fotos menores).','#B71C1C');return false}};
 const nxK=n=>'metalmig_'+n+'_v1_'+(D.rm?'r':'g');
@@ -3673,7 +3673,7 @@ body.pedfull #lctop,body.pedfull #lcnav,body.pedfull #lctp{display:none!importan
  if(window.__lcC)return;window.__lcC=1;
  const G=!D.rm;
  const E=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
- const NOVS=[
+ const NOVS=[{v:'v269',d:'28/11/2026',t:'Cartão novo do candidato',l:[['g','Candidatos: cartão novo e mais padronizado. Faixa com nota, nome, “Mora em” e data; seis bolinhas sempre iguais (clientes ativos, anos como representante, idade atual com data de nascimento, lojas CNAE na mesorregião, clientes nossos na cidade e na mesorregião), com “sem informação” quando faltar dado e uma setinha para recolher.'],['g','Novos blocos: Equipe, vagas da região em barra, Cidade com os representantes e a contagem de clientes de cada um, Produto que chamou a atenção, Clientes que ele citou, e uma opinião sugerida (só sua) sobre contratar ou não.'],['g','No fim do cartão: Situação e cinco botões iguais (Ficha, Em análise, Aprovar, Reprovar, Reserva), telefone para copiar e Histórico. Saiu o “Mover para…”.']]},
   {v:'v268',d:'26/11/2026',t:'Meus pedidos sempre à vista',l:[['g','Aplicativo de pedidos: no alto da tela ficam sempre dois botões, “🛒 Novo pedido” e “📋 Meus pedidos”. Antes, no computador, não havia como abrir a lista de pedidos lançados.'],['g','Na lista, abas separadas: Todos, ✏️ Rascunhos, 🔒 Enviados e ✔ Digitados. Os digitados ficam na própria aba, para consultar fácil. Nada foi tirado, só separado.']]},
   {v:'v267',d:'26/11/2026',t:'Status dos pedidos: rascunho × enviar',l:[['g','Aplicativo de pedidos: no fim do pedido agora há dois botões. “💾 Salvar rascunho” guarda só no celular (não vai para a fábrica) e “📤 Enviar para a fábrica” pede confirmação e envia.'],['g','Pedido enviado fica travado: não dá para alterar nem apagar (o Google também recusa). Rascunho também não tem botão de apagar.'],['g','Lista “Lançados” com o status de cada pedido: ✏️ Rascunho (vermelho), 🔒 Enviado (ainda não confirmado pela fábrica) e ✔ Digitado (confirmado pela fábrica), com filtros no alto. Rascunho não conta como venda.'],['g','Sistema › Pedidos recebidos agora abre em “Todos”, para nenhum pedido ficar escondido.']]},
   {v:'v266',d:'26/11/2026',t:'Apagar pedido de teste',l:[['g','Sistema › Pedidos recebidos: novo botão “🗑 Apagar” em cada pedido, com confirmação. O pedido sai da sua lista, da página da Débora e da pasta do Google (o PDF vai para a lixeira do Drive, onde fica 30 dias).']]},
